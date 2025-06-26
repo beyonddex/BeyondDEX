@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BeyondDEX</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     body {
       margin: 0;
@@ -29,8 +32,13 @@
       height: 60px;
     }
 
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
     nav a {
-      margin: 0 15px;
       text-decoration: none;
       color: #000;
       font-weight: 500;
@@ -50,6 +58,39 @@
     .btn:hover {
       background: black;
       color: white;
+    }
+
+    .profile-wrapper {
+      position: relative;
+    }
+
+    .profile-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .logout-dropdown {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .logout-dropdown div {
+      padding: 10px;
+      cursor: pointer;
     }
 
     .hero {
@@ -164,11 +205,11 @@
         <img src="assets/bdx.png" alt="BeyondDEX Logo" />
       </a>
     </div>
-    <nav>
+    <nav id="nav">
       <a href="/">Home</a>
       <a href="/dex.html">DEX</a>
       <a href="/macro.html">Dashboard</a>
-      <a href="/auth.html" class="btn">Login / Register</a>
+      <a href="/auth.html" class="btn" id="authBtn">Login / Register</a>
     </nav>
   </header>
 
@@ -218,5 +259,53 @@
     &copy; 2025 BeyondDEX. All rights reserved.<br />
     <a href="mailto:team@beyonddex.io">team@beyonddex.io</a>
   </footer>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+      authDomain: "beyonddex-be653.firebaseapp.com",
+      projectId: "beyonddex-be653",
+      storageBucket: "beyonddex-be653.firebasestorage.app",
+      messagingSenderId: "687411546401",
+      appId: "1:687411546401:web:ec71401e52751d3e121660",
+      measurementId: "G-6SH111LB7J"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged(async user => {
+      const nav = document.getElementById("nav");
+      const authBtn = document.getElementById("authBtn");
+      if (user) {
+        const doc = await db.collection("users").doc(user.uid).get();
+        const username = doc.exists ? doc.data().username : "U";
+        const initial = username.charAt(0).toUpperCase();
+
+        const profile = document.createElement("div");
+        profile.classList.add("profile-wrapper");
+        profile.innerHTML = `
+          <div class="profile-circle" id="profileCircle">${initial}</div>
+          <div class="logout-dropdown" id="logoutDropdown">
+            <div id="logoutBtn">Log out</div>
+          </div>
+        `;
+        nav.replaceChild(profile, authBtn);
+
+        const dropdown = profile.querySelector("#logoutDropdown");
+        const circle = profile.querySelector("#profileCircle");
+        const logout = profile.querySelector("#logoutBtn");
+
+        circle.addEventListener("click", () => {
+          dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        });
+
+        logout.addEventListener("click", () => {
+          auth.signOut().then(() => location.reload());
+        });
+      }
+    });
+  </script>
 </body>
 </html>
