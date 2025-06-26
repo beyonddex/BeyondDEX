@@ -151,15 +151,13 @@
     }
 
     #onlineUsersCount {
-  margin-top: 10px;
-  padding: 12px 20px;
-  font-size: 14px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
-  z-index: 1;
-}
-
-
+      margin-top: 60px;
+      padding: 12px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #fff;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
@@ -240,6 +238,20 @@
       });
     });
 
+    function getRelativeTime(timestamp) {
+      const now = Date.now();
+      const diff = now - timestamp.toDate().getTime();
+
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+
+      if (seconds < 60) return "just now";
+      if (minutes < 60) return `${minutes} min ago`;
+      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      return timestamp.toDate().toLocaleDateString();
+    }
+
     function updatePresence(uid, username) {
       userDocId = uid;
       db.collection("presence").doc(uid).set({
@@ -282,13 +294,14 @@
         db.collection("chat").orderBy("timestamp").onSnapshot(snapshot => {
           chatBox.innerHTML = "";
           snapshot.forEach(doc => {
-            const { username, text } = doc.data();
+            const { username, text, timestamp } = doc.data();
+            const timeStr = timestamp ? getRelativeTime(timestamp) : '';
             const div = document.createElement("div");
             div.className = "chat-message";
-            div.innerHTML = `<strong>${username}:</strong> ${text}`;
+            div.innerHTML = `<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
             chatBox.appendChild(div);
-            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
           });
+          chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
         });
 
       } else {
