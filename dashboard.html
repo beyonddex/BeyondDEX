@@ -13,11 +13,12 @@
       font-family: 'Inter', sans-serif;
       background: #fff;
       color: #000;
-      height: 100vh;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
     }
+
 
     header {
       display: flex;
@@ -33,9 +34,11 @@
       z-index: 999;
     }
 
+
     .logo-container img {
       height: 50px;
     }
+
 
     .nav-links a {
       margin-left: 20px;
@@ -44,10 +47,12 @@
       font-weight: 500;
     }
 
+
     .user-container {
       position: relative;
       margin-left: auto;
     }
+
 
     .user-circle {
       width: 40px;
@@ -63,6 +68,7 @@
       cursor: pointer;
     }
 
+
     .dropdown {
       position: absolute;
       top: 50px;
@@ -76,6 +82,7 @@
       z-index: 1000;
     }
 
+
     .dropdown a {
       display: block;
       padding: 10px;
@@ -84,31 +91,19 @@
       font-size: 14px;
     }
 
+
     .dropdown a:hover {
       background: #f0f0f0;
     }
 
-    .dashboard-wrapper {
+
+    .dashboard-content {
       display: flex;
       flex: 1;
+      height: 100%;
       margin-top: 80px;
-      height: calc(100vh - 80px);
     }
 
-    .sidebar-left {
-      width: 200px;
-      background: #f9f9f9;
-      border-right: 1px solid #e0e0e0;
-      padding: 20px;
-    }
-
-    .sidebar-left nav a {
-      display: block;
-      margin-bottom: 15px;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-    }
 
     main {
       flex: 1;
@@ -116,33 +111,42 @@
       overflow-y: auto;
     }
 
+
     .sidebar {
       width: 300px;
       border-left: 1px solid #e0e0e0;
       display: flex;
       flex-direction: column;
+      height: calc(100vh - 80px);
+      position: relative;
     }
+
 
     .chat-box {
       flex: 1;
-      padding: 20px;
+      padding: 20px 20px 20px 20px;
       overflow-y: auto;
+      max-height: 100%;
     }
+
 
     .chat-message {
       margin-bottom: 10px;
     }
+
 
     .chat-message strong {
       color: #555;
       margin-right: 6px;
     }
 
+
     .chat-input {
       display: flex;
       padding: 10px;
       border-top: 1px solid #e0e0e0;
     }
+
 
     .chat-input input {
       flex: 1;
@@ -151,6 +155,7 @@
       border-radius: 6px;
       font-size: 14px;
     }
+
 
     .chat-input button {
       margin-left: 10px;
@@ -162,13 +167,42 @@
       cursor: pointer;
     }
 
+
     #onlineUsersCount {
       margin-top: 12px;
       padding: 12px 20px;
       font-size: 14px;
       border-bottom: 1px solid #e0e0e0;
       background: #fff;
+      z-index: 1;
     }
+
+    .left-nav {
+  width: 200px;
+  border-right: 1px solid #e0e0e0;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 10px;
+}
+
+.left-nav button {
+  background: none;
+  border: none;
+  padding: 12px;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.left-nav button:hover {
+  background: #e0e0e0;
+}
+
+
   </style>
 </head>
 <body>
@@ -189,31 +223,182 @@
     </div>
   </header>
 
-  <div class="dashboard-wrapper">
-    <aside class="sidebar-left">
-      <nav>
-        <a href="#">Markets</a>
-        <a href="#">News Feed</a>
-        <a href="#">Whale Alerts</a>
-        <a href="#">Tools</a>
-        <a href="#">Calendar</a>
-        <a href="#">Settings</a>
-      </nav>
-    </aside>
 
-    <main>
-      <h1>Welcome to BeyondDEX Dashboard</h1>
-      <p>You have successfully logged in.</p>
-    </main>
-
-    <aside class="sidebar">
-      <div id="onlineUsersCount">Online Users: 0</div>
-      <div class="chat-box" id="chatBox"></div>
-      <div class="chat-input">
-        <input type="text" id="chatInput" placeholder="Type a message..." />
-        <button id="sendMessage">Send</button>
-      </div>
-    </aside>
+  <div class="dashboard-content">
+  <div class="left-nav">
+    <button>📊 Charts</button>
+    <button>📰 News</button>
+    <button>🐋 Whale Alerts</button>
   </div>
+
+  <main>
+    <h1>Welcome to BeyondDEX Dashboard</h1>
+    <p>Select a module from the left to get started.</p>
+  </main>
+
+  <aside class="sidebar">
+    <div id="onlineUsersCount">Online Users: 0</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Type a message..." />
+      <button id="sendMessage">Send</button>
+    </div>
+  </aside>
+</div>
+
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+      authDomain: "beyonddex-be653.firebaseapp.com",
+      projectId: "beyonddex-be653",
+      storageBucket: "beyonddex-be653.firebasestorage.app",
+      messagingSenderId: "687411546401",
+      appId: "1:687411546401:web:ec71401e52751d3e121660",
+      measurementId: "G-6SH111LB7J"
+    };
+
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+
+    const userCircle = document.getElementById("userCircle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    const sendMessage = document.getElementById("sendMessage");
+    const onlineUsersCount = document.getElementById("onlineUsersCount");
+
+
+    let currentUsername = "";
+    let userDocId = "";
+
+
+    userCircle.addEventListener("click", () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+    });
+
+
+    window.addEventListener("click", e => {
+      if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
+
+
+    document.getElementById("logout").addEventListener("click", () => {
+      if (userDocId) {
+        db.collection("presence").doc(userDocId).delete();
+      }
+      auth.signOut().then(() => {
+        window.location.href = "/auth.html";
+      });
+    });
+
+
+    function getRelativeTime(timestamp) {
+      const now = Date.now();
+      const diff = now - timestamp.toDate().getTime();
+
+
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+
+
+      if (seconds < 60) return "just now";
+      if (minutes < 60) return `${minutes} min ago`;
+      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      return timestamp.toDate().toLocaleDateString();
+    }
+
+
+    function updatePresence(uid, username) {
+      userDocId = uid;
+      db.collection("presence").doc(uid).set({
+        username,
+        lastActive: firebase.firestore.Timestamp.now()
+      }, { merge: true });
+    }
+
+
+    function monitorPresence() {
+      setInterval(() => {
+        if (userDocId && currentUsername) {
+          updatePresence(userDocId, currentUsername);
+        }
+      }, 30000);
+
+
+      db.collection("presence").onSnapshot(snapshot => {
+        const now = Date.now();
+        const onlineUsers = snapshot.docs.filter(doc => {
+          const data = doc.data();
+          return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
+        });
+        onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
+      });
+    }
+
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const uid = user.uid;
+        db.collection("users").doc(uid).get().then(doc => {
+          if (doc.exists) {
+            const username = doc.data().username || user.email || "Anon";
+            currentUsername = username;
+            userDocId = uid;
+            userCircle.textContent = username.charAt(0).toUpperCase();
+            updatePresence(uid, username);
+            monitorPresence();
+          }
+        });
+
+
+        db.collection("chat").orderBy("timestamp").onSnapshot(snapshot => {
+          chatBox.innerHTML = "";
+          snapshot.forEach(doc => {
+            const { username, text, timestamp } = doc.data();
+            const timeStr = timestamp ? getRelativeTime(timestamp) : '';
+            const div = document.createElement("div");
+            div.className = "chat-message";
+            div.innerHTML = `<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
+            chatBox.appendChild(div);
+          });
+          chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+        });
+
+
+      } else {
+        window.location.href = "/auth.html";
+      }
+    });
+
+
+    function sendChatMessage() {
+      const message = chatInput.value.trim();
+      if (message) {
+        db.collection("chat").add({
+          username: currentUsername,
+          text: message,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        chatInput.value = "";
+        chatInput.focus();
+      }
+    }
+
+
+    sendMessage.addEventListener("click", sendChatMessage);
+    chatInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendChatMessage();
+    });
+  </script>
 </body>
 </html>
+
+
+
