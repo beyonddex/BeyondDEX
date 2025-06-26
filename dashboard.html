@@ -107,20 +107,14 @@
       display: flex;
       flex-direction: column;
       height: calc(100vh - 80px);
-    }
-
-    #onlineUsersCount {
-      padding: 10px;
-      font-size: 14px;
-      border-bottom: 1px solid #e0e0e0;
-      text-align: center;
-      background: #fafafa;
+      position: relative;
     }
 
     .chat-box {
       flex: 1;
-      padding: 20px;
+      padding: 40px 20px 20px 20px;
       overflow-y: auto;
+      max-height: 100%;
     }
 
     .chat-message {
@@ -154,6 +148,19 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
+    }
+
+    #onlineUsersCount {
+      padding: 10px;
+      font-size: 14px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+      background: #fafafa;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1;
     }
   </style>
 </head>
@@ -239,7 +246,7 @@
       userDocId = uid;
       db.collection("presence").doc(uid).set({
         username,
-        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        lastActive: firebase.firestore.Timestamp.now()
       }, { merge: true });
     }
 
@@ -250,15 +257,14 @@
         }
       }, 30000);
 
-      db.collection("presence")
-        .onSnapshot(snapshot => {
-          const now = Date.now();
-          const onlineUsers = snapshot.docs.filter(doc => {
-            const data = doc.data();
-            return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
-          });
-          onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
+      db.collection("presence").onSnapshot(snapshot => {
+        const now = Date.now();
+        const onlineUsers = snapshot.docs.filter(doc => {
+          const data = doc.data();
+          return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
         });
+        onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
+      });
     }
 
     auth.onAuthStateChanged(user => {
@@ -275,18 +281,17 @@
           }
         });
 
-        db.collection("chat").orderBy("timestamp")
-          .onSnapshot(snapshot => {
-            chatBox.innerHTML = "";
-            snapshot.forEach(doc => {
-              const { username, text } = doc.data();
-              const div = document.createElement("div");
-              div.className = "chat-message";
-              div.innerHTML = `<strong>${username}:</strong> ${text}`;
-              chatBox.appendChild(div);
-              chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
-            });
+        db.collection("chat").orderBy("timestamp").onSnapshot(snapshot => {
+          chatBox.innerHTML = "";
+          snapshot.forEach(doc => {
+            const { username, text } = doc.data();
+            const div = document.createElement("div");
+            div.className = "chat-message";
+            div.innerHTML = `<strong>${username}:</strong> ${text}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
           });
+        });
 
       } else {
         window.location.href = "/auth.html";
