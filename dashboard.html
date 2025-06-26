@@ -47,6 +47,8 @@
     .user-container {
       position: relative;
       margin-left: auto;
+      display: flex;
+      align-items: center;
     }
 
     .user-circle {
@@ -61,6 +63,12 @@
       font-weight: bold;
       font-size: 18px;
       cursor: pointer;
+    }
+
+    .online-count {
+      margin-left: 20px;
+      font-size: 14px;
+      color: #555;
     }
 
     .dropdown {
@@ -162,6 +170,7 @@
     </div>
     <div class="user-container">
       <div class="user-circle" id="userCircle">?</div>
+      <div class="online-count" id="onlineUsersCount">Online: 0</div>
       <div class="dropdown" id="dropdownMenu">
         <a href="#" id="logout">Log Out</a>
       </div>
@@ -203,6 +212,7 @@
     const chatBox = document.getElementById("chatBox");
     const chatInput = document.getElementById("chatInput");
     const sendMessage = document.getElementById("sendMessage");
+    const onlineUsersCount = document.getElementById("onlineUsersCount");
 
     let currentUsername = "";
 
@@ -217,9 +227,21 @@
     });
 
     document.getElementById("logout").addEventListener("click", () => {
-      auth.signOut().then(() => {
-        window.location.href = "/auth.html";
-      });
+      const user = auth.currentUser;
+      if (user) {
+        db.collection("presence").doc(user.uid).update({
+          online: false,
+          lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          auth.signOut().then(() => {
+            window.location.href = "/auth.html";
+          });
+        });
+      } else {
+        auth.signOut().then(() => {
+          window.location.href = "/auth.html";
+        });
+      }
     });
 
     auth.onAuthStateChanged(user => {
@@ -230,8 +252,19 @@
             const username = doc.data().username || user.email || "Anon";
             currentUsername = username;
             userCircle.textContent = username.charAt(0).toUpperCase();
+
+            db.collection("presence").doc(uid).set({
+              username: username,
+              online: true,
+              lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            });
           }
         });
+
+        db.collection("presence").where("online", "==", true)
+          .onSnapshot(snapshot => {
+            onlineUsersCount.textContent = `Online: ${snapshot.size}`;
+          });
 
         db.collection("chat").orderBy("timestamp")
           .onSnapshot(snapshot => {
@@ -267,6 +300,16 @@
     sendMessage.addEventListener("click", sendChatMessage);
     chatInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") sendChatMessage();
+    });
+
+    window.addEventListener("beforeunload", () => {
+      const user = auth.currentUser;
+      if (user) {
+        db.collection("presence").doc(user.uid).update({
+          online: false,
+          lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
     });
   </script>
 </body>
