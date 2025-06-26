@@ -13,6 +13,8 @@
       font-family: 'Inter', sans-serif;
       background: #fff;
       color: #000;
+      display: flex;
+      height: 100vh;
     }
 
     header {
@@ -25,6 +27,7 @@
       top: 0;
       background: white;
       z-index: 999;
+      width: 100%;
     }
 
     .logo-container img {
@@ -71,44 +74,92 @@
       background: #f0f0f0;
     }
 
-    .message-box {
-      text-align: center;
-      margin-top: 100px;
+    .main-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: 300px;
+      border-left: 1px solid #e0e0e0;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background: #f9f9f9;
+      font-size: 14px;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input input {
+      flex-grow: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .chat-input button {
+      padding: 8px 12px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .dashboard-content {
+      flex-grow: 1;
       padding: 40px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    }
-
-    .message-box h1 {
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
-
-    .message-box p {
-      font-size: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo-container">
-      <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
-    </div>
-    <div class="user-container">
-      <div class="user-circle" id="userCircle">?</div>
-      <div class="dropdown" id="dropdownMenu">
-        <a href="#" id="logout">Log Out</a>
+  <div style="flex-direction: column; width: 100%;">
+    <header>
+      <div class="logo-container">
+        <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
+      </div>
+      <div class="user-container">
+        <div class="user-circle" id="userCircle">?</div>
+        <div class="dropdown" id="dropdownMenu">
+          <a href="#" id="logout">Log Out</a>
+        </div>
+      </div>
+    </header>
+    <div class="main-container">
+      <div class="dashboard-content">
+        <div>
+          <h1>Welcome to BeyondDEX Dashboard</h1>
+          <p>You have successfully logged in.</p>
+        </div>
+      </div>
+      <div class="sidebar">
+        <div class="chat-box" id="chatMessages"></div>
+        <div class="chat-input">
+          <input type="text" id="chatInput" placeholder="Type a message..." />
+          <button id="sendBtn">Send</button>
+        </div>
       </div>
     </div>
-  </header>
-
-  <div class="message-box">
-    <h1>Welcome to BeyondDEX Dashboard</h1>
-    <p>You have successfully logged in.</p>
   </div>
 
   <script>
@@ -118,8 +169,7 @@
       projectId: "beyonddex-be653",
       storageBucket: "beyonddex-be653.firebasestorage.app",
       messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
+      appId: "1:687411546401:web:ec71401e52751d3e121660"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -128,32 +178,62 @@
 
     const userCircle = document.getElementById("userCircle");
     const dropdownMenu = document.getElementById("dropdownMenu");
+    const logout = document.getElementById("logout");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const chatMessages = document.getElementById("chatMessages");
 
-    // Toggle dropdown on click
+    let currentUsername = "";
+    let currentUser = null;
+
     userCircle.addEventListener("click", () => {
       dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     });
 
-    // Logout
-    document.getElementById("logout").addEventListener("click", () => {
+    logout.addEventListener("click", () => {
       auth.signOut().then(() => {
         window.location.href = "/auth.html";
       });
     });
 
-    // Get user info
     auth.onAuthStateChanged(user => {
       if (user) {
-        const uid = user.uid;
-        db.collection("users").doc(uid).get().then(doc => {
+        currentUser = user;
+        db.collection("users").doc(user.uid).get().then(doc => {
           if (doc.exists) {
-            const username = doc.data().username;
-            userCircle.textContent = username.charAt(0).toUpperCase();
+            currentUsername = doc.data().username || "User";
+            userCircle.textContent = currentUsername.charAt(0).toUpperCase();
           }
         });
+
+        db.collection("globalChat").orderBy("createdAt")
+          .onSnapshot(snapshot => {
+            chatMessages.innerHTML = "";
+            snapshot.forEach(doc => {
+              const msg = doc.data();
+              const div = document.createElement("div");
+              div.textContent = `${msg.username || 'User'}: ${msg.message}`;
+              chatMessages.appendChild(div);
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+          });
       } else {
         window.location.href = "/auth.html";
       }
+    });
+
+    sendBtn.addEventListener("click", () => {
+      const message = chatInput.value.trim();
+      if (!message || !currentUser) return;
+
+      db.collection("globalChat").add({
+        uid: currentUser.uid,
+        username: currentUsername,
+        message,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      chatInput.value = "";
     });
   </script>
 </body>
