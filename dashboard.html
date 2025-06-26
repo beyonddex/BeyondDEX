@@ -14,6 +14,7 @@
       background: #fff;
       color: #000;
       display: flex;
+      flex-direction: column;
       height: 100vh;
       overflow: hidden;
     }
@@ -87,19 +88,32 @@
       background: #f0f0f0;
     }
 
+    .dashboard-content {
+      display: flex;
+      flex: 1;
+      height: 100%;
+      margin-top: 80px;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
     .sidebar {
       width: 300px;
       border-left: 1px solid #e0e0e0;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      padding-top: 80px;
+      height: calc(100vh - 80px);
     }
 
     .chat-box {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
+      max-height: 100%;
     }
 
     .chat-message {
@@ -134,14 +148,6 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
-    main {
-      flex: 1;
-      padding-top: 80px;
-      padding-left: 40px;
-      padding-right: 40px;
-      overflow-y: auto;
-    }
   </style>
 </head>
 <body>
@@ -162,19 +168,20 @@
     </div>
   </header>
 
-  <main>
-    <h1>Welcome to BeyondDEX Dashboard</h1>
-    <p>You have successfully logged in.</p>
-    <!-- Add any dashboard widgets here -->
-  </main>
+  <div class="dashboard-content">
+    <main>
+      <h1>Welcome to BeyondDEX Dashboard</h1>
+      <p>You have successfully logged in.</p>
+    </main>
 
-  <aside class="sidebar">
-    <div class="chat-box" id="chatBox"></div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Type a message..." />
-      <button id="sendMessage">Send</button>
-    </div>
-  </aside>
+    <aside class="sidebar">
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button id="sendMessage">Send</button>
+      </div>
+    </aside>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -203,6 +210,12 @@
       dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     });
 
+    window.addEventListener("click", e => {
+      if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
+
     document.getElementById("logout").addEventListener("click", () => {
       auth.signOut().then(() => {
         window.location.href = "/auth.html";
@@ -214,7 +227,7 @@
         const uid = user.uid;
         db.collection("users").doc(uid).get().then(doc => {
           if (doc.exists) {
-            const username = doc.data().username;
+            const username = doc.data().username || user.email || "Anon";
             currentUsername = username;
             userCircle.textContent = username.charAt(0).toUpperCase();
           }
@@ -229,7 +242,7 @@
               div.className = "chat-message";
               div.innerHTML = `<strong>${username}:</strong> ${text}`;
               chatBox.appendChild(div);
-              chatBox.scrollTop = chatBox.scrollHeight;
+              chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
             });
           });
 
@@ -247,6 +260,7 @@
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         chatInput.value = "";
+        chatInput.focus();
       }
     }
 
