@@ -88,17 +88,51 @@
       background: #f0f0f0;
     }
 
-    .dashboard-content {
+    .dashboard-wrapper {
       display: flex;
-      flex: 1;
       height: 100%;
       margin-top: 80px;
     }
 
+    .left-nav {
+      width: 220px;
+      background: #f9f9f9;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+    }
+
+    .left-nav a {
+      padding: 15px 25px;
+      text-decoration: none;
+      color: #000;
+      font-weight: 500;
+    }
+
+    .left-nav a:hover {
+      background: #eaeaea;
+    }
+
+    .main-dashboard {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      overflow: hidden;
+    }
+
     main {
       flex: 1;
-      padding: 40px;
+      padding: 30px;
       overflow-y: auto;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section h2 {
+      margin-bottom: 15px;
     }
 
     .sidebar {
@@ -112,7 +146,7 @@
 
     .chat-box {
       flex: 1;
-      padding: 20px 20px 20px 20px;
+      padding: 20px;
       overflow-y: auto;
       max-height: 100%;
     }
@@ -151,8 +185,8 @@
     }
 
     #onlineUsersCount {
-      margin-top: 12px;
-      padding: 12px 20px;
+      margin-top: 8px;
+      padding: 10px 20px;
       font-size: 14px;
       border-bottom: 1px solid #e0e0e0;
       background: #fff;
@@ -178,154 +212,42 @@
     </div>
   </header>
 
-  <div class="dashboard-content">
-    <main>
-      <h1>Welcome to BeyondDEX Dashboard</h1>
-      <p>You have successfully logged in.</p>
-    </main>
+  <div class="dashboard-wrapper">
+    <nav class="left-nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Markets</a>
+      <a href="#">News Feed</a>
+      <a href="#">Whale Alerts</a>
+      <a href="#">Calendar</a>
+    </nav>
 
-    <aside class="sidebar">
-      <div id="onlineUsersCount">Online Users: 0</div>
-      <div class="chat-box" id="chatBox"></div>
-      <div class="chat-input">
-        <input type="text" id="chatInput" placeholder="Type a message..." />
-        <button id="sendMessage">Send</button>
-      </div>
-    </aside>
+    <div class="main-dashboard">
+      <main>
+        <div class="section">
+          <h2>Token Chart</h2>
+          <div style="height: 200px; border: 1px solid #ccc; background: #f5f5f5;"></div>
+        </div>
+
+        <div class="section">
+          <h2>Economic News</h2>
+          <div style="height: 150px; border: 1px solid #ccc; background: #f5f5f5;"></div>
+        </div>
+
+        <div class="section">
+          <h2>Whale Alerts</h2>
+          <div style="height: 150px; border: 1px solid #ccc; background: #f5f5f5;"></div>
+        </div>
+      </main>
+
+      <aside class="sidebar">
+        <div id="onlineUsersCount">Online Users: 0</div>
+        <div class="chat-box" id="chatBox"></div>
+        <div class="chat-input">
+          <input type="text" id="chatInput" placeholder="Type a message..." />
+          <button id="sendMessage">Send</button>
+        </div>
+      </aside>
+    </div>
   </div>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const userCircle = document.getElementById("userCircle");
-    const dropdownMenu = document.getElementById("dropdownMenu");
-    const chatBox = document.getElementById("chatBox");
-    const chatInput = document.getElementById("chatInput");
-    const sendMessage = document.getElementById("sendMessage");
-    const onlineUsersCount = document.getElementById("onlineUsersCount");
-
-    let currentUsername = "";
-    let userDocId = "";
-
-    userCircle.addEventListener("click", () => {
-      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
-    });
-
-    window.addEventListener("click", e => {
-      if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        dropdownMenu.style.display = "none";
-      }
-    });
-
-    document.getElementById("logout").addEventListener("click", () => {
-      if (userDocId) {
-        db.collection("presence").doc(userDocId).delete();
-      }
-      auth.signOut().then(() => {
-        window.location.href = "/auth.html";
-      });
-    });
-
-    function getRelativeTime(timestamp) {
-      const now = Date.now();
-      const diff = now - timestamp.toDate().getTime();
-
-      const seconds = Math.floor(diff / 1000);
-      const minutes = Math.floor(seconds / 60);
-      const hours = Math.floor(minutes / 60);
-
-      if (seconds < 60) return "just now";
-      if (minutes < 60) return `${minutes} min ago`;
-      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-      return timestamp.toDate().toLocaleDateString();
-    }
-
-    function updatePresence(uid, username) {
-      userDocId = uid;
-      db.collection("presence").doc(uid).set({
-        username,
-        lastActive: firebase.firestore.Timestamp.now()
-      }, { merge: true });
-    }
-
-    function monitorPresence() {
-      setInterval(() => {
-        if (userDocId && currentUsername) {
-          updatePresence(userDocId, currentUsername);
-        }
-      }, 30000);
-
-      db.collection("presence").onSnapshot(snapshot => {
-        const now = Date.now();
-        const onlineUsers = snapshot.docs.filter(doc => {
-          const data = doc.data();
-          return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
-        });
-        onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
-      });
-    }
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        const uid = user.uid;
-        db.collection("users").doc(uid).get().then(doc => {
-          if (doc.exists) {
-            const username = doc.data().username || user.email || "Anon";
-            currentUsername = username;
-            userDocId = uid;
-            userCircle.textContent = username.charAt(0).toUpperCase();
-            updatePresence(uid, username);
-            monitorPresence();
-          }
-        });
-
-        db.collection("chat").orderBy("timestamp").onSnapshot(snapshot => {
-          chatBox.innerHTML = "";
-          snapshot.forEach(doc => {
-            const { username, text, timestamp } = doc.data();
-            const timeStr = timestamp ? getRelativeTime(timestamp) : '';
-            const div = document.createElement("div");
-            div.className = "chat-message";
-            div.innerHTML = `<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
-            chatBox.appendChild(div);
-          });
-          chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
-        });
-
-      } else {
-        window.location.href = "/auth.html";
-      }
-    });
-
-    function sendChatMessage() {
-      const message = chatInput.value.trim();
-      if (message) {
-        db.collection("chat").add({
-          username: currentUsername,
-          text: message,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        chatInput.value = "";
-        chatInput.focus();
-      }
-    }
-
-    sendMessage.addEventListener("click", sendChatMessage);
-    chatInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendChatMessage();
-    });
-  </script>
 </body>
 </html>
