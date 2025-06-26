@@ -13,10 +13,10 @@
       font-family: 'Inter', sans-serif;
       background: #fff;
       color: #000;
-      display: flex;
-      flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     header {
@@ -90,49 +90,30 @@
 
     .dashboard-wrapper {
       display: flex;
-      height: 100%;
+      flex: 1;
       margin-top: 80px;
+      height: calc(100vh - 80px);
     }
 
-    .left-nav {
-      width: 220px;
+    .sidebar-left {
+      width: 200px;
       background: #f9f9f9;
       border-right: 1px solid #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      padding-top: 20px;
+      padding: 20px;
     }
 
-    .left-nav a {
-      padding: 15px 25px;
+    .sidebar-left nav a {
+      display: block;
+      margin-bottom: 15px;
       text-decoration: none;
-      color: #000;
+      color: #333;
       font-weight: 500;
-    }
-
-    .left-nav a:hover {
-      background: #eaeaea;
-    }
-
-    .main-dashboard {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      overflow: hidden;
     }
 
     main {
       flex: 1;
-      padding: 30px;
+      padding: 40px;
       overflow-y: auto;
-    }
-
-    .section {
-      margin-bottom: 40px;
-    }
-
-    .section h2 {
-      margin-bottom: 15px;
     }
 
     .sidebar {
@@ -140,15 +121,12 @@
       border-left: 1px solid #e0e0e0;
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 80px);
-      position: relative;
     }
 
     .chat-box {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
-      max-height: 100%;
     }
 
     .chat-message {
@@ -185,12 +163,11 @@
     }
 
     #onlineUsersCount {
-      margin-top: 8px;
-      padding: 10px 20px;
+      margin-top: 12px;
+      padding: 12px 20px;
       font-size: 14px;
       border-bottom: 1px solid #e0e0e0;
       background: #fff;
-      z-index: 1;
     }
   </style>
 </head>
@@ -213,41 +190,30 @@
   </header>
 
   <div class="dashboard-wrapper">
-    <nav class="left-nav">
-      <a href="#">Dashboard</a>
-      <a href="#">Markets</a>
-      <a href="#">News Feed</a>
-      <a href="#">Whale Alerts</a>
-      <a href="#">Calendar</a>
-    </nav>
+    <aside class="sidebar-left">
+      <nav>
+        <a href="#">Markets</a>
+        <a href="#">News Feed</a>
+        <a href="#">Whale Alerts</a>
+        <a href="#">Tools</a>
+        <a href="#">Calendar</a>
+        <a href="#">Settings</a>
+      </nav>
+    </aside>
 
-    <div class="main-dashboard">
-      <main>
-        <div class="section">
-          <h2>Token Chart</h2>
-          <div style="height: 200px; border: 1px solid #ccc; background: #f5f5f5;"></div>
-        </div>
+    <main>
+      <h1>Welcome to BeyondDEX Dashboard</h1>
+      <p>You have successfully logged in.</p>
+    </main>
 
-        <div class="section">
-          <h2>Economic News</h2>
-          <div style="height: 150px; border: 1px solid #ccc; background: #f5f5f5;"></div>
-        </div>
-
-        <div class="section">
-          <h2>Whale Alerts</h2>
-          <div style="height: 150px; border: 1px solid #ccc; background: #f5f5f5;"></div>
-        </div>
-      </main>
-
-      <aside class="sidebar">
-        <div id="onlineUsersCount">Online Users: 0</div>
-        <div class="chat-box" id="chatBox"></div>
-        <div class="chat-input">
-          <input type="text" id="chatInput" placeholder="Type a message..." />
-          <button id="sendMessage">Send</button>
-        </div>
-      </aside>
-    </div>
+    <aside class="sidebar">
+      <div id="onlineUsersCount">Online Users: 0</div>
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button id="sendMessage">Send</button>
+      </div>
+    </aside>
   </div>
 </body>
 </html>
