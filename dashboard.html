@@ -15,6 +15,7 @@
       color: #000;
       display: flex;
       height: 100vh;
+      overflow: hidden;
     }
 
     header {
@@ -23,15 +24,28 @@
       align-items: center;
       padding: 20px 40px;
       border-bottom: 1px solid #e0e0e0;
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       background: white;
       z-index: 999;
-      width: 100%;
     }
 
     .logo-container img {
       height: 50px;
+    }
+
+    .nav-links a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #000;
+      font-weight: 500;
+    }
+
+    .user-container {
+      position: relative;
+      margin-left: auto;
     }
 
     .user-circle {
@@ -46,7 +60,6 @@
       font-weight: bold;
       font-size: 18px;
       cursor: pointer;
-      position: relative;
     }
 
     .dropdown {
@@ -74,48 +87,47 @@
       background: #f0f0f0;
     }
 
-    .main-container {
-      display: flex;
-      width: 100%;
-      height: 100%;
-    }
-
     .sidebar {
       width: 300px;
       border-left: 1px solid #e0e0e0;
-      padding: 20px;
-      box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      height: 100vh;
+      padding-top: 80px;
     }
 
     .chat-box {
-      flex-grow: 1;
+      flex: 1;
+      padding: 20px;
       overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 10px;
+    }
+
+    .chat-message {
       margin-bottom: 10px;
-      border-radius: 8px;
-      background: #f9f9f9;
-      font-size: 14px;
+    }
+
+    .chat-message strong {
+      color: #555;
+      margin-right: 6px;
     }
 
     .chat-input {
       display: flex;
-      gap: 10px;
+      padding: 10px;
+      border-top: 1px solid #e0e0e0;
     }
 
     .chat-input input {
-      flex-grow: 1;
-      padding: 8px;
+      flex: 1;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 14px;
     }
 
     .chat-input button {
-      padding: 8px 12px;
+      margin-left: 10px;
+      padding: 10px 15px;
       background: black;
       color: white;
       border: none;
@@ -123,44 +135,46 @@
       cursor: pointer;
     }
 
-    .dashboard-content {
-      flex-grow: 1;
-      padding: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    main {
+      flex: 1;
+      padding-top: 80px;
+      padding-left: 40px;
+      padding-right: 40px;
+      overflow-y: auto;
     }
   </style>
 </head>
 <body>
-  <div style="flex-direction: column; width: 100%;">
-    <header>
-      <div class="logo-container">
-        <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
-      </div>
-      <div class="user-container">
-        <div class="user-circle" id="userCircle">?</div>
-        <div class="dropdown" id="dropdownMenu">
-          <a href="#" id="logout">Log Out</a>
-        </div>
-      </div>
-    </header>
-    <div class="main-container">
-      <div class="dashboard-content">
-        <div>
-          <h1>Welcome to BeyondDEX Dashboard</h1>
-          <p>You have successfully logged in.</p>
-        </div>
-      </div>
-      <div class="sidebar">
-        <div class="chat-box" id="chatMessages"></div>
-        <div class="chat-input">
-          <input type="text" id="chatInput" placeholder="Type a message..." />
-          <button id="sendBtn">Send</button>
-        </div>
+  <header>
+    <div class="logo-container">
+      <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
+    </div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/dex.html">DEX</a>
+      <a href="/macro.html">Dashboard</a>
+    </div>
+    <div class="user-container">
+      <div class="user-circle" id="userCircle">?</div>
+      <div class="dropdown" id="dropdownMenu">
+        <a href="#" id="logout">Log Out</a>
       </div>
     </div>
-  </div>
+  </header>
+
+  <main>
+    <h1>Welcome to BeyondDEX Dashboard</h1>
+    <p>You have successfully logged in.</p>
+    <!-- Add any dashboard widgets here -->
+  </main>
+
+  <aside class="sidebar">
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Type a message..." />
+      <button id="sendMessage">Send</button>
+    </div>
+  </aside>
 
   <script>
     const firebaseConfig = {
@@ -169,7 +183,8 @@
       projectId: "beyonddex-be653",
       storageBucket: "beyonddex-be653.firebasestorage.app",
       messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660"
+      appId: "1:687411546401:web:ec71401e52751d3e121660",
+      measurementId: "G-6SH111LB7J"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -178,19 +193,17 @@
 
     const userCircle = document.getElementById("userCircle");
     const dropdownMenu = document.getElementById("dropdownMenu");
-    const logout = document.getElementById("logout");
+    const chatBox = document.getElementById("chatBox");
     const chatInput = document.getElementById("chatInput");
-    const sendBtn = document.getElementById("sendBtn");
-    const chatMessages = document.getElementById("chatMessages");
+    const sendMessage = document.getElementById("sendMessage");
 
     let currentUsername = "";
-    let currentUser = null;
 
     userCircle.addEventListener("click", () => {
       dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     });
 
-    logout.addEventListener("click", () => {
+    document.getElementById("logout").addEventListener("click", () => {
       auth.signOut().then(() => {
         window.location.href = "/auth.html";
       });
@@ -198,42 +211,48 @@
 
     auth.onAuthStateChanged(user => {
       if (user) {
-        currentUser = user;
-        db.collection("users").doc(user.uid).get().then(doc => {
+        const uid = user.uid;
+        db.collection("users").doc(uid).get().then(doc => {
           if (doc.exists) {
-            currentUsername = doc.data().username || "User";
-            userCircle.textContent = currentUsername.charAt(0).toUpperCase();
+            const username = doc.data().username;
+            currentUsername = username;
+            userCircle.textContent = username.charAt(0).toUpperCase();
           }
         });
 
-        db.collection("globalChat").orderBy("createdAt")
+        db.collection("chat").orderBy("timestamp")
           .onSnapshot(snapshot => {
-            chatMessages.innerHTML = "";
+            chatBox.innerHTML = "";
             snapshot.forEach(doc => {
-              const msg = doc.data();
+              const { username, text } = doc.data();
               const div = document.createElement("div");
-              div.textContent = `${msg.username || 'User'}: ${msg.message}`;
-              chatMessages.appendChild(div);
-              chatMessages.scrollTop = chatMessages.scrollHeight;
+              div.className = "chat-message";
+              div.innerHTML = `<strong>${username}:</strong> ${text}`;
+              chatBox.appendChild(div);
+              chatBox.scrollTop = chatBox.scrollHeight;
             });
           });
+
       } else {
         window.location.href = "/auth.html";
       }
     });
 
-    sendBtn.addEventListener("click", () => {
+    function sendChatMessage() {
       const message = chatInput.value.trim();
-      if (!message || !currentUser) return;
+      if (message) {
+        db.collection("chat").add({
+          username: currentUsername,
+          text: message,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        chatInput.value = "";
+      }
+    }
 
-      db.collection("globalChat").add({
-        uid: currentUser.uid,
-        username: currentUsername,
-        message,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      chatInput.value = "";
+    sendMessage.addEventListener("click", sendChatMessage);
+    chatInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendChatMessage();
     });
   </script>
 </body>
