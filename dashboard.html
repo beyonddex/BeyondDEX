@@ -469,7 +469,12 @@ async function loadTokenChart(tokenId, symbol) {
     const times = data.prices.map(p => new Date(p[0]));
     const prices = data.prices.map(p => p[1]);
 
-    Plotly.newPlot('tokenChartInner', [{
+    const chartEl = document.getElementById('tokenChartInner');
+
+    // 🔁 Clear chart before rendering new one
+    Plotly.purge(chartEl);
+
+    Plotly.newPlot(chartEl, [{
       x: times,
       y: prices,
       type: 'scatter',
@@ -480,7 +485,8 @@ async function loadTokenChart(tokenId, symbol) {
       margin: { t: 40, l: 40, r: 10, b: 30 },
       paper_bgcolor: '#fff',
       plot_bgcolor: '#fff',
-      font: { family: 'Inter, sans-serif', color: '#000' }
+      font: { family: 'Inter, sans-serif', color: '#000' },
+      responsive: true
     }, {
       displayModeBar: false
     });
