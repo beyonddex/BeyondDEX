@@ -427,9 +427,12 @@
 
 // Chart Loader
 async function loadTokenChart(tokenId, symbol) {
+  console.log(`Loading chart for ${tokenId} (${symbol})...`);
   try {
     const res = await fetch(`https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1&interval=hourly`);
     const data = await res.json();
+
+    console.log("Chart data:", data);
 
     const times = data.prices.map(p => new Date(p[0]));
     const prices = data.prices.map(p => p[1]);
@@ -455,8 +458,11 @@ async function loadTokenChart(tokenId, symbol) {
   }
 }
 
-loadMarketData();
-setInterval(loadMarketData, 60000);
+document.addEventListener('DOMContentLoaded', () => {
+  loadMarketData();                        // Initial fetch when ready
+  setInterval(loadMarketData, 60000);     // Then update every 60 sec
+});
+
 
   </script>
 </body>
