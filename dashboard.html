@@ -7,6 +7,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -18,212 +19,31 @@
       height: 100vh;
       overflow: hidden;
     }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 40px;
-      border-bottom: 1px solid #e0e0e0;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      z-index: 999;
-    }
-
-    .logo-container img {
-      height: 50px;
-    }
-
-    .nav-links a {
-      margin-left: 20px;
-      text-decoration: none;
-      color: #000;
-      font-weight: 500;
-    }
-
-    .user-container {
-      position: relative;
-      margin-left: auto;
-    }
-
-    .user-circle {
-      width: 40px;
-      height: 40px;
-      background: #000;
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .dropdown {
-      position: absolute;
-      top: 50px;
-      right: 0;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      display: none;
-      min-width: 120px;
-      z-index: 1000;
-    }
-
-    .dropdown a {
-      display: block;
-      padding: 10px;
-      text-decoration: none;
-      color: #000;
-      font-size: 14px;
-    }
-
-    .dropdown a:hover {
-      background: #f0f0f0;
-    }
-
-    .dashboard-content {
-      display: flex;
-      flex: 1;
-      height: 100%;
-      margin-top: 80px;
-    }
-
-    .left-nav {
-      width: 200px;
-      border-right: 1px solid #e0e0e0;
-      background: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      padding: 20px 10px;
-    }
-
-    .left-nav button {
-      background: none;
-      border: none;
-      padding: 12px;
-      font-size: 15px;
-      text-align: left;
-      cursor: pointer;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      transition: background 0.2s;
-    }
-
-    .left-nav button:hover {
-      background: #e0e0e0;
-    }
-
-    main {
-      flex: 1;
-      padding: 40px 40px 40px 260px; /* Adjusted for flush alignment */
-      overflow-y: auto;
-      position: relative;
-    }
-
-    .market-section {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 260px;
-      height: 70%;
-      border-right: 1px solid #e0e0e0;
-      padding: 15px;
-      background: #fafafa;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-
-    .market-up {
-      color: green;
-      font-weight: 500;
-    }
-
-    .market-down {
-      color: red;
-      font-weight: 500;
-    }
-
-    .heatmap-section {
-  font-size: 0; /* removes inline spacing gaps */
-  padding-top: 20px;
-}
-
-    .heatmap-tile {
-  display: inline-block;
-  margin: 2px;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 6px;
-  text-align: center;
-  line-height: 1.2;
-  vertical-align: top;
-  box-sizing: border-box;
-}
-
-
-    .sidebar {
-      width: 300px;
-      border-left: 1px solid #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 80px);
-      position: relative;
-    }
-
-    .chat-box {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .chat-message {
-      margin-bottom: 10px;
-    }
-
-    .chat-message strong {
-      color: #555;
-      margin-right: 6px;
-    }
-
-    .chat-input {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-    .chat-input button {
-      margin-left: 10px;
-      padding: 10px 15px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    #onlineUsersCount {
-      margin-top: 12px;
-      padding: 12px 20px;
-      font-size: 14px;
-      border-bottom: 1px solid #e0e0e0;
-      background: #fff;
-      z-index: 1;
-    }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #e0e0e0; position: fixed; top: 0; left: 0; right: 0; background: white; z-index: 999; }
+    .logo-container img { height: 50px; }
+    .nav-links a { margin-left: 20px; text-decoration: none; color: #000; font-weight: 500; }
+    .user-container { position: relative; margin-left: auto; }
+    .user-circle { width: 40px; height: 40px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; cursor: pointer; }
+    .dropdown { position: absolute; top: 50px; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; min-width: 120px; z-index: 1000; }
+    .dropdown a { display: block; padding: 10px; text-decoration: none; color: #000; font-size: 14px; }
+    .dropdown a:hover { background: #f0f0f0; }
+    .dashboard-content { display: flex; flex: 1; height: 100%; margin-top: 80px; }
+    .left-nav { width: 200px; border-right: 1px solid #e0e0e0; background: #f9f9f9; display: flex; flex-direction: column; padding: 20px 10px; }
+    .left-nav button { background: none; border: none; padding: 12px; font-size: 15px; text-align: left; cursor: pointer; margin-bottom: 10px; border-radius: 6px; transition: background 0.2s; }
+    .left-nav button:hover { background: #e0e0e0; }
+    main { flex: 1; padding: 40px 40px 40px 260px; overflow-y: auto; position: relative; }
+    .market-section { position: absolute; top: 0; left: 0; width: 260px; height: 70%; border-right: 1px solid #e0e0e0; padding: 15px; background: #fafafa; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .market-up { color: green; font-weight: 500; }
+    .market-down { color: red; font-weight: 500; }
+    .heatmap-section { padding-top: 20px; }
+    .sidebar { width: 300px; border-left: 1px solid #e0e0e0; display: flex; flex-direction: column; height: calc(100vh - 80px); position: relative; }
+    .chat-box { flex: 1; padding: 20px; overflow-y: auto; }
+    .chat-message { margin-bottom: 10px; }
+    .chat-message strong { color: #555; margin-right: 6px; }
+    .chat-input { display: flex; padding: 10px; border-top: 1px solid #e0e0e0; }
+    .chat-input input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    .chat-input button { margin-left: 10px; padding: 10px 15px; background: black; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    #onlineUsersCount { margin-top: 12px; padding: 12px 20px; font-size: 14px; border-bottom: 1px solid #e0e0e0; background: #fff; z-index: 1; }
   </style>
 </head>
 <body>
@@ -252,13 +72,15 @@
     </div>
 
     <main>
-      <div class="market-section">
-        <h4>Top Volume Tokens</h4>
-        <ul id="marketList" style="list-style:none; padding:0; font-size:14px; margin: 10px 0 0 0;"></ul>
-        <h4 style="margin-top: 20px">Market Heatmap</h4>
-        <div class="heatmap-section" id="heatmap"></div>
+    <div class="market-section">
+      <h4>Top Volume Tokens</h4>
+      <ul id="marketList" style="list-style:none; padding:0; font-size:14px; margin: 10px 0 0 0;"></ul>
+      <h4 style="margin-top: 20px">Market Heatmap</h4>
+      <div class="heatmap-section">
+        <div id="heatmap" style="height: 300px;"></div>
       </div>
-    </main>
+    </div>
+  </main>
 
     <aside class="sidebar">
       <div id="onlineUsersCount">Online Users: 0</div>
@@ -398,32 +220,43 @@
         const data = await res.json();
 
         const list = document.getElementById('marketList');
-        const heatmap = document.getElementById('heatmap');
         list.innerHTML = '';
-        heatmap.innerHTML = '';
-
         data.forEach(coin => {
           const change = coin.price_change_percentage_24h;
           const changeClass = change >= 0 ? 'market-up' : 'market-down';
           const changeSymbol = change >= 0 ? '▲' : '▼';
           const absChange = Math.abs(change);
-          const size = Math.min(120, Math.max(50, absChange * 4));
-          const bgColor = change >= 0 ? `rgba(0,180,0,${Math.min(1, absChange / 10)})` : `rgba(255,0,0,${Math.min(1, absChange / 10)})`;
-
-          // List
           const li = document.createElement('li');
           li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
           list.appendChild(li);
-
-          // Heatmap tile
-          const tile = document.createElement('div');
-          tile.className = 'heatmap-tile';
-          tile.style.width = `${size}px`;
-          tile.style.height = `${size}px`;
-          tile.style.backgroundColor = bgColor;
-          tile.innerHTML = `${coin.symbol.toUpperCase()}<br>${change.toFixed(2)}%`;
-          heatmap.appendChild(tile);
         });
+
+        // Plotly Heatmap
+        const heatmapEl = document.getElementById('heatmap');
+        const labels = data.map(c => `${c.symbol.toUpperCase()}\n${c.price_change_percentage_24h.toFixed(2)}%`);
+        const values = data.map(c => Math.abs(c.price_change_percentage_24h));
+        const colors = data.map(c => c.price_change_percentage_24h >= 0 ? 'green' : 'red');
+
+        const trace = {
+          type: "treemap",
+          labels: labels,
+          parents: labels.map(_ => ""),
+          values: values,
+          marker: {
+            colors: colors,
+            colorscale: [['0', 'rgb(255,0,0)'], ['1', 'rgb(0,200,0)']],
+            color: data.map(c => c.price_change_percentage_24h),
+            cmin: -10,
+            cmax: 10
+          },
+          textinfo: "label",
+        };
+
+        Plotly.newPlot(heatmapEl, [trace], {
+          margin: { t: 0, l: 0, r: 0, b: 0 },
+          paper_bgcolor: 'white',
+          plot_bgcolor: 'white'
+        }, { displayModeBar: false });
       } catch (e) {
         console.error('Error fetching market data', e);
       }
