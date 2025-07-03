@@ -455,62 +455,65 @@ async function loadMarketData() {
 
 // Chart Loader
 let currentChartToken = null;
-let chartDebounceTimeout = null;
+let isLoadingChart = false;
 
 async function loadTokenChart(tokenId, symbol) {
-  // Debounce if the same token is clicked repeatedly
-  if (tokenId === currentChartToken) return;
+  if (isLoadingChart || tokenId === currentChartToken) return;
+
   currentChartToken = tokenId;
+  isLoadingChart = true;
 
-  clearTimeout(chartDebounceTimeout);
+  const chartEl = document.getElementById('tokenChartInner');
+  if (!chartEl) return;
 
-  chartDebounceTimeout = setTimeout(async () => {
-    try {
-      const chartEl = document.getElementById('tokenChartInner');
-      if (!chartEl) {
-        console.error('Chart container not found.');
-        return;
-      }
+  // Show loading message
+  chartEl.innerHTML = '<p>Loading chart...</p>';
 
-      // Optional: show a loading state
-      chartEl.innerHTML = '<p>Loading chart...</p>';
+  try {
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1`
+    );
 
-      const res = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1`
-      );
-      const data = await res.json();
+    // Fail fast if response is bad
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
 
-      if (!data.prices || data.prices.length === 0) {
-        chartEl.innerHTML = `<p>No chart data available for ${symbol}.</p>`;
-        return;
-      }
+    const data = await res.json();
 
-      const times = data.prices.map(p => new Date(p[0]));
-      const prices = data.prices.map(p => p[1]);
-
-      await Plotly.react(chartEl, [{
-        x: times,
-        y: prices,
-        type: 'scatter',
-        mode: 'lines',
-        line: { color: '#3b82f6', width: 2 }
-      }], {
-        title: `${symbol}/USD - 24h`,
-        margin: { t: 40, l: 40, r: 10, b: 30 },
-        paper_bgcolor: '#fff',
-        plot_bgcolor: '#fff',
-        font: { family: 'Inter, sans-serif', color: '#000' },
-        responsive: true
-      }, {
-        displayModeBar: false
-      });
-
-    } catch (e) {
-      console.error(`Error loading chart for ${tokenId}`, e);
-      const chartEl = document.getElementById('tokenChartInner');
-      if (chartEl) chartEl.innerHTML = `<p>Error loading chart for ${symbol}</p>`;
+    if (!data.prices || data.prices.length === 0) {
+      chartEl.innerHTML = `<p>No chart data available for ${symbol}</p>`;
+      isLoadingChart = false;
+      return;
     }
-  }, 200); // delay to prevent flood on fast clicks
+
+    const times = data.prices.map(p => new Date(p[0]));
+    const prices = data.prices.map(p => p[1]);
+
+    // Clear placeholder before rendering
+    chartEl.innerHTML = '';
+
+    await Plotly.react(chartEl, [{
+      x: times,
+      y: prices,
+      type: 'scatter',
+      mode: 'lines',
+      line: { color: '#3b82f6', width: 2 }
+    }], {
+      title: `${symbol}/USD - 24h`,
+      margin: { t: 40, l: 40, r: 10, b: 30 },
+      paper_bgcolor: '#fff',
+      plot_bgcolor: '#fff',
+      font: { family: 'Inter, sans-serif', color: '#000' },
+      responsive: true
+    }, {
+      displayModeBar: false
+    });
+
+  } catch (e) {
+    console.error(`Error loading chart for ${tokenId}`, e);
+    chartEl.innerHTML = `<p>Error loading chart for ${symbol}</p>`;
+  } finally {
+    isLoadingChart = false;
+  }
 }
 
 
