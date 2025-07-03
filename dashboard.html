@@ -454,42 +454,35 @@ async function loadMarketData() {
 }
 
 // Chart Loader
-let currentChartToken = null;
-let isLoadingChart = false;
-
 async function loadTokenChart(tokenId, symbol) {
-  if (isLoadingChart || tokenId === currentChartToken) return;
-
-  currentChartToken = tokenId;
-  isLoadingChart = true;
-
   const chartEl = document.getElementById('tokenChartInner');
   if (!chartEl) return;
 
-  // Show loading message
-  chartEl.innerHTML = '<p>Loading chart...</p>';
+  // Show loading indicator (non-destructive)
+  if (!chartEl.querySelector('.loading-indicator')) {
+    const loader = document.createElement('div');
+    loader.className = 'loading-indicator';
+    loader.innerText = 'Loading chart...';
+    loader.style.textAlign = 'center';
+    loader.style.paddingTop = '100px';
+    loader.style.color = '#888';
+    loader.style.fontSize = '14px';
+    chartEl.appendChild(loader);
+  }
 
   try {
     const res = await fetch(
       `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1`
     );
-
-    // Fail fast if response is bad
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-
     const data = await res.json();
 
     if (!data.prices || data.prices.length === 0) {
-      chartEl.innerHTML = `<p>No chart data available for ${symbol}</p>`;
-      isLoadingChart = false;
+      console.error(`No price data for ${symbol}`);
       return;
     }
 
     const times = data.prices.map(p => new Date(p[0]));
     const prices = data.prices.map(p => p[1]);
-
-    // Clear placeholder before rendering
-    chartEl.innerHTML = '';
 
     await Plotly.react(chartEl, [{
       x: times,
@@ -510,9 +503,9 @@ async function loadTokenChart(tokenId, symbol) {
 
   } catch (e) {
     console.error(`Error loading chart for ${tokenId}`, e);
-    chartEl.innerHTML = `<p>Error loading chart for ${symbol}</p>`;
   } finally {
-    isLoadingChart = false;
+    const loader = chartEl.querySelector('.loading-indicator');
+    if (loader) loader.remove();
   }
 }
 
