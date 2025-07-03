@@ -318,7 +318,13 @@
     const list = document.getElementById('marketList');
     list.innerHTML = '';
 
-    const chartContainer = document.getElementById('tokenChartInner');
+    let chartContainer = document.getElementById('tokenChartInner');
+if (!chartContainer) {
+  chartContainer = document.createElement('div');
+  chartContainer.id = 'tokenChartInner';
+  document.querySelector('.chart-section').appendChild(chartContainer);
+}
+
 
 
     data.forEach((coin, index) => {
