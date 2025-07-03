@@ -454,44 +454,63 @@ async function loadMarketData() {
 }
 
 // Chart Loader
+let currentChartToken = null;
+let chartDebounceTimeout = null;
+
 async function loadTokenChart(tokenId, symbol) {
-  try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1`
-    );
-    const data = await res.json();
+  // Debounce if the same token is clicked repeatedly
+  if (tokenId === currentChartToken) return;
+  currentChartToken = tokenId;
 
-    if (!data.prices || data.prices.length === 0) {
-      console.error(`No price data for ${symbol}`);
-      return;
+  clearTimeout(chartDebounceTimeout);
+
+  chartDebounceTimeout = setTimeout(async () => {
+    try {
+      const chartEl = document.getElementById('tokenChartInner');
+      if (!chartEl) {
+        console.error('Chart container not found.');
+        return;
+      }
+
+      // Optional: show a loading state
+      chartEl.innerHTML = '<p>Loading chart...</p>';
+
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1`
+      );
+      const data = await res.json();
+
+      if (!data.prices || data.prices.length === 0) {
+        chartEl.innerHTML = `<p>No chart data available for ${symbol}.</p>`;
+        return;
+      }
+
+      const times = data.prices.map(p => new Date(p[0]));
+      const prices = data.prices.map(p => p[1]);
+
+      await Plotly.react(chartEl, [{
+        x: times,
+        y: prices,
+        type: 'scatter',
+        mode: 'lines',
+        line: { color: '#3b82f6', width: 2 }
+      }], {
+        title: `${symbol}/USD - 24h`,
+        margin: { t: 40, l: 40, r: 10, b: 30 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fff',
+        font: { family: 'Inter, sans-serif', color: '#000' },
+        responsive: true
+      }, {
+        displayModeBar: false
+      });
+
+    } catch (e) {
+      console.error(`Error loading chart for ${tokenId}`, e);
+      const chartEl = document.getElementById('tokenChartInner');
+      if (chartEl) chartEl.innerHTML = `<p>Error loading chart for ${symbol}</p>`;
     }
-
-    const times = data.prices.map(p => new Date(p[0]));
-    const prices = data.prices.map(p => p[1]);
-
-    const chartEl = document.getElementById('tokenChartInner');
-
-    // Instead of purge(), just use react() which is more stable for updates:
-Plotly.react(chartEl, [{
-  x: times,
-  y: prices,
-  type: 'scatter',
-  mode: 'lines',
-  line: { color: '#3b82f6', width: 2 }
-}], {
-  title: `${symbol}/USD - 24h`,
-  margin: { t: 40, l: 40, r: 10, b: 30 },
-  paper_bgcolor: '#fff',
-  plot_bgcolor: '#fff',
-  font: { family: 'Inter, sans-serif', color: '#000' },
-  responsive: true
-}, {
-  displayModeBar: false
-});
-
-  } catch (e) {
-    console.error(`Error loading chart for ${tokenId}`, e);
-  }
+  }, 200); // delay to prevent flood on fast clicks
 }
 
 
