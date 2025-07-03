@@ -73,11 +73,12 @@
 
 .heatmap-section {
   margin-top: 24px;
-  height: 250px; /* Increase height */
+  height: 500px; /* Increased from 250px */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
+
 
 
     .sidebar { width: 300px; border-left: 1px solid #e0e0e0; display: flex; flex-direction: column; height: calc(100vh - 80px); position: relative; }
@@ -260,72 +261,79 @@
 
     async function loadMarketData() {
   try {
-    const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h');
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=15&page=1&sparkline=false&price_change_percentage=24h'
+    );
     const data = await res.json();
 
     // Update Market List
     const list = document.getElementById('marketList');
     list.innerHTML = '';
-    data.forEach(coin => {
+    data.forEach((coin) => {
       const change = coin.price_change_percentage_24h;
       const changeClass = change >= 0 ? 'market-up' : 'market-down';
       const changeSymbol = change >= 0 ? '▲' : '▼';
       const absChange = Math.abs(change);
       const li = document.createElement('li');
-      li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
+      li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(
+        2
+      )}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
       list.appendChild(li);
     });
 
-    // Prepare Heatmap Data
+    // Heatmap
     const heatmapEl = document.getElementById('heatmap');
-    const labels = data.map(c => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`);
-    const values = data.map(c => Math.abs(c.price_change_percentage_24h));
-    const colors = data.map(c => c.price_change_percentage_24h >= 0 ? "#16a34a" : "#e11d48"); // Tailwind green/red
+    const labels = data.map(
+      (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
+    );
+    const values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
+    const colors = data.map((c) => (c.price_change_percentage_24h >= 0 ? '#16a34a' : '#e11d48'));
 
     const trace = {
-  type: "treemap",
-  labels: labels,
-  parents: data.map(() => ""),
-  values: values.map(v => Math.max(v, 1)), // prevent zero/small domination
-  marker: {
-    colors: colors,
-    line: { width: 2, color: "#ffffff" }
-  },
-  textinfo: "label+value",
-  branchvalues: "total", // key to showing more tiles
-  textfont: {
-    size: 13,
-    color: "#ffffff",
-    family: "Inter, sans-serif"
-  },
-  leaf: { opacity: 1 }
-};
+      type: 'treemap',
+      labels: labels,
+      parents: data.map(() => ''),
+      values: values,
+      marker: {
+        colors: colors,
+        line: { width: 2, color: '#ffffff' }
+      },
+      textinfo: 'label+value',
+      branchvalues: 'total',
+      textfont: {
+        size: 12,
+        color: '#ffffff',
+        family: 'Inter, sans-serif'
+      },
+      outsidetextfont: {
+        size: 12,
+        color: '#000000'
+      }
+    };
 
-const layout = {
-  paper_bgcolor: "#ffffff",
-  plot_bgcolor: "#ffffff",
-  height: 420,
-  margin: { t: 10, l: 10, r: 10, b: 10 },
-  font: {
-    family: "Inter, sans-serif",
-    size: 13,
-    color: "#000000"
-  },
-  uniformtext: {
-    minsize: 11,
-    mode: "hide"
-  }
-};
+    const layout = {
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      height: 500,
+      margin: { t: 10, l: 0, r: 0, b: 0 },
+      font: {
+        family: 'Inter, sans-serif',
+        size: 13,
+        color: '#000000'
+      },
+      uniformtext: {
+        minsize: 10,
+        mode: 'hide'
+      }
+    };
 
-Plotly.react(heatmapEl, [trace], layout, {
-  displayModeBar: false,
-  transition: {
-    duration: 500,
-    easing: 'cubic-in-out'
-  }
-});
-
-
+    Plotly.react(heatmapEl, [trace], layout, {
+      displayModeBar: false,
+      transition: {
+        duration: 500,
+        easing: 'cubic-in-out'
+      }
+    });
   } catch (e) {
     console.error('Error fetching market data', e);
   }
