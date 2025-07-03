@@ -35,7 +35,11 @@
     .market-section { position: absolute; top: 0; left: 0; width: 260px; height: 70%; border-right: 1px solid #e0e0e0; padding: 15px; background: #fafafa; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     .market-up { color: green; font-weight: 500; }
     .market-down { color: red; font-weight: 500; }
-    .heatmap-section { padding-top: 20px; }
+    .heatmap-section {
+     padding-top: 20px;
+     border-radius: 8px;
+     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
     .sidebar { width: 300px; border-left: 1px solid #e0e0e0; display: flex; flex-direction: column; height: calc(100vh - 80px); position: relative; }
     .chat-box { flex: 1; padding: 20px; overflow-y: auto; }
     .chat-message { margin-bottom: 10px; }
@@ -215,55 +219,74 @@
     });
 
     async function loadMarketData() {
-      try {
-        const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h');
-        const data = await res.json();
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h');
+    const data = await res.json();
 
-        const list = document.getElementById('marketList');
-        list.innerHTML = '';
-        data.forEach(coin => {
-          const change = coin.price_change_percentage_24h;
-          const changeClass = change >= 0 ? 'market-up' : 'market-down';
-          const changeSymbol = change >= 0 ? '▲' : '▼';
-          const absChange = Math.abs(change);
-          const li = document.createElement('li');
-          li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
-          list.appendChild(li);
-        });
+    // Update Market List
+    const list = document.getElementById('marketList');
+    list.innerHTML = '';
+    data.forEach(coin => {
+      const change = coin.price_change_percentage_24h;
+      const changeClass = change >= 0 ? 'market-up' : 'market-down';
+      const changeSymbol = change >= 0 ? '▲' : '▼';
+      const absChange = Math.abs(change);
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
+      list.appendChild(li);
+    });
 
-        // Plotly Heatmap
-        const heatmapEl = document.getElementById('heatmap');
-        const labels = data.map(c => `${c.symbol.toUpperCase()}\n${c.price_change_percentage_24h.toFixed(2)}%`);
-        const values = data.map(c => Math.abs(c.price_change_percentage_24h));
-        const colors = data.map(c => c.price_change_percentage_24h >= 0 ? 'green' : 'red');
+    // Prepare Heatmap Data
+    const heatmapEl = document.getElementById('heatmap');
+    const labels = data.map(c => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`);
+    const values = data.map(c => Math.abs(c.price_change_percentage_24h));
+    const colors = data.map(c => c.price_change_percentage_24h >= 0 ? "#16a34a" : "#e11d48"); // Tailwind green/red
 
-        const trace = {
-          type: "treemap",
-          labels: labels,
-          parents: labels.map(_ => ""),
-          values: values,
-          marker: {
-            colors: colors,
-            colorscale: [['0', 'rgb(255,0,0)'], ['1', 'rgb(0,200,0)']],
-            color: data.map(c => c.price_change_percentage_24h),
-            cmin: -10,
-            cmax: 10
-          },
-          textinfo: "label",
-        };
+    const trace = {
+      type: "treemap",
+      labels: labels,
+      parents: data.map(() => ""),
+      values: values,
+      marker: {
+        colors: colors,
+        line: { width: 2, color: "#ffffff" }
+      },
+      textinfo: "label",
+      textfont: {
+        size: 14,
+        color: "#ffffff",
+        family: "Inter, sans-serif"
+      },
+      outsidetextfont: { size: 12, color: "#000" },
+      leaf: { opacity: 1 }
+    };
 
-        Plotly.newPlot(heatmapEl, [trace], {
-          margin: { t: 0, l: 0, r: 0, b: 0 },
-          paper_bgcolor: 'white',
-          plot_bgcolor: 'white'
-        }, { displayModeBar: false });
-      } catch (e) {
-        console.error('Error fetching market data', e);
+    const layout = {
+      paper_bgcolor: "#ffffff",
+      plot_bgcolor: "#ffffff",
+      margin: { t: 0, l: 0, r: 0, b: 0 },
+      xaxis: { visible: false },
+      yaxis: { visible: false },
+      font: {
+        family: "Inter, sans-serif",
+        size: 14,
+        color: "#000000"
       }
-    }
+    };
 
-    loadMarketData();
-    setInterval(loadMarketData, 60000);
+    Plotly.newPlot(heatmapEl, [trace], layout, {
+      displayModeBar: false,
+      staticPlot: true
+    });
+
+  } catch (e) {
+    console.error('Error fetching market data', e);
+  }
+}
+
+loadMarketData();
+setInterval(loadMarketData, 60000);
+
   </script>
 </body>
 </html>
