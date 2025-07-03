@@ -118,6 +118,13 @@
 .heatmap-section:hover {
   cursor: pointer;
 }
+#tokenChartInner p {
+  font-size: 14px;
+  text-align: center;
+  padding-top: 100px;
+  color: #888;
+}
+
 
 
 
@@ -448,14 +455,22 @@ async function loadMarketData() {
 
 // Chart Loader
 async function loadTokenChart(tokenId, symbol) {
+  const container = document.getElementById('tokenChartInner');
+  if (!container) return;
+
+  container.innerHTML = '<p style="color:#888;">Loading chart...</p>';
+
   try {
     const res = await fetch(
       `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1&interval=hourly`
     );
+
+    if (!res.ok) throw new Error(`Failed fetch with status ${res.status}`);
+
     const data = await res.json();
 
     if (!data.prices || data.prices.length === 0) {
-      console.error(`No price data for ${symbol}`);
+      container.innerHTML = `<p style="color:#e11d48;">No chart data available for ${symbol}.</p>`;
       return;
     }
 
@@ -475,13 +490,16 @@ async function loadTokenChart(tokenId, symbol) {
       plot_bgcolor: '#fff',
       font: { family: 'Inter, sans-serif', color: '#000' }
     }, {
-      displayModeBar: false
+      displayModeBar: false,
+      responsive: true
     });
 
   } catch (e) {
     console.error(`Error loading chart for ${tokenId}`, e);
+    container.innerHTML = `<p style="color:#e11d48;">Error loading chart for ${symbol}.</p>`;
   }
 }
+
 
 // Call once on page load
 loadMarketData();
