@@ -150,26 +150,23 @@
     }
 
     .heatmap-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px; /* tighter gap */
+  font-size: 0; /* removes inline spacing gaps */
   padding-top: 20px;
-  max-width: 100%;
-  align-content: flex-start; /* forces rows to align tightly */
 }
 
     .heatmap-tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
+  margin: 2px;
   color: white;
   font-size: 12px;
   font-weight: bold;
   border-radius: 6px;
   text-align: center;
   line-height: 1.2;
-  box-sizing: border-box; /* ensures sizing stays accurate */
+  vertical-align: top;
+  box-sizing: border-box;
 }
+
 
     .sidebar {
       width: 300px;
