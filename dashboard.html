@@ -308,24 +308,38 @@
       if (e.key === "Enter") sendChatMessage();
     });
 
-   async function loadMarketData() {
+   // Map token symbols to correct CoinGecko chart IDs
+const idFixMap = {
+  usdt: 'tether',
+  usdc: 'usd-coin',
+  btc: 'bitcoin',
+  eth: 'ethereum',
+  bnb: 'binancecoin',
+  xrp: 'ripple',
+  doge: 'dogecoin',
+  sol: 'solana',
+  link: 'chainlink',
+  ada: 'cardano',
+  ton: 'the-open-network' // example for TON
+};
+
+async function loadMarketData() {
   try {
     const res = await fetch(
-      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h'
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=15&page=1&sparkline=false&price_change_percentage=24h'
     );
     const data = await res.json();
 
     const list = document.getElementById('marketList');
     list.innerHTML = '';
 
-    let chartContainer = document.getElementById('tokenChartInner');
+    const chartContainer = document.getElementById('tokenChartInner');
     if (!chartContainer) {
-      chartContainer = document.createElement('div');
-      chartContainer.id = 'tokenChartInner';
-      document.querySelector('.chart-section').appendChild(chartContainer);
+      const newDiv = document.createElement('div');
+      newDiv.id = 'tokenChartInner';
+      document.querySelector('.chart-section').appendChild(newDiv);
     }
 
-    // Loop & render token list
     data.forEach((coin, index) => {
       const change = coin.price_change_percentage_24h;
       const changeClass = change >= 0 ? 'market-up' : 'market-down';
@@ -341,15 +355,14 @@
         <small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>
       `;
 
-      // Hover and click styles
       li.addEventListener('mouseover', () => {
         if (!li.classList.contains('active')) li.style.backgroundColor = '#f0f0f0';
       });
+
       li.addEventListener('mouseout', () => {
         if (!li.classList.contains('active')) li.style.backgroundColor = '';
       });
 
-      // Click behavior
       li.addEventListener('click', () => {
         document.querySelectorAll('.token-entry').forEach(el => {
           el.classList.remove('active');
@@ -357,16 +370,21 @@
         });
         li.classList.add('active');
         li.style.backgroundColor = '#e0e0e0';
-        loadTokenChart(coin.id, coin.symbol.toUpperCase());
+
+        const fixedId = idFixMap[coin.symbol.toLowerCase()] || coin.id;
+        console.log(`Clicked token: ${coin.symbol} → ID used: ${fixedId}`);
+        loadTokenChart(fixedId, coin.symbol.toUpperCase());
       });
 
       list.appendChild(li);
 
-      // Auto-load first token
+      // Load first token chart by default
       if (index === 0) {
         li.classList.add('active');
         li.style.backgroundColor = '#e0e0e0';
-        loadTokenChart(coin.id, coin.symbol.toUpperCase());
+        const fixedId = idFixMap[coin.symbol.toLowerCase()] || coin.id;
+        console.log(`Auto-load token: ${coin.symbol} → ID used: ${fixedId}`);
+        loadTokenChart(fixedId, coin.symbol.toUpperCase());
       }
     });
 
@@ -393,13 +411,17 @@
         size: 12,
         color: '#ffffff',
         family: 'Inter, sans-serif'
+      },
+      outsidetextfont: {
+        size: 12,
+        color: '#000000'
       }
     };
 
     const layout = {
       paper_bgcolor: '#ffffff',
       plot_bgcolor: '#ffffff',
-      height: 400,
+      height: 500,
       margin: { t: 10, l: 0, r: 0, b: 0 },
       font: {
         family: 'Inter, sans-serif',
@@ -419,7 +441,6 @@
         easing: 'cubic-in-out'
       }
     });
-
   } catch (e) {
     console.error('Error fetching market data', e);
   }
@@ -427,21 +448,14 @@
 
 // Chart Loader
 async function loadTokenChart(tokenId, symbol) {
-  console.log(`Trying to load chart for: ${tokenId} (${symbol})`);
-  const chartEl = document.getElementById('tokenChartInner');
-
   try {
-    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1&interval=hourly`);
-    if (!res.ok) {
-      console.error('Chart API response error:', res.status);
-      chartEl.innerHTML = `<p style="text-align:center; color:red;">Failed to load chart.</p>`;
-      return;
-    }
-
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1&interval=hourly`
+    );
     const data = await res.json();
+
     if (!data.prices || data.prices.length === 0) {
-      console.warn('No price data found for chart.');
-      chartEl.innerHTML = `<p style="text-align:center; color:gray;">No chart data available.</p>`;
+      console.error(`No price data for ${symbol}`);
       return;
     }
 
@@ -455,7 +469,7 @@ async function loadTokenChart(tokenId, symbol) {
       mode: 'lines',
       line: { color: '#3b82f6', width: 2 }
     }], {
-      title: `${symbol}/USD — 24h`,
+      title: `${symbol}/USD - 24h`,
       margin: { t: 40, l: 40, r: 10, b: 30 },
       paper_bgcolor: '#fff',
       plot_bgcolor: '#fff',
@@ -464,19 +478,15 @@ async function loadTokenChart(tokenId, symbol) {
       displayModeBar: false
     });
 
-    console.log(`Chart rendered successfully for ${symbol}.`);
-
   } catch (e) {
-    console.error(`Error loading chart for ${tokenId}:`, e);
-    chartEl.innerHTML = `<p style="text-align:center; color:red;">Chart failed to load.</p>`;
+    console.error(`Error loading chart for ${tokenId}`, e);
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadMarketData();                        // Initial fetch when ready
-  setInterval(loadMarketData, 60000);     // Then update every 60 sec
-});
-
+// Call once on page load
+loadMarketData();
+// Update every 60 seconds
+setInterval(loadMarketData, 60000);
 
   </script>
 </body>
