@@ -149,6 +149,26 @@
       font-weight: 500;
     }
 
+    .heatmap-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 20px;
+      max-width: 100%;
+    }
+
+    .heatmap-tile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 6px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
     .sidebar {
       width: 300px;
       border-left: 1px solid #e0e0e0;
@@ -234,11 +254,10 @@
 
     <main>
       <div class="market-section">
-        <h4>Top 10 Volume Tokens</h4>
+        <h4>Top Volume Tokens</h4>
         <ul id="marketList" style="list-style:none; padding:0; font-size:14px; margin: 10px 0 0 0;"></ul>
-
-        <h4 style="margin-top: 30px;">Crypto Heatmap</h4>
-        <div class="heatmap" id="heatmap"></div>
+        <h4 style="margin-top: 20px">Market Heatmap</h4>
+        <div class="heatmap-section" id="heatmap"></div>
       </div>
     </main>
 
@@ -380,37 +399,34 @@
         const data = await res.json();
 
         const list = document.getElementById('marketList');
-        list.innerHTML = '';
-
-        data.forEach(coin => {
-          const li = document.createElement('li');
-          const change = coin.price_change_percentage_24h;
-          const changeClass = change >= 0 ? 'market-up' : 'market-down';
-          const changeSymbol = change >= 0 ? '▲' : '▼';
-          li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${Math.abs(change).toFixed(2)}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
-          list.appendChild(li);
-        });
-
         const heatmap = document.getElementById('heatmap');
+        list.innerHTML = '';
         heatmap.innerHTML = '';
 
         data.forEach(coin => {
           const change = coin.price_change_percentage_24h;
-          let bgColor = '#aaa';
+          const changeClass = change >= 0 ? 'market-up' : 'market-down';
+          const changeSymbol = change >= 0 ? '▲' : '▼';
+          const absChange = Math.abs(change);
+          const size = Math.min(120, Math.max(50, absChange * 4));
+          const bgColor = change >= 0 ? `rgba(0,180,0,${Math.min(1, absChange / 10)})` : `rgba(255,0,0,${Math.min(1, absChange / 10)})`;
 
-          if (change >= 10) bgColor = '#006400'; // Dark Green
-          else if (change > 0) bgColor = '#90ee90'; // Light Green
-          else if (change <= -10) bgColor = '#8b0000'; // Dark Red
-          else if (change < 0) bgColor = '#ff7f7f'; // Light Red
+          // List
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
+          list.appendChild(li);
 
+          // Heatmap tile
           const tile = document.createElement('div');
           tile.className = 'heatmap-tile';
+          tile.style.width = `${size}px`;
+          tile.style.height = `${size}px`;
           tile.style.backgroundColor = bgColor;
-          tile.innerHTML = `${coin.symbol.toUpperCase()}<br/>${change.toFixed(2)}%`;
+          tile.innerHTML = `${coin.symbol.toUpperCase()}<br>${change.toFixed(2)}%`;
           heatmap.appendChild(tile);
         });
       } catch (e) {
-        console.error('Error loading market data:', e);
+        console.error('Error fetching market data', e);
       }
     }
 
