@@ -427,12 +427,23 @@
 
 // Chart Loader
 async function loadTokenChart(tokenId, symbol) {
-  console.log(`Loading chart for ${tokenId} (${symbol})...`);
+  console.log(`Trying to load chart for: ${tokenId} (${symbol})`);
+  const chartEl = document.getElementById('tokenChartInner');
+
   try {
     const res = await fetch(`https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1&interval=hourly`);
-    const data = await res.json();
+    if (!res.ok) {
+      console.error('Chart API response error:', res.status);
+      chartEl.innerHTML = `<p style="text-align:center; color:red;">Failed to load chart.</p>`;
+      return;
+    }
 
-    console.log("Chart data:", data);
+    const data = await res.json();
+    if (!data.prices || data.prices.length === 0) {
+      console.warn('No price data found for chart.');
+      chartEl.innerHTML = `<p style="text-align:center; color:gray;">No chart data available.</p>`;
+      return;
+    }
 
     const times = data.prices.map(p => new Date(p[0]));
     const prices = data.prices.map(p => p[1]);
@@ -444,7 +455,7 @@ async function loadTokenChart(tokenId, symbol) {
       mode: 'lines',
       line: { color: '#3b82f6', width: 2 }
     }], {
-      title: `${symbol}/USD - 24h`,
+      title: `${symbol}/USD — 24h`,
       margin: { t: 40, l: 40, r: 10, b: 30 },
       paper_bgcolor: '#fff',
       plot_bgcolor: '#fff',
@@ -453,8 +464,11 @@ async function loadTokenChart(tokenId, symbol) {
       displayModeBar: false
     });
 
+    console.log(`Chart rendered successfully for ${symbol}.`);
+
   } catch (e) {
-    console.error(`Error loading chart for ${tokenId}`, e);
+    console.error(`Error loading chart for ${tokenId}:`, e);
+    chartEl.innerHTML = `<p style="text-align:center; color:red;">Chart failed to load.</p>`;
   }
 }
 
