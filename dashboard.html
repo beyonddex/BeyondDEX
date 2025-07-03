@@ -73,10 +73,12 @@
 
 .heatmap-section {
   margin-top: 24px;
+  height: 250px; /* Increase height */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
+
 
     .sidebar { width: 300px; border-left: 1px solid #e0e0e0; display: flex; flex-direction: column; height: calc(100vh - 80px); position: relative; }
     .chat-box { flex: 1; padding: 20px; overflow-y: auto; }
@@ -281,41 +283,46 @@
     const colors = data.map(c => c.price_change_percentage_24h >= 0 ? "#16a34a" : "#e11d48"); // Tailwind green/red
 
     const trace = {
-      type: "treemap",
-      labels: labels,
-      parents: data.map(() => ""),
-      values: values,
-      marker: {
-        colors: colors,
-        line: { width: 2, color: "#ffffff" }
-      },
-      textinfo: "label",
-      textfont: {
-        size: 14,
-        color: "#ffffff",
-        family: "Inter, sans-serif"
-      },
-      outsidetextfont: { size: 12, color: "#000" },
-      leaf: { opacity: 1 }
-    };
+  type: "treemap",
+  labels: labels,
+  parents: data.map(() => ""),
+  values: values,
+  marker: {
+    colors: colors,
+    line: { width: 2, color: "#ffffff" }
+  },
+  textinfo: "label",
+  textfont: {
+    size: 13,
+    color: "#ffffff",
+    family: "Inter, sans-serif"
+  },
+  outsidetextfont: { size: 11, color: "#000" },
+  leaf: { opacity: 1 }
+};
 
-    const layout = {
-      paper_bgcolor: "#ffffff",
-      plot_bgcolor: "#ffffff",
-      margin: { t: 0, l: 0, r: 0, b: 0 },
-      xaxis: { visible: false },
-      yaxis: { visible: false },
-      font: {
-        family: "Inter, sans-serif",
-        size: 14,
-        color: "#000000"
-      }
-    };
+const layout = {
+  paper_bgcolor: "#ffffff",
+  plot_bgcolor: "#ffffff",
+  height: 400, // Increased to show more tiles
+  margin: { t: 10, l: 10, r: 10, b: 10 },
+  xaxis: { visible: false },
+  yaxis: { visible: false },
+  font: {
+    family: "Inter, sans-serif",
+    size: 13,
+    color: "#000000"
+  },
+  uniformtext: {
+    minsize: 12,
+    mode: "hide"
+  }
+};
 
-    Plotly.newPlot(heatmapEl, [trace], layout, {
-      displayModeBar: false,
-      staticPlot: true
-    });
+Plotly.newPlot(heatmapEl, [trace], layout, {
+  displayModeBar: false,
+  staticPlot: true
+});
 
   } catch (e) {
     console.error('Error fetching market data', e);
