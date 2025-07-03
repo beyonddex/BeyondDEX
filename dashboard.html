@@ -54,6 +54,21 @@
   overflow-y: auto;
   margin-bottom: 12px;
 }
+#marketList li {
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    #marketList li:hover {
+      background: #e0e0e0;
+    }
+
+    #marketList li.active {
+      background: #d4d4d4;
+      font-weight: bold;
+    }
 
 .market-up {
   color: #16a34a;
@@ -66,12 +81,21 @@
 }
 
 .heatmap-section {
-  margin-top: 24px;
-  height: 500px; /* Increased from 250px */
+  flex-shrink: 0;
+  height: 300px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
+.chart-section {
+      flex: 1;
+      height: 300px;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      background: #ffffff;
+    }
+
 
 
 
@@ -111,13 +135,16 @@
     </div>
 
     <main>
-    <div class="market-section">
-  <h4>Top Volume Tokens</h4>
-  <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
-
-  <h4 style="margin-top: 24px;">Market Heatmap</h4>
-  <div class="heatmap-section" id="heatmap"></div>
-</div>
+     <div class="market-section">
+      <h4>Top Volume Tokens</h4>
+      <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
+      <h4 style="margin-top: 24px;">Market Heatmap</h4>
+      <div class="heatmap-section" id="heatmap"></div>
+    </div>
+    <div class="chart-section">
+      <h4>Price Chart</h4>
+      <div id="priceChart" style="width:100%; height:240px;"></div>
+    </div>
 
   </main>
 
@@ -253,29 +280,53 @@
       if (e.key === "Enter") sendChatMessage();
     });
 
-    async function loadMarketData() {
+   async function loadMarketData() {
   try {
     const res = await fetch(
       'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=15&page=1&sparkline=false&price_change_percentage=24h'
     );
     const data = await res.json();
 
-    // Update Market List
     const list = document.getElementById('marketList');
     list.innerHTML = '';
-    data.forEach((coin) => {
+
+    const chartContainer = document.getElementById('tokenChart');
+    if (chartContainer) chartContainer.innerHTML = '<div id="tokenChartInner"></div>';
+
+    data.forEach((coin, index) => {
       const change = coin.price_change_percentage_24h;
       const changeClass = change >= 0 ? 'market-up' : 'market-down';
       const changeSymbol = change >= 0 ? '▲' : '▼';
       const absChange = Math.abs(change);
+
       const li = document.createElement('li');
-      li.innerHTML = `<strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()} <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(
-        2
-      )}%</span><br/><small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>`;
+      li.classList.add('token-entry');
+      li.setAttribute('data-id', coin.id);
+      li.innerHTML = `
+        <strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()}
+        <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/>
+        <small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>
+      `;
+
+      // Add hover + click behavior
+      li.addEventListener('mouseover', () => li.style.backgroundColor = '#f0f0f0');
+      li.addEventListener('mouseout', () => {
+        if (!li.classList.contains('active')) li.style.backgroundColor = '';
+      });
+      li.addEventListener('click', () => {
+        document.querySelectorAll('.token-entry').forEach(el => {
+          el.classList.remove('active');
+          el.style.backgroundColor = '';
+        });
+        li.classList.add('active');
+        li.style.backgroundColor = '#e0e0e0';
+        loadTokenChart(coin.id, coin.symbol.toUpperCase());
+      });
+
       list.appendChild(li);
     });
 
-    // Heatmap
+    // HEATMAP
     const heatmapEl = document.getElementById('heatmap');
     const labels = data.map(
       (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
@@ -330,6 +381,36 @@
     });
   } catch (e) {
     console.error('Error fetching market data', e);
+  }
+}
+
+// Chart Loader
+async function loadTokenChart(tokenId, symbol) {
+  try {
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1&interval=hourly`);
+    const data = await res.json();
+
+    const times = data.prices.map(p => new Date(p[0]));
+    const prices = data.prices.map(p => p[1]);
+
+    Plotly.newPlot('tokenChartInner', [{
+      x: times,
+      y: prices,
+      type: 'scatter',
+      mode: 'lines',
+      line: { color: '#3b82f6', width: 2 }
+    }], {
+      title: `${symbol}/USD - 24h`,
+      margin: { t: 40, l: 40, r: 10, b: 30 },
+      paper_bgcolor: '#fff',
+      plot_bgcolor: '#fff',
+      font: { family: 'Inter, sans-serif', color: '#000' }
+    }, {
+      displayModeBar: false
+    });
+
+  } catch (e) {
+    console.error(`Error loading chart for ${tokenId}`, e);
   }
 }
 
