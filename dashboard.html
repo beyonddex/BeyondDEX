@@ -471,25 +471,23 @@ async function loadTokenChart(tokenId, symbol) {
 
     const chartEl = document.getElementById('tokenChartInner');
 
-    // 🔁 Clear chart before rendering new one
-    Plotly.purge(chartEl);
-
-    Plotly.newPlot(chartEl, [{
-      x: times,
-      y: prices,
-      type: 'scatter',
-      mode: 'lines',
-      line: { color: '#3b82f6', width: 2 }
-    }], {
-      title: `${symbol}/USD - 24h`,
-      margin: { t: 40, l: 40, r: 10, b: 30 },
-      paper_bgcolor: '#fff',
-      plot_bgcolor: '#fff',
-      font: { family: 'Inter, sans-serif', color: '#000' },
-      responsive: true
-    }, {
-      displayModeBar: false
-    });
+    // Instead of purge(), just use react() which is more stable for updates:
+Plotly.react(chartEl, [{
+  x: times,
+  y: prices,
+  type: 'scatter',
+  mode: 'lines',
+  line: { color: '#3b82f6', width: 2 }
+}], {
+  title: `${symbol}/USD - 24h`,
+  margin: { t: 40, l: 40, r: 10, b: 30 },
+  paper_bgcolor: '#fff',
+  plot_bgcolor: '#fff',
+  font: { family: 'Inter, sans-serif', color: '#000' },
+  responsive: true
+}, {
+  displayModeBar: false
+});
 
   } catch (e) {
     console.error(`Error loading chart for ${tokenId}`, e);
@@ -501,8 +499,8 @@ async function loadTokenChart(tokenId, symbol) {
 
 // Call once on page load
 loadMarketData();
-// Update every 60 seconds
-setInterval(loadMarketData, 60000);
+setInterval(loadMarketData, 30000); // updates every 30 seconds
+
 
   </script>
 </body>
