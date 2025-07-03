@@ -87,14 +87,37 @@
   overflow: hidden;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
+.market-panel {
+  display: flex;
+  gap: 20px;
+  height: 100%;
+  align-items: flex-start;
+}
+
+.token-heatmap {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.volume-section {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
 .chart-section {
-      flex: 1;
-      height: 300px;
-      border-radius: 8px;
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-      padding: 20px;
-      background: #ffffff;
-    }
+  flex: 1;
+  height: 500px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+}
+.heatmap-section:hover {
+  cursor: pointer;
+}
 
 
 
@@ -135,18 +158,23 @@
     </div>
 
     <main>
-     <div class="market-section">
-      <h4>Top Volume Tokens</h4>
-      <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
-      <h4 style="margin-top: 24px;">Market Heatmap</h4>
-      <div class="heatmap-section" id="heatmap"></div>
+  <div class="market-panel">
+    <div class="token-heatmap">
+      <div class="volume-section">
+        <h4>Top Volume Tokens</h4>
+        <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
+      </div>
+      <div class="heatmap-section">
+        <h4>Market Heatmap</h4>
+        <div id="heatmap"></div>
+      </div>
     </div>
     <div class="chart-section">
       <h4>Price Chart</h4>
-      <div id="priceChart" style="width:100%; height:240px;"></div>
+      <div id="tokenChartInner" style="width:100%; height:100%;"></div>
     </div>
-
-  </main>
+  </div>
+</main>
 
     <aside class="sidebar">
       <div id="onlineUsersCount">Online Users: 0</div>
@@ -290,8 +318,8 @@
     const list = document.getElementById('marketList');
     list.innerHTML = '';
 
-    const chartContainer = document.getElementById('tokenChart');
-    if (chartContainer) chartContainer.innerHTML = '<div id="tokenChartInner"></div>';
+    const chartContainer = document.getElementById('tokenChartInner');
+
 
     data.forEach((coin, index) => {
       const change = coin.price_change_percentage_24h;
