@@ -533,13 +533,13 @@ async function loadTokenChart(tokenId, symbol) {
 }
 async function loadCryptoNews() {
   try {
-    const res = await fetch('https://cryptopanic.com/api/v1/posts/?public=true');
+    const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
     const json = await res.json();
 
     const newsList = document.getElementById('cryptoNewsList');
     newsList.innerHTML = '';
 
-    const articles = json.results.slice(0, 6); // top 6 headlines
+    const articles = json.Data.slice(0, 6);
     articles.forEach(article => {
       const li = document.createElement('li');
       li.innerHTML = `<a href="${article.url}" target="_blank">${article.title}</a>`;
@@ -549,6 +549,7 @@ async function loadCryptoNews() {
     console.error('Failed to load crypto news:', e);
   }
 }
+
 
 window.addEventListener('DOMContentLoaded', () => {
   loadCryptoNews();
