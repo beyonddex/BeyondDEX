@@ -31,131 +31,109 @@
     .left-nav { width: 200px; border-right: 1px solid #e0e0e0; background: #f9f9f9; display: flex; flex-direction: column; padding: 20px 10px; }
     .left-nav button { background: none; border: none; padding: 12px; font-size: 15px; text-align: left; cursor: pointer; margin-bottom: 10px; border-radius: 6px; transition: background 0.2s; }
     .left-nav button:hover { background: #e0e0e0; }
-    main { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
+    main { flex: 1; padding: 40px 20px 40px 20px; overflow-y: auto; position: relative; }
 
     .market-section {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 260px;
-  height: calc(100% - 40px);
-  padding: 20px 16px;
-  background: #fafafa;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-}
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: calc(100% - 40px);
+      padding: 20px 16px;
+      background: #fafafa;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+    }
 
-#marketList {
-  max-height: 200px;
-  overflow-y: auto;
-  margin-bottom: 12px;
-}
-#marketList li {
+    #marketList {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    #marketList li {
       cursor: pointer;
       padding: 8px;
       border-radius: 6px;
       transition: background 0.2s;
     }
-
     #marketList li:hover {
       background: #e0e0e0;
     }
-
     #marketList li.active {
       background: #d4d4d4;
       font-weight: bold;
     }
 
-.market-up {
-  color: #16a34a;
-  font-weight: 500;
-}
+    .market-up { color: #16a34a; font-weight: 500; }
+    .market-down { color: #e11d48; font-weight: 500; }
 
-.market-down {
-  color: #e11d48;
-  font-weight: 500;
-}
+    .market-panel {
+      display: flex;
+      gap: 20px;
+      height: 100%;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
 
-.heatmap-section {
-  flex-shrink: 0;
-  height: 300px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-}
-.market-panel {
-  display: flex;
-  gap: 20px;
-  height: 100%;
-  align-items: flex-start;
-}
+    .token-heatmap {
+      width: 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-.token-heatmap {
-  width: 350px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+    .volume-section {
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
 
-.volume-section {
-  max-height: 250px;
-  overflow-y: auto;
-  padding-right: 8px;
-}
+    .chart-section {
+      flex: 1;
+      max-width: 640px;
+      height: 500px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+    }
 
-.chart-section {
-  flex: 1;
-  height: 500px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-}
-.heatmap-section:hover {
-  cursor: pointer;
-}
-#tokenChartInner p {
-  font-size: 14px;
-  text-align: center;
-  padding-top: 100px;
-  color: #888;
-}
-#newsSection {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #ddd;
-}
+    .market-right-section {
+      width: 240px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      font-size: 14px;
+    }
 
-#cryptoNewsList li {
-  margin-bottom: 12px;
-  font-size: 14px;
-}
-
-#cryptoNewsList a {
-  text-decoration: none;
-  color: #1e3a8a;
-}
-
-#cryptoNewsList a:hover {
-  text-decoration: underline;
-}
-
-
-
-
-
-    .sidebar { width: 300px; border-left: 1px solid #e0e0e0; display: flex; flex-direction: column; height: calc(100vh - 80px); position: relative; }
-    .chat-box { flex: 1; padding: 20px; overflow-y: auto; }
-    .chat-message { margin-bottom: 10px; }
-    .chat-message strong { color: #555; margin-right: 6px; }
-    .chat-input { display: flex; padding: 10px; border-top: 1px solid #e0e0e0; }
-    .chat-input input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-    .chat-input button { margin-left: 10px; padding: 10px 15px; background: black; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    #onlineUsersCount { margin-top: 12px; padding: 12px 20px; font-size: 14px; border-bottom: 1px solid #e0e0e0; background: #fff; z-index: 1; }
+    .heatmap-section:hover { cursor: pointer; }
+    #tokenChartInner p {
+      font-size: 14px;
+      text-align: center;
+      padding-top: 100px;
+      color: #888;
+    }
+    #newsSection {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+    #cryptoNewsList li {
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    #cryptoNewsList a {
+      text-decoration: none;
+      color: #1e3a8a;
+    }
+    #cryptoNewsList a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -184,28 +162,36 @@
     </div>
 
     <main>
-  <div class="market-panel">
-  <div class="token-heatmap">
-    <div class="volume-section">
-      <h4>Top Volume Tokens</h4>
-      <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
+    <div class="market-panel">
+      <div class="token-heatmap">
+        <div class="volume-section">
+          <h4>Top Volume Tokens</h4>
+          <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
+        </div>
+        <div class="heatmap-section">
+          <h4>Market Heatmap</h4>
+          <div id="heatmap"></div>
+        </div>
+      </div>
+      <div class="chart-section">
+        <h4>Price Chart</h4>
+        <div id="tokenChartInner" style="width:100%; height:100%;"></div>
+        <div id="newsSection">
+          <h4>Latest Crypto News</h4>
+          <ul id="cryptoNewsList" style="list-style:none; padding-left:0;"></ul>
+        </div>
+      </div>
+      <div class="market-right-section">
+        <h4>Market Data</h4>
+        <ul style="list-style: none; padding-left: 0;">
+          <li><strong>Total Market Cap:</strong> $2.1T</li>
+          <li><strong>BTC Dominance:</strong> 52.3%</li>
+          <li><strong>ETH Dominance:</strong> 18.5%</li>
+          <li><strong>Fear & Greed Index:</strong> 64 (Greed)</li>
+        </ul>
+      </div>
     </div>
-    <div class="heatmap-section">
-      <h4>Market Heatmap</h4>
-      <div id="heatmap"></div>
-    </div>
-  </div>
-  <div class="chart-section">
-    <h4>Price Chart</h4>
-    <div id="tokenChartInner" style="width:100%; height:100%;"></div>
-    <div id="newsSection">
-  <h4>Latest Crypto News</h4>
-  <ul id="cryptoNewsList" style="list-style:none; padding-left:0;"></ul>
-</div>
-
-  </div>
-</div>
-</main>
+  </main>
     <aside class="sidebar">
       <div id="onlineUsersCount">Online Users: 0</div>
       <div class="chat-box" id="chatBox"></div>
