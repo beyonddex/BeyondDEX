@@ -124,6 +124,25 @@
   padding-top: 100px;
   color: #888;
 }
+#newsSection {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+#cryptoNewsList li {
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+#cryptoNewsList a {
+  text-decoration: none;
+  color: #1e3a8a;
+}
+
+#cryptoNewsList a:hover {
+  text-decoration: underline;
+}
 
 
 
@@ -179,6 +198,11 @@
   <div class="chart-section">
     <h4>Price Chart</h4>
     <div id="tokenChartInner" style="width:100%; height:100%;"></div>
+    <div id="newsSection">
+  <h4>Latest Crypto News</h4>
+  <ul id="cryptoNewsList" style="list-style:none; padding-left:0;"></ul>
+</div>
+
   </div>
 </div>
 </main>
@@ -507,13 +531,32 @@ async function loadTokenChart(tokenId, symbol) {
     if (loader) loader.remove();
   }
 }
+async function loadCryptoNews() {
+  try {
+    const res = await fetch('https://cryptopanic.com/api/v1/posts/?public=true');
+    const json = await res.json();
 
+    const newsList = document.getElementById('cryptoNewsList');
+    newsList.innerHTML = '';
 
+    const articles = json.results.slice(0, 6); // top 6 headlines
+    articles.forEach(article => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="${article.url}" target="_blank">${article.title}</a>`;
+      newsList.appendChild(li);
+    });
+  } catch (e) {
+    console.error('Failed to load crypto news:', e);
+  }
+}
 
+window.addEventListener('DOMContentLoaded', () => {
+  loadCryptoNews();
+  setInterval(loadCryptoNews, 60000);
 
-// Call once on page load
-loadMarketData();
-setInterval(loadMarketData, 30000); // updates every 30 seconds
+  loadMarketData();
+  setInterval(loadMarketData, 30000);
+});
 
 
   </script>
