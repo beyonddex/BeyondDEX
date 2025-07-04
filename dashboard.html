@@ -72,11 +72,13 @@
     .market-down { color: #e11d48; font-weight: 500; }
 
     .market-panel {
-  display: grid;
-  grid-template-columns: 350px 1fr 220px;
+  display: flex;
   gap: 20px;
+  height: 100%;
   align-items: flex-start;
+  position: relative; 
 }
+
 
 
     .token-heatmap {
@@ -102,15 +104,20 @@
       padding: 20px;
     }
 
-    .market-right-section {
-  background: #fafafa;
+    
+.market-data-box {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 200px;
+  background: #f9f9f9;
+  border-radius: 8px;
   padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   font-size: 14px;
-  line-height: 1.6;
-  margin-top: 6px;
+  line-height: 1.4;
 }
+
 
 
     .heatmap-section:hover { cursor: pointer; }
@@ -183,7 +190,7 @@
           <ul id="cryptoNewsList" style="list-style:none; padding-left:0;"></ul>
         </div>
       </div>
-      <div class="market-right-section">
+      <div class="market-data-box">
         <h4>Market Data</h4>
         <ul style="list-style: none; padding-left: 0;">
           <li><strong>Total Market Cap:</strong> $2.1T</li>
