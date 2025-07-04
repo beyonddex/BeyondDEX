@@ -531,6 +531,19 @@ async function loadTokenChart(tokenId, symbol) {
     if (loader) loader.remove();
   }
 }
+function getRelativeTime(timestamp) {
+  const now = Date.now();
+  const diff = now - timestamp * 1000; // convert from seconds
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
 async function loadCryptoNews() {
   try {
     const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
@@ -539,16 +552,22 @@ async function loadCryptoNews() {
     const newsList = document.getElementById('cryptoNewsList');
     newsList.innerHTML = '';
 
-    const articles = json.Data.slice(0, 6);
+    const articles = json.Data.slice(0, 3); // only show 3 articles
     articles.forEach(article => {
       const li = document.createElement('li');
-      li.innerHTML = `<a href="${article.url}" target="_blank">${article.title}</a>`;
+      const timeAgo = getRelativeTime(article.published_on);
+
+      li.innerHTML = `
+        <a href="${article.url}" target="_blank">${article.title}</a><br/>
+        <small style="color: #666;">${timeAgo}</small>
+      `;
       newsList.appendChild(li);
     });
   } catch (e) {
     console.error('Failed to load crypto news:', e);
   }
 }
+
 
 
 window.addEventListener('DOMContentLoaded', () => {
