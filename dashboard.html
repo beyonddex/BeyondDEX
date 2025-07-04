@@ -96,16 +96,21 @@
     }
 
    .chart-section {
-  position: relative; /* Make it the anchor for .market-data-box */
+  position: relative;
   flex: 1;
   max-width: 640px;
-  height: 500px;
+  min-width: 0; /* allow flex to shrink */
+  height: auto; /* allow it to grow */
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
   padding: 20px;
-  overflow: hidden;
+  overflow: visible; /* show everything */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
+
 
 .market-data-box {
   width: 220px;
