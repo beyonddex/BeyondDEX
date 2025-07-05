@@ -616,7 +616,46 @@ async function loadCryptoNews() {
     console.error('Failed to load crypto news:', e);
   }
 }
+async function loadExtraMarketData() {
+  try {
+    // 1. BTC/ETH dominance + ratio from CoinMarketCap
+    const cmcRes = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
+      headers: {
+        'X-CMC_PRO_API_KEY': '4fef58b8-e7a6-45fb-8982-ab6d9e1145fc'
+      }
+    });
+    const cmcData = await cmcRes.json();
+    const btcDom = cmcData.data.btc_dominance.toFixed(2);
+    const ethDom = cmcData.data.eth_dominance.toFixed(2);
+    const btcEthRatio = (btcDom / ethDom).toFixed(2);
 
+    // 2. Fear & Greed Index (from alternative.me)
+    const fngRes = await fetch('https://api.alternative.me/fng/');
+    const fngData = await fngRes.json();
+    const fearGreed = `${fngData.data[0].value} (${fngData.data[0].value_classification})`;
+
+    // 3. Funding rate from Binance
+    const binanceRes = await fetch('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT');
+    const binanceData = await binanceRes.json();
+    const fundingRate = (parseFloat(binanceData.lastFundingRate) * 100).toFixed(4) + '%';
+
+    // Update the market data box content
+    const box = document.querySelector('.market-data-box');
+    box.innerHTML = `
+      <h4>Market Data</h4>
+      <ul style="list-style: none; padding-left: 0;">
+        <li><strong>BTC Dominance:</strong> ${btcDom}%</li>
+        <li><strong>ETH Dominance:</strong> ${ethDom}%</li>
+        <li><strong>BTC/ETH Ratio:</strong> ${btcEthRatio}</li>
+        <li><strong>Funding Rate (Binance):</strong> ${fundingRate}</li>
+        <li><strong>Fear & Greed Index:</strong> ${fearGreed}</li>
+      </ul>
+    `;
+
+  } catch (err) {
+    console.error('Error loading extra market data', err);
+  }
+}
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -625,6 +664,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   loadMarketData();
   setInterval(loadMarketData, 30000);
+
+  loadExtraMarketData(); // <-- 🔥 Add this
+  setInterval(loadExtraMarketData, 60000); // refresh every 60s
 });
 
 
