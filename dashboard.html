@@ -620,16 +620,13 @@ async function loadCryptoNews() {
 }
 async function loadExtraMarketData() {
   try {
-    // 1. BTC/ETH dominance + ratio from CoinMarketCap
-    const cmcRes = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
-      headers: {
-        'X-CMC_PRO_API_KEY': '4fef58b8-e7a6-45fb-8982-ab6d9e1145fc'
-      }
-    });
-    const cmcData = await cmcRes.json();
-    const btcDom = cmcData.data.btc_dominance.toFixed(2);
-    const ethDom = cmcData.data.eth_dominance.toFixed(2);
-    const btcEthRatio = (btcDom / ethDom).toFixed(2);
+    const res = await fetch('https://api.coingecko.com/api/v3/global');
+const data = await res.json();
+
+const btcDom = data.data.market_cap_percentage.btc.toFixed(2);
+const ethDom = data.data.market_cap_percentage.eth.toFixed(2);
+const btcEthRatio = (btcDom / ethDom).toFixed(2);
+
 
     // 2. Fear & Greed Index (from alternative.me)
     const fngRes = await fetch('https://api.alternative.me/fng/');
