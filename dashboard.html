@@ -620,12 +620,15 @@ async function loadCryptoNews() {
 }
 async function loadExtraMarketData() {
   try {
-    const res = await fetch('https://api.coingecko.com/api/v3/global');
+    // 1. BTC/ETH dominance + ratio from CoinMarketCap
+   const res = await fetch('/api/market-data');
 const data = await res.json();
 
-const btcDom = data.data.market_cap_percentage.btc.toFixed(2);
-const ethDom = data.data.market_cap_percentage.eth.toFixed(2);
-const btcEthRatio = (btcDom / ethDom).toFixed(2);
+const btcDom = data.btcDom;
+const ethDom = data.ethDom;
+const btcEthRatio = data.btcEthRatio;
+const fundingRate = data.fundingRate;
+const fearGreed = data.fearGreed;
 
 
     // 2. Fear & Greed Index (from alternative.me)
