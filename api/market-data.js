@@ -1,5 +1,9 @@
 export default async function handler(req, res) {
   try {
+    const headers = {
+      'User-Agent': 'BeyondDEX/1.0 (+https://yourdomain.com)'
+    };
+
     const [
       cmcRes,
       fngRes,
@@ -7,11 +11,14 @@ export default async function handler(req, res) {
       binanceOIRes
     ] = await Promise.all([
       fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
-        headers: { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY }
+        headers: {
+          'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY,
+          ...headers
+        }
       }),
-      fetch('https://api.alternative.me/fng/'),
-      fetch('https://fapi.binance.com/fapi/v1/fundingRate?symbol=BTCUSDT&limit=1'),
-      fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=5m&limit=1')
+      fetch('https://api.alternative.me/fng/', { headers }),
+      fetch('https://fapi.binance.com/fapi/v1/fundingRate?symbol=BTCUSDT&limit=1', { headers }),
+      fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=5m&limit=1', { headers })
     ]);
 
     const cmcData = await cmcRes.json();
