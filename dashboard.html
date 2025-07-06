@@ -638,7 +638,11 @@ async function loadExtraMarketData() {
         <li><strong>BTC Dominance:</strong> ${btcDom}%</li>
         <li><strong>ETH Dominance:</strong> ${ethDom}%</li>
         <li><strong>BTC/ETH Ratio:</strong> ${btcEthRatio}</li>
-        <li><strong>Funding Rate (Binance):</strong> ${fundingRate}</li>
+        <li><strong>Funding Rate (Binance):</strong> 
+        <span class="${fundingRate === 'Unavailable' ? '' : parseFloat(fundingRate) >= 0 ? 'market-up' : 'market-down'}">
+         ${fundingRate}
+        </span>
+        </li>
         <li><strong>Fear & Greed Index:</strong> ${fearGreed}</li>
       </ul>
     `;

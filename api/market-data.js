@@ -12,14 +12,26 @@ export default async function handler(req, res) {
     const fngData = await fngRes.json();
     const binanceData = await binanceRes.json();
 
-    const btcDom = cmcData.data.btc_dominance.toFixed(2);
-    const ethDom = cmcData.data.eth_dominance.toFixed(2);
+    const btcDom = parseFloat(cmcData.data.btc_dominance).toFixed(2);
+    const ethDom = parseFloat(cmcData.data.eth_dominance).toFixed(2);
     const btcEthRatio = (btcDom / ethDom).toFixed(2);
-    const fundingRate = (parseFloat(binanceData.lastFundingRate) * 100).toFixed(4) + '%';
+
+    let fundingRate = 'Unavailable';
+    if (binanceData.lastFundingRate !== undefined && !isNaN(binanceData.lastFundingRate)) {
+      fundingRate = (parseFloat(binanceData.lastFundingRate) * 100).toFixed(4);
+    }
+
     const fearGreed = `${fngData.data[0].value} (${fngData.data[0].value_classification})`;
 
-    res.status(200).json({ btcDom, ethDom, btcEthRatio, fundingRate, fearGreed });
+    res.status(200).json({
+      btcDom,
+      ethDom,
+      btcEthRatio,
+      fundingRate,
+      fearGreed
+    });
   } catch (e) {
+    console.error('Market data API error:', e);
     res.status(500).json({ error: 'Failed to fetch market data' });
   }
 }
