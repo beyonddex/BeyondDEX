@@ -33,11 +33,6 @@
     flex: 1;
     padding: 40px 20px 60px 20px; /* extra bottom padding for space */
     }
-    .page-wrapper {
-    display: flex;
-    flex-direction: column;
-     height: 100%;
-    }
 
     .market-section {
       position: absolute;
@@ -192,6 +187,25 @@
       cursor: pointer;
       font-weight: 500;
     }
+    .dashboard-content {
+  display: flex;
+  flex-direction: column; /* make it stack vertically */
+  flex: 1;
+  margin-top: 80px;
+}
+
+.dashboard-row {
+  display: flex;
+  flex: 1;
+}
+
+.dashboard-footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: #999;
+}
+
 
   </style>
 </head>
@@ -212,8 +226,9 @@
       </div>
     </div>
   </header>
-<div class="page-wrapper">
+
   <div class="dashboard-content">
+    <div class="dashboard-row">
     <div class="left-nav">
       <button>📊 Overview</button>
       <button>📰 News</button>
@@ -287,13 +302,14 @@
         <button id="sendMessage">Send</button>
       </div>
     </aside>
+    </div>
+    <footer style="text-align:center; padding: 20px; font-size: 13px; color: #999;">
+  © 2025 BeyondDEX. All rights reserved.
+</footer>
+
   </div>
 </main>
 
-<footer style="text-align:center; padding: 20px; font-size: 13px; color: #999;">
-  © 2025 BeyondDEX. All rights reserved.
-</footer>
-</div>
 
   <script>
     const firebaseConfig = {
