@@ -231,7 +231,6 @@
   align-items: stretch;
   gap: 12px;
   min-height: 0;
-  margin-left:20px;
 }
 
 .dashboard-footer,
@@ -243,6 +242,13 @@ footer {
   border-top: 1px solid #e0e0e0;
   margin-top: auto;
 }
+.dashboard-main-content {
+  display: flex;
+  gap: 12px;
+  margin-left: 20px; /* ✅ Push it right, away from left-nav */
+  flex: 1;
+}
+
 
   </style>
 </head>
@@ -273,7 +279,7 @@ footer {
       <button>🐋 Whale Alerts</button>
     </div>
 
-    
+  <div class="dashboard-main-content">
   <div class="market-panel">
     <div class="token-heatmap">
       <div class="volume-section">
@@ -338,6 +344,7 @@ footer {
       </div>
     </aside>
     </div>
+  </div>
 </main>    
 <footer style="text-align:center; padding: 20px; font-size: 13px; color: #999;">
   © 2025 BeyondDEX. All rights reserved.
