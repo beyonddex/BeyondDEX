@@ -33,6 +33,11 @@
     flex: 1;
     padding: 40px 20px 60px 20px; /* extra bottom padding for space */
     }
+    .page-wrapper {
+    display: flex;
+    flex-direction: column;
+     height: 100%;
+    }
 
     .market-section {
       position: absolute;
@@ -207,7 +212,7 @@
       </div>
     </div>
   </header>
-
+<div class="page-wrapper">
   <div class="dashboard-content">
     <div class="left-nav">
       <button>📊 Overview</button>
@@ -288,6 +293,7 @@
 <footer style="text-align:center; padding: 20px; font-size: 13px; color: #999;">
   © 2025 BeyondDEX. All rights reserved.
 </footer>
+</div>
 
   <script>
     const firebaseConfig = {
