@@ -252,6 +252,7 @@
     <li><strong>ETH Dominance:</strong> <span id="ethDominance">Loading...</span></li>
     <li><strong>BTC/ETH Ratio:</strong> <span id="btcEthRatio">Loading...</span></li>
     <li><strong>Funding Rate (BTC Perps):</strong> <span id="fundingRate">Loading...</span></li>
+    <li><strong>Open Interest (Binance):</strong> <span id="openInterest">–</span></li>
     <li><strong>Fear & Greed Index:</strong> <span id="fearGreedIndex">Loading...</span></li>
   </ul>
 </div>
@@ -620,36 +621,42 @@ async function loadCryptoNews() {
 }
 async function loadExtraMarketData() {
   try {
-    // Fetch all needed market data from your backend
     const res = await fetch('/api/market-data');
     const data = await res.json();
 
-    const btcDom = data.btcDom;
-    const ethDom = data.ethDom;
-    const btcEthRatio = data.btcEthRatio;
-    const fundingRate = data.fundingRate;
-    const fearGreed = data.fearGreed;
+    const { btcDom, ethDom, btcEthRatio, fundingRate, openInterest, fearGreed, totalMarketCap } = data;
 
-    // Update the market data box content
-    const box = document.querySelector('.market-data-box');
-    box.innerHTML = `
-      <h4>Market Data</h4>
-      <ul style="list-style: none; padding-left: 0;">
-        <li><strong>BTC Dominance:</strong> ${btcDom}%</li>
-        <li><strong>ETH Dominance:</strong> ${ethDom}%</li>
-        <li><strong>BTC/ETH Ratio:</strong> ${btcEthRatio}</li>
-        <li><strong>Funding Rate (Binance):</strong> 
-        <span class="${fundingRate === 'Unavailable' ? '' : parseFloat(fundingRate) >= 0 ? 'market-up' : 'market-down'}">
-         ${fundingRate}
-        </span>
-        </li>
-        <li><strong>Fear & Greed Index:</strong> ${fearGreed}</li>
-      </ul>
-    `;
+    // Apply text + color class to a target span
+    const updateSpan = (id, value) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      el.classList.remove('market-up', 'market-down');
+
+      if (value !== 'Unavailable' && !isNaN(parseFloat(value))) {
+        el.classList.add(parseFloat(value) >= 0 ? 'market-up' : 'market-down');
+      }
+
+      el.textContent = value;
+    };
+
+    document.getElementById('btcDominance').textContent = `${btcDom}%`;
+    document.getElementById('ethDominance').textContent = `${ethDom}%`;
+    document.getElementById('btcEthRatio').textContent = btcEthRatio;
+    document.getElementById('fearGreedIndex').textContent = fearGreed;
+
+    updateSpan('fundingRate', fundingRate);
+    updateSpan('openInterest', openInterest);
+
+    if (totalMarketCap) {
+      document.getElementById('totalMarketCap').textContent = totalMarketCap;
+    }
+
   } catch (err) {
     console.error('Error loading extra market data', err);
   }
 }
+
 
 
 window.addEventListener('DOMContentLoaded', () => {
