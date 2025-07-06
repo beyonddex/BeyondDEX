@@ -72,15 +72,12 @@
     .market-down { color: #e11d48; font-weight: 500; }
 
     .market-panel {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  height: 100%;
-  position: relative;
-}
-
-
-
+      display: flex;
+      align-items: flex-start;
+      gap: 24px; /* Slightly more space between columns */
+      height: 100%;
+      position: relative;
+    }
 
     .token-heatmap {
       width: 350px;
@@ -95,118 +92,90 @@
       padding-right: 8px;
     }
 
-   .chart-section {
-  position: relative;
-  flex: 1;
-  max-width: 640px;
-  min-width: 0;
-  height: auto; /* allow it to grow */
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-.market-data-box {
-  width: 220px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  font-size: 14px;
-  line-height: 1.4;
-}
-.market-insights-box {
-  width: 220px;
-  background: #f1f1f1;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  margin-top: 16px;
-  font-size: 14px;
-}
-.market-data-column {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 220px;
-  margin-right: 16px; /* 👈 Adds spacing from the chat */
-}
+    .chart-section {
+      flex: 1;
+      max-width: 640px;
+      min-width: 0;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
 
+    .market-data-column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 220px;
+    }
 
-
-    .heatmap-section:hover { cursor: pointer; }
-    #tokenChartInner p {
+    .market-data-box {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       font-size: 14px;
-      text-align: center;
-      padding-top: 100px;
-      color: #888;
+      line-height: 1.4;
     }
-    #newsSection {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
-    }
-    #cryptoNewsList li {
-      margin-bottom: 12px;
+
+    .market-insights-box {
+      background: #f1f1f1;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       font-size: 14px;
     }
-    #cryptoNewsList a {
-      text-decoration: none;
-      color: #1e3a8a;
-    }
-    #cryptoNewsList a:hover {
-      text-decoration: underline;
-    }
+
     .sidebar {
-  width: 260px;
-  padding: 16px;
-  background: #fafafa;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: calc(100% - 40px); /* 👈 Stretch to fill available vertical space */
-}
+      width: 280px;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100% - 40px);
+      margin-left: auto; /* Push sidebar to far right */
+    }
 
-.chat-box {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  line-height: 1.4;
-}
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
 
-.chat-input {
-  display: flex;
-  gap: 8px;
-}
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
 
-.chat-input input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
+    .chat-input input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
 
-.chat-input button {
-  padding: 8px 12px;
-  border: none;
-  background: #3b82f6;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-}
+    .chat-input button {
+      padding: 8px 12px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
 
   </style>
 </head>
