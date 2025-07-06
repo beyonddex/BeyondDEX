@@ -252,7 +252,6 @@
     <li><strong>ETH Dominance:</strong> <span id="ethDominance">Loading...</span></li>
     <li><strong>BTC/ETH Ratio:</strong> <span id="btcEthRatio">Loading...</span></li>
     <li><strong>Funding Rate (BTC Perps):</strong> <span id="fundingRate">Loading...</span></li>
-    <li><strong>Open Interest (Binance):</strong> <span id="openInterest">–</span></li>
     <li><strong>Fear & Greed Index:</strong> <span id="fearGreedIndex">Loading...</span></li>
   </ul>
 </div>
@@ -646,7 +645,6 @@ async function loadExtraMarketData() {
     document.getElementById('fearGreedIndex').textContent = fearGreed;
 
     updateSpan('fundingRate', fundingRate);
-    updateSpan('openInterest', openInterest);
 
     if (totalMarketCap) {
       document.getElementById('totalMarketCap').textContent = totalMarketCap;
