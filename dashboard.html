@@ -37,13 +37,15 @@
     .dropdown { position: absolute; top: 50px; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; min-width: 120px; z-index: 1000; }
     .dropdown a { display: block; padding: 10px; text-decoration: none; color: #000; font-size: 14px; }
     .dropdown a:hover { background: #f0f0f0; }
+    .page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
     .dashboard-content {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  margin-top: 90px; /* Push content below fixed header */
-  min-height: 0;
-  padding: 0 20px;
+  padding-bottom: 40px; /* space so content doesn't touch footer */
 }
     .left-nav {
   width: 200px;
@@ -253,6 +255,7 @@ footer {
   </style>
 </head>
 <body>
+  <div class="page-wrapper">
   <header>
     <div class="logo-container">
       <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
@@ -351,6 +354,7 @@ footer {
 <footer style="text-align:center; padding: 20px; font-size: 13px; color: #999;">
   © 2025 BeyondDEX. All rights reserved.
 </footer>
+</div>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
