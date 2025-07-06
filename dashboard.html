@@ -620,26 +620,15 @@ async function loadCryptoNews() {
 }
 async function loadExtraMarketData() {
   try {
-    // 1. BTC/ETH dominance + ratio from CoinMarketCap
-   const res = await fetch('/api/market-data');
-const data = await res.json();
+    // Fetch all needed market data from your backend
+    const res = await fetch('/api/market-data');
+    const data = await res.json();
 
-const btcDom = data.btcDom;
-const ethDom = data.ethDom;
-const btcEthRatio = data.btcEthRatio;
-const fundingRate = data.fundingRate;
-const fearGreed = data.fearGreed;
-
-
-    // 2. Fear & Greed Index (from alternative.me)
-    const fngRes = await fetch('https://api.alternative.me/fng/');
-    const fngData = await fngRes.json();
-    const fearGreed = `${fngData.data[0].value} (${fngData.data[0].value_classification})`;
-
-    // 3. Funding rate from Binance
-    const binanceRes = await fetch('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT');
-    const binanceData = await binanceRes.json();
-    const fundingRate = (parseFloat(binanceData.lastFundingRate) * 100).toFixed(4) + '%';
+    const btcDom = data.btcDom;
+    const ethDom = data.ethDom;
+    const btcEthRatio = data.btcEthRatio;
+    const fundingRate = data.fundingRate;
+    const fearGreed = data.fearGreed;
 
     // Update the market data box content
     const box = document.querySelector('.market-data-box');
@@ -653,7 +642,6 @@ const fearGreed = data.fearGreed;
         <li><strong>Fear & Greed Index:</strong> ${fearGreed}</li>
       </ul>
     `;
-
   } catch (err) {
     console.error('Error loading extra market data', err);
   }
