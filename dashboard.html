@@ -128,6 +128,13 @@
   margin-top: 16px;
   font-size: 14px;
 }
+.market-data-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 220px;
+}
+
 
 
     .heatmap-section:hover { cursor: pointer; }
@@ -251,22 +258,25 @@
       </div>
     </div>
 
-    <div class="market-data-box">
-  <h4>Market Data</h4>
-  <ul id="marketDataList" style="list-style: none; padding-left: 0;">
-    <li><strong>Total Market Cap:</strong> <span id="totalMarketCap">Loading...</span></li>
-    <li><strong>BTC Dominance:</strong> <span id="btcDominance">Loading...</span></li>
-    <li><strong>ETH Dominance:</strong> <span id="ethDominance">Loading...</span></li>
-    <li><strong>BTC/ETH Ratio:</strong> <span id="btcEthRatio">Loading...</span></li>
-    <li><strong>Funding Rate (BTC Perps):</strong> <span id="fundingRate">Loading...</span></li>
-    <li><strong>Fear & Greed Index:</strong> <span id="fearGreedIndex">Loading...</span></li>
-  </ul>
-</div>
-<div class="market-insights-box">
-  <h4>On-Chain Insights (Coming Soon)</h4>
-  <p style="font-size: 13px; color: #555; line-height: 1.4;">
-    Stay tuned for exchange inflows, outflows, and whale wallet trackers to help you analyze market sentiment and big-money moves.
-  </p>
+   <div class="market-data-column">
+  <div class="market-data-box">
+    <h4>Market Data</h4>
+    <ul id="marketDataList" style="list-style: none; padding-left: 0;">
+      <li><strong>Total Market Cap:</strong> <span id="totalMarketCap">Loading...</span></li>
+      <li><strong>BTC Dominance:</strong> <span id="btcDominance">Loading...</span></li>
+      <li><strong>ETH Dominance:</strong> <span id="ethDominance">Loading...</span></li>
+      <li><strong>BTC/ETH Ratio:</strong> <span id="btcEthRatio">Loading...</span></li>
+      <li><strong>Funding Rate (BTC Perps):</strong> <span id="fundingRate">Loading...</span></li>
+      <li><strong>Fear & Greed Index:</strong> <span id="fearGreedIndex">Loading...</span></li>
+    </ul>
+  </div>
+
+  <div class="market-insights-box">
+    <h4>On-Chain Insights (Coming Soon)</h4>
+    <p style="font-size: 13px; color: #555; line-height: 1.4;">
+      Stay tuned for exchange inflows, outflows, and whale wallet trackers to help you analyze market sentiment and big-money moves.
+    </p>
+  </div>
 </div>
 
 
