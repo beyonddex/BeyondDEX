@@ -133,6 +133,7 @@
   flex-direction: column;
   gap: 16px;
   width: 220px;
+  margin-right: 16px; /* 👈 Adds spacing from the chat */
 }
 
 
@@ -167,10 +168,10 @@
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   font-size: 14px;
-  height: 500px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  height: calc(100% - 40px); /* 👈 Stretch to fill available vertical space */
 }
 
 .chat-box {
