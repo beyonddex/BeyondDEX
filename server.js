@@ -11,7 +11,7 @@ app.use(cors());
 // ✅ Register your new calendar route
 app.use('/api/calendar', require('./api/calendar'));
 
-app.use('/api', require('./api/market-data'));
+//app.use('/api', require('./api/market-data'));
 
 // Serve static files (for frontend)
 app.use(express.static(__dirname));
