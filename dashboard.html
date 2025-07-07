@@ -774,39 +774,57 @@ async function loadExtraMarketData() {
   }
 }
 // Example: fetch today's economic events
-async function loadTodayCalendar() {
-  const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-  const res = await fetch('/api/calendar');
-  const events = await res.json();
-  renderCalendar(events);
+async function load7DayCalendar() {
+  try {
+    const res = await fetch('/api/calendar');
+    const events = await res.json();
+    renderCalendar(events);
+  } catch (err) {
+    console.error('Failed to load 7-day calendar:', err);
+  }
 }
+
 function renderCalendar(events) {
   const ul = document.getElementById('econCalendarList');
   ul.innerHTML = '';
-  const impactMap = { Low: 0, Medium: 1, High: 2 };
 
+  if (!events.length) {
+    const li = document.createElement('li');
+    li.textContent = 'No economic events in the next 7 days.';
+    li.style.color = '#888';
+    ul.appendChild(li);
+    return;
+  }
+
+  let lastDate = '';
   events.forEach(e => {
-    const impactLevel = impactMap[e.impact] ?? 1;
-    const impactClass = `impact-${['low','medium','high'][impactLevel]}`;
+    if (e.date !== lastDate) {
+      const dateLi = document.createElement('li');
+      dateLi.textContent = new Date(e.date).toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+      dateLi.style.fontWeight = 'bold';
+      dateLi.style.marginTop = '10px';
+      ul.appendChild(dateLi);
+      lastDate = e.date;
+    }
 
     const li = document.createElement('li');
     li.className = 'economic-event';
+    const impactClass = `impact-${['low','medium','high'][e.impact]}`;
     li.innerHTML = `
-      <span class="event-time">${e.time || '--:--'}</span>
+      <span class="event-time">${e.time}</span>
       <span class="event-info">
         <img class="flag" src="https://countryflagsapi.com/png/${e.country}" alt="${e.country}">
         <span class="event-name">${e.event}</span>
       </span>
-      <span class="${impactClass}">${['Low','Med','High'][impactLevel]}</span>
+      <span class="${impactClass}">${['Low','Med','High'][e.impact]}</span>
     `;
     ul.appendChild(li);
   });
 }
-
-
-
-
-
 
 window.addEventListener('DOMContentLoaded', () => {
   loadCryptoNews();
@@ -818,7 +836,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadExtraMarketData(); // <-- 🔥 Add this
   setInterval(loadExtraMarketData, 60000); // refresh every 60s
 
-   loadTodayCalendar();
+   load7DayCalendar();
 });
 
 
