@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     const from = today.toISOString().split('T')[0];      // e.g. 2025-07-06
     const to = nextWeek.toISOString().split('T')[0];      // e.g. 2025-07-13
 
-    const response = await axios.get('https://financialmodelingprep.com/api/v3/economic_calendar', {
+    const response = await axios.get('https://financialmodelingprep.com/stable/economic_calendar', {
       params: {
         from,
         to,
