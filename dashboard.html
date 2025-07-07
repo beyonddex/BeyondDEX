@@ -170,51 +170,49 @@
   margin: 0;
 }
 
-.economic-events-list .event {
+.economic-events-list li {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 0;
-  font-size: 13px;
-  border-bottom: 1px solid #eaeaea;
+  margin-bottom: 12px;
 }
 
-.economic-events-list .event:last-child {
-  border-bottom: none;
+.event-time {
+  font-weight: 500;
+  min-width: 60px;
 }
 
-.economic-events-list .time {
-  font-weight: bold;
-  color: #333;
-  width: 50px;
+.event-impact {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  min-width: 55px;
+  text-align: center;
 }
 
-.economic-events-list .title {
+.event-impact.low {
+  background-color: #22c55e; /* green */
+}
+
+.event-impact.medium {
+  background-color: #f97316; /* orange */
+}
+
+.event-impact.high {
+  background-color: #ef4444; /* red */
+}
+
+.event-name {
   flex: 1;
-  color: #444;
-}
-
-.economic-events-list .event.low {
-  border-left: 4px solid #16a34a;
-  padding-left: 6px;
-}
-
-.economic-events-list .event.medium {
-  border-left: 4px solid #f59e0b;
-  padding-left: 6px;
-}
-
-.economic-events-list .event.high {
-  border-left: 4px solid #dc2626;
-  padding-left: 6px;
 }
 
 .powered-by {
   font-size: 12px;
   color: #888;
-  margin-top: 8px;
+  margin-top: 12px;
   display: block;
-  text-align: right;
 }
 
 
@@ -374,26 +372,27 @@ footer {
     </p>
   </div>
  <div class="economic-calendar-box">
-  <h4>Today’s Economic Events</h4>
+  <h4>Economic Calendar (Today)</h4>
   <ul class="economic-events-list">
-    <!-- Example hardcoded event, replace with dynamic rendering later -->
-    <li class="event high">
-      <img src="https://flagsapi.com/US/shiny/16.png" alt="US Flag">
-      <span class="time">08:30</span>
-      <span class="title">Non-Farm Payrolls</span>
+    <li>
+      <img src="https://flagsapi.com/US/shiny/16.png" alt="US Flag" />
+      <span class="event-time">08:30</span>
+      <span class="event-impact high">High</span>
+      <span class="event-name">Non-Farm Payrolls</span>
     </li>
-    <li class="event medium">
-      <img src="https://flagsapi.com/EU/shiny/16.png" alt="EU Flag">
-      <span class="time">10:00</span>
-      <span class="title">ECB Interest Rate Decision</span>
+    <li>
+      <img src="https://flagsapi.com/DE/shiny/16.png" alt="EU Flag" />
+      <span class="event-time">09:00</span>
+      <span class="event-impact medium">Medium</span>
+      <span class="event-name">EU CPI (YoY)</span>
     </li>
-    <li class="event low">
-      <img src="https://flagsapi.com/JP/shiny/16.png" alt="Japan Flag">
-      <span class="time">22:00</span>
-      <span class="title">Tokyo CPI</span>
+    <li>
+      <img src="https://flagsapi.com/GB/shiny/16.png" alt="UK Flag" />
+      <span class="event-time">10:00</span>
+      <span class="event-impact low">Low</span>
+      <span class="event-name">BoE Member Speech</span>
     </li>
   </ul>
-  <small class="powered-by">Preview • Full calendar coming soon</small>
 </div>
 </div>
 
