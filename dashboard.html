@@ -776,7 +776,7 @@ async function loadExtraMarketData() {
 // Example: fetch today's economic events
 async function loadTodayCalendar() {
   const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-  const res = await fetch(`https://financialmodelingprep.com/api/v3/economic-calendar?from=${date}&to=${date}&apikey=YOUR_API_KEY`);
+  const res = await fetch('/api/calendar');
   const events = await res.json();
   renderCalendar(events);
 }
@@ -812,6 +812,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   loadExtraMarketData(); // <-- 🔥 Add this
   setInterval(loadExtraMarketData, 60000); // refresh every 60s
+
+   loadTodayCalendar();
 });
 
 
