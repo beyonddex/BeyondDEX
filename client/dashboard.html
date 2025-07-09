@@ -165,7 +165,7 @@
 }
 
 .economic-calendar-preview {
-  max-height:350px;
+  max-height:400px;
   overflow:hidden;
   background: #f9f9f9;
   padding: 16px;
@@ -809,7 +809,7 @@ function renderCalendar(events) {
   const ul = document.getElementById('econCalendarList');
   ul.innerHTML = '';
 
-  const PREVIEW_HEIGHT = 350; // same as CSS height
+  const PREVIEW_HEIGHT = 400; // same as CSS height
   const ESTIMATED_ITEM_HEIGHT = 42; // px per event (adjust if needed)
   const MAX_EVENTS = Math.floor(PREVIEW_HEIGHT / ESTIMATED_ITEM_HEIGHT);
 
@@ -856,7 +856,7 @@ function renderCalendar(events) {
     const flagURL = `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
 
     li.innerHTML = `
-      <span class="event-time">${e.time || '--'}</span>
+      <span class="event-time">${e.time ? e.time : ''}</span>
       <span class="event-info">
         <img class="flag" src="${flagURL}" alt="${e.country}">
         <span class="event-name">${e.event}</span>
