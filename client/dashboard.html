@@ -81,7 +81,7 @@
   font-size: 14px;
 }
 #heatmap {
-  background-color: #ffffff;
+  background-color: #ffffff !important;
   padding: 12px;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
@@ -621,16 +621,17 @@ const trace = {
   parents: data.map(() => ''),
   values: values,
   marker: {
-    colors: data.map(c => c.price_change_percentage_24h),
-    colorscale: [
-      [0, '#dc2626'],
-      [0.5, '#f3f4f6'],
-      [1, '#16a34a']
-    ],
-    cmin: -10,
-    cmax: 10,
-    line: { width: 1, color: '#e5e7eb' }
-  },
+  colors: data.map(c => c.price_change_percentage_24h),
+  colorscale: [
+    [0, '#b91c1c'],     // improved red
+    [0.5, '#f3f4f6'],   // neutral center
+    [1, '#059669']      // improved green
+  ],
+  cmin: -10,
+  cmax: 10,
+  colorbar: false,
+  line: { width: 1, color: '#e5e7eb' }
+},
   textinfo: 'label+value',
   textposition: 'middle center', // ✅ Add this line for better alignment
   branchvalues: 'total',
