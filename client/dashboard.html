@@ -594,9 +594,10 @@ async function loadMarketData() {
     // HEATMAP
     heatmapEl = document.getElementById('heatmap');
 labels = data.map(
-  (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
+  (c) => `${c.symbol.toUpperCase()}\n${c.price_change_percentage_24h.toFixed(2)}%`
 );
 values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
+const changes = data.map(c => c.price_change_percentage_24h);
 
 const trace = {
   type: 'treemap',
@@ -604,39 +605,40 @@ const trace = {
   parents: data.map(() => ''),
   values: values,
   marker: {
-    colors: data.map(c => c.price_change_percentage_24h),
+    colors: changes,
     colorscale: [
-      [0, '#b91c1c'],    // muted red
-      [0.5, '#1e293b'],  // dark slate neutral midpoint
-      [1, '#10b981']     // muted green
+      [0, '#fde2e2'],    // very soft red
+      [0.5, '#f1f5f9'],  // neutral center
+      [1, '#d1fae5']     // soft green
     ],
     cmin: -10,
     cmax: 10,
     colorbar: false,
-    line: { width: 2, color: '#111827' }
+    line: { width: 1.5, color: '#e5e7eb' }
   },
-  textinfo: 'label+value',
-  branchvalues: 'total',
+  textinfo: 'label',
+  textposition: 'middle center',
+  insidetextanchor: 'middle',
   textfont: {
-    size: 13,
-    color: '#f9fafb',
+    size: 14,
+    color: '#111827',
     family: 'Inter, sans-serif'
   },
   outsidetextfont: {
     size: 12,
-    color: '#f9fafb'
+    color: '#111827'
   }
 };
 
 const layout = {
-  paper_bgcolor: '#111827',
-  plot_bgcolor: '#111827',
+  paper_bgcolor: '#ffffff',
+  plot_bgcolor: '#ffffff',
   height: 500,
   margin: { t: 10, l: 0, r: 0, b: 0 },
   font: {
     family: 'Inter, sans-serif',
     size: 13,
-    color: '#f3f4f6'
+    color: '#111827'
   },
   uniformtext: {
     minsize: 10,
