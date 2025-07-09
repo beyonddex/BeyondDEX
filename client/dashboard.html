@@ -592,12 +592,11 @@ async function loadMarketData() {
     });
 
     // HEATMAP
-    heatmapEl = document.getElementById('heatmap');
-labels = data.map(
-  (c) => `${c.symbol.toUpperCase()}\n${c.price_change_percentage_24h.toFixed(2)}%`
+    const heatmapEl = document.getElementById('heatmap');
+const labels = data.map(
+  (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
 );
-values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
-const changes = data.map(c => c.price_change_percentage_24h);
+const values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
 
 const trace = {
   type: 'treemap',
@@ -605,27 +604,26 @@ const trace = {
   parents: data.map(() => ''),
   values: values,
   marker: {
-    colors: changes,
+    colors: data.map(c => c.price_change_percentage_24h),
     colorscale: [
-      [0, '#fde2e2'],    // very soft red
-      [0.5, '#f1f5f9'],  // neutral center
-      [1, '#d1fae5']     // soft green
+      [0, '#f87171'],    // soft red
+      [0.5, '#f3f4f6'],  // soft neutral gray
+      [1, '#34d399']     // soft green
     ],
     cmin: -10,
     cmax: 10,
     colorbar: false,
-    line: { width: 1.5, color: '#e5e7eb' }
+    line: { width: 1, color: '#e5e7eb' } // light border
   },
-  textinfo: 'label',
-  textposition: 'middle center',
-  insidetextanchor: 'middle',
+  textinfo: 'label+value',
+  branchvalues: 'total',
   textfont: {
-    size: 14,
+    size: 13,
     color: '#111827',
     family: 'Inter, sans-serif'
   },
   outsidetextfont: {
-    size: 12,
+    size: 13,
     color: '#111827'
   }
 };
