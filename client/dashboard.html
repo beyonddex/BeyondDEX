@@ -367,7 +367,7 @@ footer {
     </p>
   </div>
  <div class="economic-calendar-preview">
-  <h4>Today’s Economic Events</h4>
+  <h4>Upcoming Economic Events</h4>
   <ul id="econCalendarList"></ul>
 </div>
 </div>
@@ -786,12 +786,30 @@ async function load7DayCalendar() {
     console.error('Failed to load 7-day calendar:', err);
   }
 }
+const countryCodeMap = {
+  'United States': 'US',
+  'Canada': 'CA',
+  'Australia': 'AU',
+  'Germany': 'DE',
+  'France': 'FR',
+  'United Kingdom': 'GB',
+  'Japan': 'JP',
+  'China': 'CN',
+  'Switzerland': 'CH',
+  'South Korea': 'KR',
+  'New Zealand': 'NZ',
+  'Italy': 'IT',
+  'Spain': 'ES',
+  'India': 'IN',
+  'Brazil': 'BR',
+  // Add more as needed
+};
 
 function renderCalendar(events) {
   const ul = document.getElementById('econCalendarList');
   ul.innerHTML = '';
 
-  const PREVIEW_HEIGHT = 300; // same as CSS height
+  const PREVIEW_HEIGHT = 350; // same as CSS height
   const ESTIMATED_ITEM_HEIGHT = 42; // px per event (adjust if needed)
   const MAX_EVENTS = Math.floor(PREVIEW_HEIGHT / ESTIMATED_ITEM_HEIGHT);
 
@@ -834,10 +852,13 @@ function renderCalendar(events) {
     const impactLevel = e.impact?.toLowerCase();
     const impactClass = impactLevel ? `impact-${impactLevel}` : '';
 
+    const countryCode = countryCodeMap[e.country] || e.country || 'UN';
+    const flagURL = `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
+
     li.innerHTML = `
       <span class="event-time">${e.time || '--'}</span>
       <span class="event-info">
-        <img class="flag" src="https://countryflagsapi.com/png/${e.country}" alt="${e.country}">
+        <img class="flag" src="${flagURL}" alt="${e.country}">
         <span class="event-name">${e.event}</span>
       </span>
       <span class="${impactClass}">${e.impact}</span>
@@ -845,7 +866,7 @@ function renderCalendar(events) {
     ul.appendChild(li);
   });
 
-  // If more events exist, show "See more" link as final item
+  // Show "See more" link if events were cut
   if (events.length > visibleEvents.length) {
     const moreLi = document.createElement('li');
     moreLi.innerHTML = `<a href="calendar.html" style="text-decoration: underline; font-size: 13px; color: #3b82f6;">See full calendar →</a>`;
