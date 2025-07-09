@@ -606,14 +606,14 @@ const trace = {
   marker: {
     colors: data.map(c => c.price_change_percentage_24h),
     colorscale: [
-      [0, '#f87171'],    // soft red
-      [0.5, '#f3f4f6'],  // soft neutral gray
-      [1, '#34d399']     // soft green
+      [0, '#dc2626'],     // rich red
+      [0.5, '#f3f4f6'],   // subtle light gray
+      [1, '#16a34a']      // rich green
     ],
     cmin: -10,
     cmax: 10,
     colorbar: false,
-    line: { width: 1, color: '#e5e7eb' } // light border
+    line: { width: 1, color: '#e5e7eb' } // soft border for white bg
   },
   textinfo: 'label+value',
   branchvalues: 'total',
