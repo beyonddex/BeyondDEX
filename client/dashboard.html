@@ -165,8 +165,8 @@
 }
 
 .economic-calendar-preview {
-  max-height:300px;
-  overflow-y:auto;
+  max-height:350px;
+  overflow:hidden;
   background: #f9f9f9;
   padding: 16px;
   border-radius: 8px;
@@ -791,16 +791,30 @@ function renderCalendar(events) {
   const ul = document.getElementById('econCalendarList');
   ul.innerHTML = '';
 
-  if (!events.length) {
-    const li = document.createElement('li');
-    li.textContent = 'No economic events in the next 7 days.';
-    li.style.color = '#888';
-    ul.appendChild(li);
-    return;
+  const PREVIEW_HEIGHT = 300; // same as CSS height
+  const ESTIMATED_ITEM_HEIGHT = 42; // px per event (adjust if needed)
+  const MAX_EVENTS = Math.floor(PREVIEW_HEIGHT / ESTIMATED_ITEM_HEIGHT);
+
+  let visibleEvents = [];
+  let lastDate = '';
+  let count = 0;
+
+  for (let i = 0; i < events.length; i++) {
+    const e = events[i];
+
+    // If it's a new date, count the header too
+    if (e.date !== lastDate) count++;
+
+    if (count >= MAX_EVENTS) break;
+
+    visibleEvents.push(e);
+    lastDate = e.date;
+    count++;
   }
 
-  let lastDate = '';
-  events.forEach(e => {
+  // Now render visibleEvents with grouped dates
+  lastDate = '';
+  visibleEvents.forEach(e => {
     if (e.date !== lastDate) {
       const dateLi = document.createElement('li');
       dateLi.textContent = new Date(e.date).toLocaleDateString(undefined, {
@@ -817,11 +831,11 @@ function renderCalendar(events) {
     const li = document.createElement('li');
     li.className = 'economic-event';
 
-    const impactLevel = e.impact?.toLowerCase(); // normalize impact string
+    const impactLevel = e.impact?.toLowerCase();
     const impactClass = impactLevel ? `impact-${impactLevel}` : '';
 
     li.innerHTML = `
-      <span class="event-time">${e.time}</span>
+      <span class="event-time">${e.time || '--'}</span>
       <span class="event-info">
         <img class="flag" src="https://countryflagsapi.com/png/${e.country}" alt="${e.country}">
         <span class="event-name">${e.event}</span>
@@ -830,7 +844,16 @@ function renderCalendar(events) {
     `;
     ul.appendChild(li);
   });
+
+  // If more events exist, show "See more" link as final item
+  if (events.length > visibleEvents.length) {
+    const moreLi = document.createElement('li');
+    moreLi.innerHTML = `<a href="calendar.html" style="text-decoration: underline; font-size: 13px; color: #3b82f6;">See full calendar →</a>`;
+    moreLi.style.marginTop = '10px';
+    ul.appendChild(moreLi);
+  }
 }
+
 
 
 window.addEventListener('DOMContentLoaded', () => {
