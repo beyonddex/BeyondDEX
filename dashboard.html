@@ -813,18 +813,22 @@ function renderCalendar(events) {
 
     const li = document.createElement('li');
     li.className = 'economic-event';
-    const impactClass = `impact-${['low','medium','high'][e.impact]}`;
+
+    const impactLevel = e.impact?.toLowerCase(); // normalize impact string
+    const impactClass = impactLevel ? `impact-${impactLevel}` : '';
+
     li.innerHTML = `
       <span class="event-time">${e.time}</span>
       <span class="event-info">
         <img class="flag" src="https://countryflagsapi.com/png/${e.country}" alt="${e.country}">
         <span class="event-name">${e.event}</span>
       </span>
-      <span class="${impactClass}">${['Low','Med','High'][e.impact]}</span>
+      <span class="${impactClass}">${e.impact}</span>
     `;
     ul.appendChild(li);
   });
 }
+
 
 window.addEventListener('DOMContentLoaded', () => {
   loadCryptoNews();
