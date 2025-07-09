@@ -14,7 +14,7 @@ app.use(express.json());
 
 // API Routes
 app.use('/api/calendar', require('./api/calendar'));
-// app.use('/api/market-data', require('./api/market-data')); // Uncomment if needed
+app.use('/api/market-data', require('./api/market-data')); // Uncomment if needed
 
 // Serve frontend static files (e.g., index.html, CSS, JS)
 app.use(express.static(__dirname));
