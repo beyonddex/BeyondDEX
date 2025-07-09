@@ -92,7 +92,6 @@
   border-radius: 6px;
   transition: background-color 0.4s ease, transform 0.3s ease;
 }
-    }
     #marketList li:hover {
       background: #e0e0e0;
     }
@@ -655,13 +654,23 @@ const layout = {
   }
 };
 
-Plotly.react(heatmapEl, [trace], layout, {
+Plotly.newPlot(heatmapEl, [trace], layout, {
   displayModeBar: false,
-  transition: {
-    duration: 500,
-    easing: 'cubic-in-out'
-  }
+  responsive: true
 });
+
+setTimeout(() => {
+  Plotly.animate(heatmapEl, {
+    data: [trace]
+  }, {
+    transition: {
+      duration: 1000,
+      easing: 'cubic-in-out'
+    },
+    frame: { duration: 1000, redraw: false }
+  });
+}, 200);
+
   } catch (e) {
     console.error('Error fetching market data', e);
   }
