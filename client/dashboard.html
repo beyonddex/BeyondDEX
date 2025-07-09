@@ -165,7 +165,7 @@
 }
 
 .economic-calendar-preview {
-  max-height:400px;
+  max-height:500px;
   overflow:hidden;
   background: #f9f9f9;
   padding: 16px;
@@ -592,58 +592,65 @@ async function loadMarketData() {
     });
 
     // HEATMAP
-    const heatmapEl = document.getElementById('heatmap');
-    const labels = data.map(
-      (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
-    );
-    const values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
-    const colors = data.map((c) => (c.price_change_percentage_24h >= 0 ? '#16a34a' : '#e11d48'));
+    heatmapEl = document.getElementById('heatmap');
+labels = data.map(
+  (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
+);
+values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
 
-    const trace = {
-      type: 'treemap',
-      labels: labels,
-      parents: data.map(() => ''),
-      values: values,
-      marker: {
-        colors: colors,
-        line: { width: 2, color: '#ffffff' }
-      },
-      textinfo: 'label+value',
-      branchvalues: 'total',
-      textfont: {
-        size: 12,
-        color: '#ffffff',
-        family: 'Inter, sans-serif'
-      },
-      outsidetextfont: {
-        size: 12,
-        color: '#000000'
-      }
-    };
+const trace = {
+  type: 'treemap',
+  labels: labels,
+  parents: data.map(() => ''),
+  values: values,
+  marker: {
+    colors: data.map(c => c.price_change_percentage_24h),
+    colorscale: [
+      [0, '#b91c1c'],    // muted red
+      [0.5, '#1e293b'],  // dark slate neutral midpoint
+      [1, '#10b981']     // muted green
+    ],
+    cmin: -10,
+    cmax: 10,
+    colorbar: false,
+    line: { width: 2, color: '#111827' }
+  },
+  textinfo: 'label+value',
+  branchvalues: 'total',
+  textfont: {
+    size: 13,
+    color: '#f9fafb',
+    family: 'Inter, sans-serif'
+  },
+  outsidetextfont: {
+    size: 12,
+    color: '#f9fafb'
+  }
+};
 
-    const layout = {
-      paper_bgcolor: '#ffffff',
-      plot_bgcolor: '#ffffff',
-      height: 500,
-      margin: { t: 10, l: 0, r: 0, b: 0 },
-      font: {
-        family: 'Inter, sans-serif',
-        size: 13,
-        color: '#000000'
-      },
-      uniformtext: {
-        minsize: 10,
-        mode: 'hide'
-      }
-    };
+const layout = {
+  paper_bgcolor: '#111827',
+  plot_bgcolor: '#111827',
+  height: 500,
+  margin: { t: 10, l: 0, r: 0, b: 0 },
+  font: {
+    family: 'Inter, sans-serif',
+    size: 13,
+    color: '#f3f4f6'
+  },
+  uniformtext: {
+    minsize: 10,
+    mode: 'hide'
+  }
+};
 
-    Plotly.react(heatmapEl, [trace], layout, {
-      displayModeBar: false,
-      transition: {
-        duration: 500,
-        easing: 'cubic-in-out'
-      }
-    });
+Plotly.react(heatmapEl, [trace], layout, {
+  displayModeBar: false,
+  transition: {
+    duration: 500,
+    easing: 'cubic-in-out'
+  }
+});
   } catch (e) {
     console.error('Error fetching market data', e);
   }
@@ -809,7 +816,7 @@ function renderCalendar(events) {
   const ul = document.getElementById('econCalendarList');
   ul.innerHTML = '';
 
-  const PREVIEW_HEIGHT = 400; // same as CSS height
+  const PREVIEW_HEIGHT = 500; // same as CSS height
   const ESTIMATED_ITEM_HEIGHT = 42; // px per event (adjust if needed)
   const MAX_EVENTS = Math.floor(PREVIEW_HEIGHT / ESTIMATED_ITEM_HEIGHT);
 
