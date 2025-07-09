@@ -80,6 +80,13 @@
   flex-direction: column;
   font-size: 14px;
 }
+#heatmap {
+  background-color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
 
     #marketList {
       max-height: 200px;
@@ -616,27 +623,28 @@ const trace = {
   marker: {
     colors: data.map(c => c.price_change_percentage_24h),
     colorscale: [
-      [0, '#dc2626'],     // rich red
-      [0.5, '#f3f4f6'],   // subtle light gray
-      [1, '#16a34a']      // rich green
+      [0, '#dc2626'],
+      [0.5, '#f3f4f6'],
+      [1, '#16a34a']
     ],
     cmin: -10,
     cmax: 10,
-    colorbar: false,
-    line: { width: 1, color: '#e5e7eb' } // soft border for white bg
+    line: { width: 1, color: '#e5e7eb' }
   },
   textinfo: 'label+value',
+  textposition: 'middle center', // ✅ Add this line for better alignment
   branchvalues: 'total',
   textfont: {
-    size: 13,
+    size: 14,
     color: '#111827',
     family: 'Inter, sans-serif'
   },
   outsidetextfont: {
-    size: 13,
+    size: 14,
     color: '#111827'
   }
 };
+
 
 const layout = {
   paper_bgcolor: '#ffffff',
@@ -649,10 +657,11 @@ const layout = {
     color: '#111827'
   },
   uniformtext: {
-    minsize: 10,
+    minsize: 12,
     mode: 'hide'
   }
 };
+
 
 Plotly.newPlot(heatmapEl, [trace], layout, {
   displayModeBar: false,
