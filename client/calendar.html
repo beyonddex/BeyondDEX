@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Economic Calendar | BeyondDEX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f9f9f9;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo img { height: 40px; }
+    .nav-links a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #000;
+      font-weight: 500;
+    }
+
+    .main-content {
+      display: flex;
+      flex: 1;
+    }
+
+    .left-nav {
+      width: 200px;
+      background: #f0f0f0;
+      padding: 20px 10px;
+      border-right: 1px solid #ddd;
+    }
+
+    .left-nav button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      background: none;
+      border: none;
+      font-size: 15px;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .left-nav button:hover {
+      background: #e0e0e0;
+    }
+
+    .calendar-section {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .calendar-box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .calendar-box ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .calendar-box li {
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .calendar-box h3 {
+      margin-top: 40px;
+      font-size: 18px;
+      color: #111;
+    }
+
+    .event-time { font-weight: bold; width: 70px; }
+    .event-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .event-info img {
+      width: 24px;
+    }
+
+    .event-name {
+      font-size: 15px;
+    }
+
+    .impact-low { color: green; }
+    .impact-medium { color: orange; }
+    .impact-high { color: red; }
+
+    .sidebar {
+      width: 280px;
+      background: #fafafa;
+      border-left: 1px solid #ddd;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .chat-input {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .chat-input button {
+      padding: 8px 12px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-left: 6px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #999;
+      border-top: 1px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <a href="index.html"><img src="assets/bdx.png" alt="BeyondDEX Logo" /></a>
+  </div>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="dex.html">DEX</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="auth.html">Login</a>
+  </div>
+</header>
+
+<div class="main-content">
+  <div class="left-nav">
+    <button onclick="window.location.href='dashboard.html'">📊 Overview</button>
+    <button onclick="window.location.href='calendar.html'">📅 Economic Calendar</button>
+    <button onclick="window.location.href='dex.html'">💱 DEX</button>
+  </div>
+
+  <div class="calendar-section">
+    <div class="calendar-box">
+      <h2 style="margin-bottom: 20px;">Full Economic Calendar</h2>
+      <ul id="econCalendarList"></ul>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div id="onlineUsersCount">Online Users: 0</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Type a message..." />
+      <button id="sendMessage">Send</button>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  © 2025 BeyondDEX. All rights reserved.<br />
+  <a href="mailto:team@beyonddex.io">team@beyonddex.io</a>
+</footer>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+    authDomain: "beyonddex-be653.firebaseapp.com",
+    projectId: "beyonddex-be653",
+    storageBucket: "beyonddex-be653.firebasestorage.app",
+    messagingSenderId: "687411546401",
+    appId: "1:687411546401:web:ec71401e52751d3e121660",
+    measurementId: "G-6SH111LB7J"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let currentUsername = '';
+  let userDocId = '';
+
+  const chatBox = document.getElementById("chatBox");
+  const chatInput = document.getElementById("chatInput");
+  const sendMessage = document.getElementById("sendMessage");
+  const onlineUsersCount = document.getElementById("onlineUsersCount");
+
+  function updatePresence(uid, username) {
+    userDocId = uid;
+    db.collection("presence").doc(uid).set({
+      username,
+      lastActive: firebase.firestore.Timestamp.now()
+    }, { merge: true });
+  }
+
+  function monitorPresence() {
+    setInterval(() => {
+      if (userDocId && currentUsername) updatePresence(userDocId, currentUsername);
+    }, 30000);
+
+    db.collection("presence").onSnapshot(snapshot => {
+      const now = Date.now();
+      const onlineUsers = snapshot.docs.filter(doc => {
+        const data = doc.data();
+        return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
+      });
+      onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
+    });
+  }
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      const uid = user.uid;
+      db.collection("users").doc(uid).get().then(doc => {
+        if (doc.exists) {
+          const username = doc.data().username || user.email || "Anon";
+          currentUsername = username;
+          userDocId = uid;
+          updatePresence(uid, username);
+          monitorPresence();
+        }
+      });
+
+      db.collection("chat").orderBy("timestamp").onSnapshot(snapshot => {
+        chatBox.innerHTML = '';
+        snapshot.forEach(doc => {
+          const { username, text, timestamp } = doc.data();
+          const timeStr = timestamp ? getRelativeTime(timestamp) : '';
+          const div = document.createElement("div");
+          div.innerHTML = `<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+
+    } else {
+      window.location.href = "/auth.html";
+    }
+  });
+
+  function sendChatMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+      db.collection("chat").add({
+        username: currentUsername,
+        text: message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      chatInput.value = "";
+      chatInput.focus();
+    }
+  }
+
+  sendMessage.addEventListener("click", sendChatMessage);
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendChatMessage();
+  });
+
+  function getRelativeTime(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp.toDate().getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+    return timestamp.toDate().toLocaleDateString();
+  }
+
+  async function loadCalendar() {
+    const res = await fetch('https://beyonddex-backend.onrender.com/api/calendar');
+    const events = await res.json();
+    renderCalendar(events);
+  }
+
+  function renderCalendar(events) {
+    const ul = document.getElementById('econCalendarList');
+    ul.innerHTML = '';
+    let lastDate = '';
+    events.forEach(e => {
+      if (e.date !== lastDate) {
+        const dateLi = document.createElement('li');
+        dateLi.innerHTML = `<h3>${new Date(e.date).toLocaleDateString(undefined, {
+          weekday: 'long', month: 'long', day: 'numeric'
+        })}</h3>`;
+        ul.appendChild(dateLi);
+        lastDate = e.date;
+      }
+
+      const li = document.createElement('li');
+      li.className = 'economic-event';
+
+      const impactClass = e.impact?.toLowerCase() ? `impact-${e.impact.toLowerCase()}` : '';
+
+      li.innerHTML = `
+        <span class="event-time">${e.time}</span>
+        <span class="event-info">
+          <img class="flag" src="https://countryflagsapi.com/png/${e.country}" alt="${e.country}">
+          <span class="event-name">${e.event}</span>
+        </span>
+        <span class="${impactClass}">${e.impact}</span>
+      `;
+      ul.appendChild(li);
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', loadCalendar);
+</script>
+
+</body>
+</html>
