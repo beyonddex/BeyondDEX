@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | BeyondDEX</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+    header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+    .logo-container img { height: 50px; }
+    .nav-links a { margin-left: 20px; text-decoration: none; color: #000; font-weight: 500; }
+    .user-container { position: relative; margin-left: auto; }
+    .user-circle { width: 40px; height: 40px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; cursor: pointer; }
+    .dropdown { position: absolute; top: 50px; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; min-width: 120px; z-index: 1000; }
+    .dropdown a { display: block; padding: 10px; text-decoration: none; color: #000; font-size: 14px; }
+    .dropdown a:hover { background: #f0f0f0; }
+    .page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+    .dashboard-content {
+  display: flex;
+  flex-direction: column;
+  padding-top:100px;
+  padding-bottom: 60px; /* space so content doesn't touch footer */
+}
+    .left-nav {
+  width: 200px;
+  border-right: 1px solid #e0e0e0;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 10px;
+}
+    .left-nav button { background: none; border: none; padding: 12px; font-size: 15px; text-align: left; cursor: pointer; margin-bottom: 10px; border-radius: 6px; transition: background 0.2s; }
+    .left-nav button:hover { background: #e0e0e0; }
+   main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+
+    .market-section {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: calc(100% - 40px);
+  padding: 20px 16px;
+  background: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+    #marketList {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    #marketList li {
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    #marketList li:hover {
+      background: #e0e0e0;
+    }
+    #marketList li.active {
+      background: #d4d4d4;
+      font-weight: bold;
+    }
+
+    .market-up { color: #16a34a; font-weight: 500; }
+    .market-down { color: #e11d48; font-weight: 500; }
+
+    .market-panel {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px; /* Slightly more space between columns */
+      height: 100%;
+      position: relative;
+    }
+
+    .token-heatmap {
+  flex: 1;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+    .volume-section {
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+   .chart-section {
+  flex: 1.3;
+  width: 500px;
+  min-width: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+   .market-data-column {
+  flex: 1;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-right: 0;
+  height: 100%;
+}
+
+    .market-data-box,
+.market-insights-box,
+.economic-calendar-box {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.economic-calendar-box {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.economic-calendar-preview {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.economic-calendar-preview ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.economic-event {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.event-time {
+  width: 50px;
+  font-weight: bold;
+}
+
+.impact-low { color: green; }
+.impact-medium { color: orange; }
+.impact-high { color: red; }
+
+.event-info {
+  flex: 1;
+}
+
+.event-info img.flag {
+  width: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.event-name {
+  vertical-align: middle;
+}
+
+.market-insights-box {
+  background: #f1f1f1;
+}
+
+.economic-calendar-box {
+  line-height: 1.5;
+}
+
+ .sidebar {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 260px;
+  height: 100%;
+  min-height: 0;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  gap: 12px;
+}
+
+.chat-box {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+    .chat-input button {
+  padding: 8px 12px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.dashboard-row {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  min-height: 0;
+}
+
+.dashboard-footer,
+footer {
+  text-align: center;
+  padding: 24px 0 40px;
+  font-size: 13px;
+  color: #999;
+  border-top: 1px solid #e0e0e0;
+  margin-top: auto;
+}
+.dashboard-main-content {
+  display: flex;
+  gap: 12px;
+  margin-left: 50px; /* ✅ Push it right, away from left-nav */
+  flex: 1;
+}
+
+
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+  <header>
+    <div class="logo-container">
+      <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
+    </div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/dex.html">DEX</a>
+      <a href="/macro.html">Dashboard</a>
+    </div>
+    <div class="user-container">
+      <div class="user-circle" id="userCircle">?</div>
+      <div class="dropdown" id="dropdownMenu">
+        <a href="#" id="logout">Log Out</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <main>
+    <div class="dashboard-row">
+    <div class="left-nav">
+      <button>📊 Overview</button>
+      <button>📰 News</button>
+      <button>🐋 Whale Alerts</button>
+    </div>
+
+  <div class="dashboard-main-content">
+  <div class="market-panel">
+    <div class="token-heatmap">
+      <div class="volume-section">
+        <h4>Top Volume Tokens</h4>
+        <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
+      </div>
+      <div class="heatmap-section">
+        <h4>Market Heatmap</h4>
+        <div id="heatmap"></div>
+      </div>
+    </div>
+
+    <div class="chart-section">
+      <h4>Price Chart</h4>
+      <div id="tokenChartInner" style="width:100%; height:400px; margin-bottom: 30px;"></div>
+
+      <div id="newsSection">
+        <h4>Latest Crypto News</h4>
+        <ul id="cryptoNewsList" style="list-style:none; padding-left:0;"></ul>
+      </div>
+    </div>
+
+   <div class="market-data-column">
+  <div class="market-data-box">
+    <h4>Market Data</h4>
+    <ul id="marketDataList" style="list-style: none; padding-left: 0;">
+      <li><strong>Total Market Cap:</strong> <span id="totalMarketCap">Loading...</span></li>
+      <li><strong>BTC Dominance:</strong> <span id="btcDominance">Loading...</span></li>
+      <li><strong>ETH Dominance:</strong> <span id="ethDominance">Loading...</span></li>
+      <li><strong>BTC/ETH Ratio:</strong> <span id="btcEthRatio">Loading...</span></li>
+      <li><strong>Funding Rate (BTC Perps):</strong> <span id="fundingRate">Loading...</span></li>
+      <li><strong>Fear & Greed Index:</strong> <span id="fearGreedIndex">Loading...</span></li>
+    </ul>
+  </div>
+
+  <div class="market-insights-box">
+    <h4>On-Chain Insights (Coming Soon)</h4>
+    <p style="font-size: 13px; color: #555; line-height: 1.4;">
+      Stay tuned for exchange inflows, outflows, and whale wallet trackers to help you analyze market sentiment and big-money moves.
+    </p>
+  </div>
+ <div class="economic-calendar-preview">
+  <h4>Today’s Economic Events</h4>
+  <ul id="econCalendarList"></ul>
+</div>
+</div>
+
+    <aside class="sidebar">
+      <div id="onlineUsersCount">Online Users: 0</div>
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button id="sendMessage">Send</button>
+      </div>
+    </aside>
+    </div>
+  </div>
+</main>    
+
+  </div>
+<footer style="text-align:center; padding: 20px; font-size: 13px; color: #999;">
+  © 2025 BeyondDEX. All rights reserved.
+</footer>
+</div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+      authDomain: "beyonddex-be653.firebaseapp.com",
+      projectId: "beyonddex-be653",
+      storageBucket: "beyonddex-be653.firebasestorage.app",
+      messagingSenderId: "687411546401",
+      appId: "1:687411546401:web:ec71401e52751d3e121660",
+      measurementId: "G-6SH111LB7J"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const userCircle = document.getElementById("userCircle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    const sendMessage = document.getElementById("sendMessage");
+    const onlineUsersCount = document.getElementById("onlineUsersCount");
+
+    let currentUsername = "";
+    let userDocId = "";
+
+    userCircle.addEventListener("click", () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+    });
+
+    window.addEventListener("click", e => {
+      if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
+
+    document.getElementById("logout").addEventListener("click", () => {
+      if (userDocId) db.collection("presence").doc(userDocId).delete();
+      auth.signOut().then(() => window.location.href = "/auth.html");
+    });
+
+    function getRelativeTime(timestamp) {
+      const now = Date.now();
+      const diff = now - timestamp.toDate().getTime();
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      if (seconds < 60) return "just now";
+      if (minutes < 60) return `${minutes} min ago`;
+      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      return timestamp.toDate().toLocaleDateString();
+    }
+
+    function updatePresence(uid, username) {
+      userDocId = uid;
+      db.collection("presence").doc(uid).set({ username, lastActive: firebase.firestore.Timestamp.now() }, { merge: true });
+    }
+
+    function monitorPresence() {
+      setInterval(() => {
+        if (userDocId && currentUsername) updatePresence(userDocId, currentUsername);
+      }, 30000);
+
+      db.collection("presence").onSnapshot(snapshot => {
+        const now = Date.now();
+        const onlineUsers = snapshot.docs.filter(doc => {
+          const data = doc.data();
+          return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
+        });
+        onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
+      });
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const uid = user.uid;
+        db.collection("users").doc(uid).get().then(doc => {
+          if (doc.exists) {
+            const username = doc.data().username || user.email || "Anon";
+            currentUsername = username;
+            userDocId = uid;
+            userCircle.textContent = username.charAt(0).toUpperCase();
+            updatePresence(uid, username);
+            monitorPresence();
+          }
+        });
+
+        db.collection("chat").orderBy("timestamp").onSnapshot(snapshot => {
+          chatBox.innerHTML = "";
+          snapshot.forEach(doc => {
+            const { username, text, timestamp } = doc.data();
+            const timeStr = timestamp ? getRelativeTime(timestamp) : '';
+            const div = document.createElement("div");
+            div.className = "chat-message";
+            div.innerHTML = `<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
+            chatBox.appendChild(div);
+          });
+          chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+        });
+
+      } else {
+        window.location.href = "/auth.html";
+      }
+    });
+
+    function sendChatMessage() {
+      const message = chatInput.value.trim();
+      if (message) {
+        db.collection("chat").add({
+          username: currentUsername,
+          text: message,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        chatInput.value = "";
+        chatInput.focus();
+      }
+    }
+
+    sendMessage.addEventListener("click", sendChatMessage);
+    chatInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendChatMessage();
+    });
+
+   // Map token symbols to correct CoinGecko chart IDs
+const idFixMap = {
+  usdt: 'tether',
+  usdc: 'usd-coin',
+  btc: 'bitcoin',
+  eth: 'ethereum',
+  bnb: 'binancecoin',
+  xrp: 'ripple',
+  doge: 'dogecoin',
+  sol: 'solana',
+  link: 'chainlink',
+  ada: 'cardano',
+  ton: 'the-open-network' // example for TON
+};
+
+async function loadMarketData() {
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=15&page=1&sparkline=false&price_change_percentage=24h'
+    );
+    const data = await res.json();
+
+    const list = document.getElementById('marketList');
+    list.innerHTML = '';
+
+    const chartContainer = document.getElementById('tokenChartInner');
+    if (!chartContainer) {
+      const newDiv = document.createElement('div');
+      newDiv.id = 'tokenChartInner';
+      document.querySelector('.chart-section').appendChild(newDiv);
+    }
+
+    data.forEach((coin, index) => {
+      const change = coin.price_change_percentage_24h;
+      const changeClass = change >= 0 ? 'market-up' : 'market-down';
+      const changeSymbol = change >= 0 ? '▲' : '▼';
+      const absChange = Math.abs(change);
+
+      const li = document.createElement('li');
+      li.classList.add('token-entry');
+      li.setAttribute('data-id', coin.id);
+      li.innerHTML = `
+        <strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()}
+        <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/>
+        <small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>
+      `;
+
+      li.addEventListener('mouseover', () => {
+        if (!li.classList.contains('active')) li.style.backgroundColor = '#f0f0f0';
+      });
+
+      li.addEventListener('mouseout', () => {
+        if (!li.classList.contains('active')) li.style.backgroundColor = '';
+      });
+
+      li.addEventListener('click', () => {
+        document.querySelectorAll('.token-entry').forEach(el => {
+          el.classList.remove('active');
+          el.style.backgroundColor = '';
+        });
+        li.classList.add('active');
+        li.style.backgroundColor = '#e0e0e0';
+
+        const fixedId = idFixMap[coin.symbol.toLowerCase()] || coin.id;
+        console.log(`Clicked token: ${coin.symbol} → ID used: ${fixedId}`);
+        loadTokenChart(fixedId, coin.symbol.toUpperCase());
+      });
+
+      list.appendChild(li);
+
+      // Load first token chart by default
+      if (index === 0) {
+        li.classList.add('active');
+        li.style.backgroundColor = '#e0e0e0';
+        const fixedId = idFixMap[coin.symbol.toLowerCase()] || coin.id;
+        console.log(`Auto-load token: ${coin.symbol} → ID used: ${fixedId}`);
+        loadTokenChart(fixedId, coin.symbol.toUpperCase());
+      }
+    });
+
+    // HEATMAP
+    const heatmapEl = document.getElementById('heatmap');
+    const labels = data.map(
+      (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
+    );
+    const values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
+    const colors = data.map((c) => (c.price_change_percentage_24h >= 0 ? '#16a34a' : '#e11d48'));
+
+    const trace = {
+      type: 'treemap',
+      labels: labels,
+      parents: data.map(() => ''),
+      values: values,
+      marker: {
+        colors: colors,
+        line: { width: 2, color: '#ffffff' }
+      },
+      textinfo: 'label+value',
+      branchvalues: 'total',
+      textfont: {
+        size: 12,
+        color: '#ffffff',
+        family: 'Inter, sans-serif'
+      },
+      outsidetextfont: {
+        size: 12,
+        color: '#000000'
+      }
+    };
+
+    const layout = {
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      height: 500,
+      margin: { t: 10, l: 0, r: 0, b: 0 },
+      font: {
+        family: 'Inter, sans-serif',
+        size: 13,
+        color: '#000000'
+      },
+      uniformtext: {
+        minsize: 10,
+        mode: 'hide'
+      }
+    };
+
+    Plotly.react(heatmapEl, [trace], layout, {
+      displayModeBar: false,
+      transition: {
+        duration: 500,
+        easing: 'cubic-in-out'
+      }
+    });
+  } catch (e) {
+    console.error('Error fetching market data', e);
+  }
+}
+
+// Chart Loader
+async function loadTokenChart(tokenId, symbol) {
+  const chartEl = document.getElementById('tokenChartInner');
+  if (!chartEl) return;
+
+  // Show loading indicator (non-destructive)
+  if (!chartEl.querySelector('.loading-indicator')) {
+    const loader = document.createElement('div');
+    loader.className = 'loading-indicator';
+    loader.innerText = 'Loading chart...';
+    loader.style.textAlign = 'center';
+    loader.style.paddingTop = '100px';
+    loader.style.color = '#888';
+    loader.style.fontSize = '14px';
+    chartEl.appendChild(loader);
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1`
+    );
+    const data = await res.json();
+
+    if (!data.prices || data.prices.length === 0) {
+      console.error(`No price data for ${symbol}`);
+      return;
+    }
+
+    const times = data.prices.map(p => new Date(p[0]));
+    const prices = data.prices.map(p => p[1]);
+
+    await Plotly.react(chartEl, [{
+  x: times,
+  y: prices,
+  type: 'scatter',
+  mode: 'lines',
+  line: { color: '#3b82f6', width: 2 }
+}], {
+  title: `${symbol}/USD - 24h`,
+  margin: { t: 40, l: 40, r: 10, b: 30 },
+  paper_bgcolor: '#fff',
+  plot_bgcolor: '#fff',
+  font: { family: 'Inter, sans-serif', color: '#000' },
+  height: 400  // 👈 Add this line to fix vertical height
+}, {
+  displayModeBar: false
+});
+
+  } catch (e) {
+    console.error(`Error loading chart for ${tokenId}`, e);
+  } finally {
+    const loader = chartEl.querySelector('.loading-indicator');
+    if (loader) loader.remove();
+  }
+}
+function getRelativeTime(timestamp) {
+  const now = Date.now();
+  const diff = now - timestamp * 1000; // convert from seconds
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
+async function loadCryptoNews() {
+  try {
+    const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+    const json = await res.json();
+
+    const newsList = document.getElementById('cryptoNewsList');
+    newsList.innerHTML = '';
+
+    const articles = json.Data.slice(0, 3); // only show 3 articles
+    articles.forEach(article => {
+      const li = document.createElement('li');
+      const timeAgo = getRelativeTime(article.published_on);
+
+      li.innerHTML = `
+        <a href="${article.url}" target="_blank">${article.title}</a><br/>
+        <small style="color: #666;">${timeAgo}</small>
+      `;
+      newsList.appendChild(li);
+    });
+  } catch (e) {
+    console.error('Failed to load crypto news:', e);
+  }
+}
+async function loadExtraMarketData() {
+  try {
+    const res = await fetch('https://beyonddex-backend.onrender.com/api/market-data');
+    const data = await res.json();
+
+    const { btcDom, ethDom, btcEthRatio, fundingRate, openInterest, fearGreed, totalMarketCap } = data;
+
+    // Apply text + color class to a target span
+    const updateSpan = (id, value) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      el.classList.remove('market-up', 'market-down');
+
+      if (value !== 'Unavailable' && !isNaN(parseFloat(value))) {
+        el.classList.add(parseFloat(value) >= 0 ? 'market-up' : 'market-down');
+      }
+
+      el.textContent = value;
+    };
+
+    document.getElementById('btcDominance').textContent = `${btcDom}%`;
+    document.getElementById('ethDominance').textContent = `${ethDom}%`;
+    document.getElementById('btcEthRatio').textContent = btcEthRatio;
+    document.getElementById('fearGreedIndex').textContent = fearGreed;
+
+    updateSpan('fundingRate', fundingRate);
+
+    if (totalMarketCap) {
+      document.getElementById('totalMarketCap').textContent = totalMarketCap;
+    }
+
+  } catch (err) {
+    console.error('Error loading extra market data', err);
+  }
+}
+// Example: fetch today's economic events
+async function load7DayCalendar() {
+  try {
+    const res = await fetch('https://beyonddex-backend.onrender.com/api/calendar')
+    const events = await res.json();
+    renderCalendar(events);
+  } catch (err) {
+    console.error('Failed to load 7-day calendar:', err);
+  }
+}
+
+function renderCalendar(events) {
+  const ul = document.getElementById('econCalendarList');
+  ul.innerHTML = '';
+
+  if (!events.length) {
+    const li = document.createElement('li');
+    li.textContent = 'No economic events in the next 7 days.';
+    li.style.color = '#888';
+    ul.appendChild(li);
+    return;
+  }
+
+  let lastDate = '';
+  events.forEach(e => {
+    if (e.date !== lastDate) {
+      const dateLi = document.createElement('li');
+      dateLi.textContent = new Date(e.date).toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+      dateLi.style.fontWeight = 'bold';
+      dateLi.style.marginTop = '10px';
+      ul.appendChild(dateLi);
+      lastDate = e.date;
+    }
+
+    const li = document.createElement('li');
+    li.className = 'economic-event';
+
+    const impactLevel = e.impact?.toLowerCase(); // normalize impact string
+    const impactClass = impactLevel ? `impact-${impactLevel}` : '';
+
+    li.innerHTML = `
+      <span class="event-time">${e.time}</span>
+      <span class="event-info">
+        <img class="flag" src="https://countryflagsapi.com/png/${e.country}" alt="${e.country}">
+        <span class="event-name">${e.event}</span>
+      </span>
+      <span class="${impactClass}">${e.impact}</span>
+    `;
+    ul.appendChild(li);
+  });
+}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadCryptoNews();
+  setInterval(loadCryptoNews, 60000);
+
+  loadMarketData();
+  setInterval(loadMarketData, 30000);
+
+  loadExtraMarketData(); // <-- 🔥 Add this
+  setInterval(loadExtraMarketData, 60000); // refresh every 60s
+
+   load7DayCalendar();
+});
+
+
+  </script>
+</body>
+</html>
+
