@@ -882,17 +882,18 @@ function renderCalendar(events) {
     { symbol: 'DOT', change: 1.5, volume: 40 }
   ];
 
-  const width = 500, height = 500, radius = 200, arcOuter = radius, arcInner = 100;
+  const width = 500, height = 500, radius = 200, arcInner = 100, hoverScale = 1.07;
 
   const svg = d3.select('#heatmap svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
     .append('g')
-    .attr('transform', `translate(${width / 2},${height / 2})`);
+    .attr('transform', `translate(${width / 2}, ${height / 2})`);
 
   const pie = d3.pie().value(d => d.volume).sort(null);
-  const arc = d3.arc().innerRadius(arcInner).outerRadius(arcOuter);
+  const arc = d3.arc().innerRadius(arcInner).outerRadius(radius);
   const tooltip = d3.select('#tooltip');
 
-  const color = d => d.change > 0 ? '#16a34a' : d.change < 0 ? '#dc2626' : '#9ca3af';
+  const color = d => d.change > 0 ? '#22c55e' : d.change < 0 ? '#ef4444' : '#9ca3af';
 
   const g = svg.selectAll('.arc')
     .data(pie(data))
@@ -906,9 +907,10 @@ function renderCalendar(events) {
     .attr('stroke', '#fff')
     .attr('stroke-width', 2)
     .on('mouseover', function (event, d) {
-      const el = d3.select(this);
-      el.raise();
-      el.transition().duration(200).attr('transform', `translate(${arc.centroid(d)[0] * 0.07}, ${arc.centroid(d)[1] * 0.07})`);
+      d3.select(this).transition().duration(200).attr('transform', () => {
+        const [x, y] = arc.centroid(d);
+        return `translate(${x * (hoverScale - 1)},${y * (hoverScale - 1)})`;
+      });
 
       tooltip.style('opacity', 1)
         .html(`<strong>${d.data.symbol}</strong><br>${d.data.change >= 0 ? '+' : ''}${d.data.change}%`)
@@ -924,21 +926,31 @@ function renderCalendar(events) {
       tooltip.style('opacity', 0);
     });
 
+  // Add both symbol and % change text
   g.append('text')
-    .attr('transform', d => `translate(${arc.centroid(d)})`)
+    .attr('transform', d => {
+      const [x, y] = arc.centroid(d);
+      return `translate(${x}, ${y - 8})`; // Symbol slightly above
+    })
     .attr('text-anchor', 'middle')
     .attr('alignment-baseline', 'middle')
     .text(d => d.data.symbol)
-    .style('fill', '#fff')
+    .style('fill', '#ffffff')
     .style('font-size', '12px')
+    .style('font-weight', 'bold')
     .style('pointer-events', 'none');
 
-  svg.append('text')
+  g.append('text')
+    .attr('transform', d => {
+      const [x, y] = arc.centroid(d);
+      return `translate(${x}, ${y + 10})`; // % below
+    })
     .attr('text-anchor', 'middle')
-    .attr('y', 6)
-    .style('font-size', '18px')
-    .style('font-weight', '600')
-    .text('Token Heatmap');
+    .attr('alignment-baseline', 'middle')
+    .text(d => `${d.data.change >= 0 ? '+' : ''}${d.data.change.toFixed(2)}%`)
+    .style('fill', d => d.data.change > 0 ? '#bbf7d0' : d.data.change < 0 ? '#fecaca' : '#d1d5db')
+    .style('font-size', '11px')
+    .style('pointer-events', 'none');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
