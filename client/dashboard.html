@@ -83,16 +83,18 @@
   font-size: 14px;
 }
 #heatmap {
-    background-color: #ffffff !important;
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    height: 620px; /* Slightly taller to accommodate the larger SVG */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  background-color: #ffffff !important;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  height: 480px; /* reduced to prevent overflow */
+  width: 100%; /* ensure responsiveness */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 
 
 
@@ -889,7 +891,7 @@ function renderCalendar(events) {
       volume: coin.total_volume || 1
     }));
 
-    const width = 500, height = 500, radius = 200, arcInner = 100, hoverScale = 1.07;
+    const width = 400, height = 400, radius = 170, arcInner = 90;
 
     const svgContainer = d3.select('#heatmap svg');
     svgContainer.selectAll("*").remove(); // clear previous
