@@ -870,87 +870,95 @@ function renderCalendar(events) {
 }
 
 // HEATMAP
-  function loadD3Heatmap() {
-  const data = [
-    { symbol: 'BTC', change: 3.2, volume: 80 },
-    { symbol: 'ETH', change: -1.1, volume: 60 },
-    { symbol: 'LTC', change: 0.0, volume: 20 },
-    { symbol: 'BNB', change: 0.6, volume: 30 },
-    { symbol: 'ADA', change: -0.5, volume: 35 },
-    { symbol: 'XRP', change: 0.2, volume: 50 },
-    { symbol: 'DOGE', change: -0.8, volume: 25 },
-    { symbol: 'DOT', change: 1.5, volume: 40 }
-  ];
+  async function loadD3Heatmap() {
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h'
+    );
+    const data = await res.json();
 
-  const width = 500, height = 500, radius = 200, arcInner = 100, hoverScale = 1.07;
+    const processedData = data.map(coin => ({
+      symbol: coin.symbol.toUpperCase(),
+      change: coin.price_change_percentage_24h || 0,
+      volume: coin.total_volume || 1
+    }));
 
-  const svg = d3.select('#heatmap svg')
-    .attr('viewBox', `0 0 ${width} ${height}`)
-    .append('g')
-    .attr('transform', `translate(${width / 2}, ${height / 2})`);
+    const width = 500, height = 500, radius = 200, arcInner = 100, hoverScale = 1.07;
 
-  const pie = d3.pie().value(d => d.volume).sort(null);
-  const arc = d3.arc().innerRadius(arcInner).outerRadius(radius);
-  const tooltip = d3.select('#tooltip');
+    const svgContainer = d3.select('#heatmap svg');
+    svgContainer.selectAll("*").remove(); // clear previous
+    const svg = svgContainer
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .append('g')
+      .attr('transform', `translate(${width / 2}, ${height / 2})`);
 
-  const color = d => d.change > 0 ? '#22c55e' : d.change < 0 ? '#ef4444' : '#9ca3af';
+    const pie = d3.pie().value(d => d.volume).sort(null);
+    const arc = d3.arc().innerRadius(arcInner).outerRadius(radius);
+    const tooltip = d3.select('#tooltip');
 
-  const g = svg.selectAll('.arc')
-    .data(pie(data))
-    .enter()
-    .append('g')
-    .attr('class', 'arc');
+    const color = d => d.change > 0 ? '#22c55e' : d.change < 0 ? '#ef4444' : '#9ca3af';
 
-  g.append('path')
-    .attr('d', arc)
-    .attr('fill', d => color(d.data))
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 2)
-    .on('mouseover', function (event, d) {
-      d3.select(this).transition().duration(200).attr('transform', () => {
-        const [x, y] = arc.centroid(d);
-        return `translate(${x * (hoverScale - 1)},${y * (hoverScale - 1)})`;
+    const g = svg.selectAll('.arc')
+      .data(pie(processedData))
+      .enter()
+      .append('g')
+      .attr('class', 'arc');
+
+    g.append('path')
+      .attr('d', arc)
+      .attr('fill', d => color(d.data))
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 2)
+      .on('mouseover', function (event, d) {
+        d3.select(this).transition().duration(200).attr('transform', () => {
+          const [x, y] = arc.centroid(d);
+          return `translate(${x * (hoverScale - 1)},${y * (hoverScale - 1)})`;
+        });
+
+        tooltip.style('opacity', 1)
+          .html(`<strong>${d.data.symbol}</strong><br>${d.data.change >= 0 ? '+' : ''}${d.data.change.toFixed(2)}%`)
+          .style('left', (event.pageX + 10) + 'px')
+          .style('top', (event.pageY - 30) + 'px');
+      })
+      .on('mousemove', event => {
+        tooltip.style('left', (event.pageX + 10) + 'px')
+          .style('top', (event.pageY - 30) + 'px');
+      })
+      .on('mouseout', function () {
+        d3.select(this).transition().duration(200).attr('transform', 'translate(0,0)');
+        tooltip.style('opacity', 0);
       });
 
-      tooltip.style('opacity', 1)
-        .html(`<strong>${d.data.symbol}</strong><br>${d.data.change >= 0 ? '+' : ''}${d.data.change}%`)
-        .style('left', (event.pageX + 10) + 'px')
-        .style('top', (event.pageY - 30) + 'px');
-    })
-    .on('mousemove', event => {
-      tooltip.style('left', (event.pageX + 10) + 'px')
-        .style('top', (event.pageY - 30) + 'px');
-    })
-    .on('mouseout', function () {
-      d3.select(this).transition().duration(200).attr('transform', 'translate(0,0)');
-      tooltip.style('opacity', 0);
-    });
+    // Symbol label
+    g.append('text')
+      .attr('transform', d => {
+        const [x, y] = arc.centroid(d);
+        return `translate(${x}, ${y - 8})`;
+      })
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'middle')
+      .text(d => d.data.symbol)
+      .style('fill', '#ffffff')
+      .style('font-size', '12px')
+      .style('font-weight', 'bold')
+      .style('pointer-events', 'none');
 
-  // Add both symbol and % change text
-  g.append('text')
-    .attr('transform', d => {
-      const [x, y] = arc.centroid(d);
-      return `translate(${x}, ${y - 8})`; // Symbol slightly above
-    })
-    .attr('text-anchor', 'middle')
-    .attr('alignment-baseline', 'middle')
-    .text(d => d.data.symbol)
-    .style('fill', '#ffffff')
-    .style('font-size', '12px')
-    .style('font-weight', 'bold')
-    .style('pointer-events', 'none');
+    // % change label
+    g.append('text')
+      .attr('transform', d => {
+        const [x, y] = arc.centroid(d);
+        return `translate(${x}, ${y + 10})`;
+      })
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'middle')
+      .text(d => `${d.data.change >= 0 ? '+' : ''}${d.data.change.toFixed(2)}%`)
+      .style('fill', d => d.data.change > 0 ? '#bbf7d0' : d.data.change < 0 ? '#fecaca' : '#d1d5db')
+      .style('font-size', '11px')
+      .style('pointer-events', 'none');
 
-  g.append('text')
-    .attr('transform', d => {
-      const [x, y] = arc.centroid(d);
-      return `translate(${x}, ${y + 10})`; // % below
-    })
-    .attr('text-anchor', 'middle')
-    .attr('alignment-baseline', 'middle')
-    .text(d => `${d.data.change >= 0 ? '+' : ''}${d.data.change.toFixed(2)}%`)
-    .style('fill', d => d.data.change > 0 ? '#bbf7d0' : d.data.change < 0 ? '#fecaca' : '#d1d5db')
-    .style('font-size', '11px')
-    .style('pointer-events', 'none');
+  } catch (e) {
+    console.error('Error loading heatmap data:', e);
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -964,7 +972,9 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(loadExtraMarketData, 60000); // refresh every 60s
 
    load7DayCalendar();
+   
    loadD3Heatmap();
+setInterval(loadD3Heatmap, 60000); // update every 60s
 });
 
 
