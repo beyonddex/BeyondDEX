@@ -856,25 +856,28 @@ function renderCalendar(events) {
   const volumes = [3.88, 8.66, 9.58, 5.04, 1.79, 4.5, 3.2, 6.7, 5.3, 2.9];
 
   const colors = price_changes.map(change => {
-    if (change > 0) return 'rgba(34,197,94,0.85)';
-    if (change < 0) return 'rgba(239,68,68,0.85)';
-    return 'rgba(156,163,175,0.85)';
+    if (change > 0) return 'rgba(16, 185, 129, 0.85)';   // vibrant green
+    if (change < 0) return 'rgba(239, 68, 68, 0.85)';     // stronger red
+    return 'rgba(156, 163, 175, 0.85)';                   // neutral gray
   });
 
-  const theta = [...Array(tokens.length).keys()].map(i => i * (360 / tokens.length));
-  const r = volumes.map(v => 2 + v / 10);
-
+  const angleStep = 360 / tokens.length;
   const traces = tokens.map((token, i) => {
-    const hoverText = `${token}<br>Change: ${price_changes[i].toFixed(2)}%<br>Volume: ${volumes[i].toFixed(2)}`;
+    const baseRadius = 3;
+    const outerRadius = baseRadius + volumes[i] / 2;  // scale volume radius
+
+    const thetaStart = i * angleStep;
+    const thetaEnd = thetaStart + angleStep * 0.9; // small gap between wedges
+
+    const hoverText = `${token}<br>Change: ${price_changes[i].toFixed(2)}%<br>Volume: ${volumes[i].toFixed(2)}B`;
+
     return {
       type: 'scatterpolar',
-      r: [r[i], r[i] + 0.3, r[i] + 0.3, r[i], r[i]],
-      theta: [theta[i], theta[i], theta[i] + 20, theta[i] + 20, theta[i]],
+      r: [baseRadius, outerRadius, outerRadius, baseRadius, baseRadius],
+      theta: [thetaStart, thetaStart, thetaEnd, thetaEnd, thetaStart],
       fill: 'toself',
       fillcolor: colors[i],
-      line: { color: 'white' },
-      name: token,
-      hoverinfo: 'text',
+      line: { color: 'white', width: 2 },
       text: hoverText,
       hovertemplate: '%{text}<extra></extra>',
       showlegend: false
@@ -882,21 +885,21 @@ function renderCalendar(events) {
   });
 
   Plotly.newPlot('heatmap', traces, {
-    title: 'Radial Token Heatmap',
+    title: '',
     polar: {
       radialaxis: { visible: false },
       angularaxis: { visible: false }
     },
     showlegend: false,
-    paper_bgcolor: 'white',
-    plot_bgcolor: 'white',
+    paper_bgcolor: '#ffffff',
+    plot_bgcolor: '#ffffff',
     height: 600,
+    margin: { t: 40, b: 20, l: 20, r: 20 },
     font: {
       family: 'Inter, sans-serif',
       size: 13,
       color: '#111827'
-    },
-    uniformtext: { minsize: 12, mode: 'hide' }
+    }
   }, {
     displayModeBar: false,
     responsive: true
