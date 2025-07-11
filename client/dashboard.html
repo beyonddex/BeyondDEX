@@ -893,6 +893,7 @@ function renderCalendar(events) {
 
     const width = 400, height = 400, radius = 170, arcInner = 90;
 
+    const hoverScale = 1.07; 
     const svgContainer = d3.select('#heatmap svg');
     svgContainer.selectAll("*").remove(); // clear previous
     const svg = svgContainer
