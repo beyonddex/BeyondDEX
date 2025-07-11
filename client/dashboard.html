@@ -488,6 +488,22 @@ footer {
         onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
       });
     }
+let onlineUserMap = {};
+
+db.collection("presence").onSnapshot(snapshot => {
+  const now = Date.now();
+  onlineUserMap = {};
+  snapshot.docs.forEach(doc => {
+    const data = doc.data();
+    const isOnline = data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
+    if (data.username) {
+      onlineUserMap[data.username] = isOnline;
+    }
+  });
+  onlineUsersCount.textContent = `Online Users: ${Object.values(onlineUserMap).filter(Boolean).length}`;
+});
+
+
 
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -509,17 +525,7 @@ footer {
             const { username, text, timestamp } = doc.data();
 const timeStr = timestamp ? getRelativeTime(timestamp) : '';
 
-// Assume user is offline until proven otherwise
-let isOnline = false;
-
-// Check presence store for username
-const presenceDoc = snapshot.docs.find(d => d.data().username === username);
-if (presenceDoc) {
-  const lastActive = presenceDoc.data().lastActive?.toDate().getTime() || 0;
-  if (Date.now() - lastActive < 60000) {
-    isOnline = true;
-  }
-}
+const isOnline = onlineUserMap[username];
 
 const statusDot = `<span style="
   display:inline-block;
