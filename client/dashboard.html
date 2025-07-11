@@ -468,17 +468,6 @@ footer {
       auth.signOut().then(() => window.location.href = "/auth.html");
     });
 
-    function getRelativeTime(timestamp) {
-      const now = Date.now();
-      const diff = now - timestamp.toDate().getTime();
-      const seconds = Math.floor(diff / 1000);
-      const minutes = Math.floor(seconds / 60);
-      const hours = Math.floor(minutes / 60);
-      if (seconds < 60) return "just now";
-      if (minutes < 60) return `${minutes} min ago`;
-      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-      return timestamp.toDate().toLocaleDateString();
-    }
 
     function updatePresence(uid, username) {
       userDocId = uid;
@@ -518,11 +507,34 @@ footer {
           chatBox.innerHTML = "";
           snapshot.forEach(doc => {
             const { username, text, timestamp } = doc.data();
-            const timeStr = timestamp ? getRelativeTime(timestamp) : '';
-            const div = document.createElement("div");
-            div.className = "chat-message";
-            div.innerHTML = `<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
-            chatBox.appendChild(div);
+const timeStr = timestamp ? getRelativeTime(timestamp) : '';
+
+// Assume user is offline until proven otherwise
+let isOnline = false;
+
+// Check presence store for username
+const presenceDoc = snapshot.docs.find(d => d.data().username === username);
+if (presenceDoc) {
+  const lastActive = presenceDoc.data().lastActive?.toDate().getTime() || 0;
+  if (Date.now() - lastActive < 60000) {
+    isOnline = true;
+  }
+}
+
+const statusDot = `<span style="
+  display:inline-block;
+  width:8px;
+  height:8px;
+  margin-right:6px;
+  border-radius:50%;
+  background-color:${isOnline ? '#22c55e' : '#9ca3af'};
+  box-shadow:${isOnline ? '0 0 8px #22c55e' : 'none'};
+"></span>`;
+
+const div = document.createElement("div");
+div.className = "chat-message";
+div.innerHTML = `${statusDot}<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
+chatBox.appendChild(div);
           });
           chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
         });
@@ -707,13 +719,25 @@ tiling: {
   }
 }
 function getRelativeTime(timestamp) {
+  if (!timestamp) return 'just now';
+
+  let timeMillis;
+
+  if (typeof timestamp === 'number') {
+    timeMillis = timestamp * 1000;
+  } else if (typeof timestamp.toDate === 'function') {
+    timeMillis = timestamp.toDate().getTime();
+  } else {
+    return 'just now';
+  }
+
   const now = Date.now();
-  const diff = now - timestamp * 1000; // convert from seconds
+  const diff = now - timeMillis;
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (minutes < 1) return 'Just now';
+  if (minutes < 1) return 'just now';
   if (minutes < 60) return `${minutes} min ago`;
   if (hours < 24) return `${hours} hr${hours > 1 ? 's' : ''} ago`;
   return `${days} day${days > 1 ? 's' : ''} ago`;
