@@ -81,11 +81,12 @@
   font-size: 14px;
 }
 #heatmap {
-  background-color: #ffffff !important;
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden; /* Smooth corners */
+      background-color: #ffffff !important;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      height: 600px;
 }
 
 
@@ -611,78 +612,58 @@ async function loadMarketData() {
     });
 
     // HEATMAP
-    const heatmapEl = document.getElementById('heatmap');
-const labels = data.map(
-  (c) => `${c.symbol.toUpperCase()} ${c.price_change_percentage_24h.toFixed(2)}%`
-);
-const values = data.map((c) => Math.max(Math.abs(c.price_change_percentage_24h), 1));
+    async function loadRadialHeatmap() {
+      const tokens = ['BTC', 'ETH', 'XRP', 'SOL', 'DOGE', 'ADA', 'AVAX', 'LINK', 'DOT', 'UNI'];
+      const price_changes = [2.36, 4.33, 2.81, -6.68, 9.39, -1.25, 5.7, -3.3, 1.9, -0.5];
+      const volumes = [3.88, 8.66, 9.58, 5.04, 1.79, 4.5, 3.2, 6.7, 5.3, 2.9];
 
-const trace = {
-  type: 'treemap',
-  labels: labels,
-  parents: data.map(() => ''),
-  values: values,
-  marker: {
-  colors: data.map(c => c.price_change_percentage_24h),
-  colorscale: [
-     [0, '#fca5a5'],  // soft red
-     [0.5, '#f1f5f9'], // light neutral
-     [1, '#86efac']   // soft green
-  ],
-  cmin: -10,
-  cmax: 10,
-  colorbar: false,
-  line: { width: 1, color: '#e5e7eb' }
-},
-  textinfo: 'label+value+percent entry',
-  textposition: 'middle center', // ✅ Add this line for better alignment
-  branchvalues: 'total',
-  textfont: {
-  size: 13,
-  color: '#1e293b',
-  family: 'Inter, sans-serif'
-},
-  outsidetextfont: {
-    size: 14,
-    color: '#111827'
-  }
-};
+      const colors = price_changes.map(change => {
+        if (change > 0) return 'rgba(34,197,94,0.85)';
+        if (change < 0) return 'rgba(239,68,68,0.85)';
+        return 'rgba(156,163,175,0.85)';
+      });
 
+      const theta = [...Array(tokens.length).keys()].map(i => i * (360 / tokens.length));
+      const r = volumes.map(v => 2 + v / 10);
 
-const layout = {
-  paper_bgcolor: '#ffffff',
-  plot_bgcolor: '#ffffff',
-  height: 500,
-  margin: { t: 10, l: 0, r: 0, b: 0 },
-  font: {
-    family: 'Inter, sans-serif',
-    size: 13,
-    color: '#111827'
-  },
-  uniformtext: {
-    minsize: 12,
-    mode: 'hide'
-  }
-};
+      const traces = tokens.map((token, i) => {
+        const hoverText = `${token}<br>Change: ${price_changes[i].toFixed(2)}%<br>Volume: ${volumes[i].toFixed(2)}`;
+        return {
+          type: 'scatterpolar',
+          r: [r[i], r[i] + 0.3, r[i] + 0.3, r[i], r[i]],
+          theta: [theta[i], theta[i], theta[i] + 20, theta[i] + 20, theta[i]],
+          fill: 'toself',
+          fillcolor: colors[i],
+          line: { color: 'white' },
+          name: token,
+          hoverinfo: 'text',
+          text: hoverText,
+          hovertemplate: '%{text}<extra></extra>',
+          showlegend: false
+        };
+      });
 
-
-Plotly.newPlot(heatmapEl, [trace], layout, {
-  displayModeBar: false,
-  responsive: true
-});
-
-setTimeout(() => {
-  Plotly.animate(heatmapEl, {
-    data: [trace]
-  }, {
-    transition: {
-      duration: 800,
-      easing: 'ease-in-out'
-    },
-    frame: { duration: 1000, redraw: false }
-  });
-}, 200);
-
+      Plotly.newPlot('heatmap', traces, {
+        title: 'Radial Token Heatmap',
+        polar: {
+          radialaxis: { visible: false },
+          angularaxis: { visible: false }
+        },
+        showlegend: false,
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        height: 600,
+        font: {
+          family: 'Inter, sans-serif',
+          size: 13,
+          color: '#111827'
+        },
+        uniformtext: { minsize: 12, mode: 'hide' }
+      }, {
+        displayModeBar: false,
+        responsive: true
+      });
+    }
 
   } catch (e) {
     console.error('Error fetching market data', e);
@@ -935,6 +916,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(loadExtraMarketData, 60000); // refresh every 60s
 
    load7DayCalendar();
+   loadRadialHeatmap();
 });
 
 
