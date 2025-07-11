@@ -490,84 +490,75 @@ footer {
     }
 let onlineUserMap = {};
 
-function renderChatMessages() {
-  db.collection("chat").orderBy("timestamp").get().then(snapshot => {
-    chatBox.innerHTML = "";
-    snapshot.forEach(doc => {
-      const { username, text, timestamp } = doc.data();
-      const timeStr = timestamp ? getRelativeTime(timestamp) : '';
-      const isOnline = onlineUserMap[username];
+ function renderChatMessages() {
+    db.collection("chat").orderBy("timestamp").get().then(snapshot => {
+      chatBox.innerHTML = "";
+      snapshot.forEach(doc => {
+        const { username, text, timestamp } = doc.data();
+        const timeStr = timestamp ? getRelativeTime(timestamp) : '';
+        const isOnline = onlineUserMap[username];
 
-      const statusDot = `<span style="
-        display:inline-block;
-        width:8px;
-        height:8px;
-        margin-right:6px;
-        border-radius:50%;
-        background-color:${isOnline ? '#22c55e' : '#9ca3af'};
-        box-shadow:${isOnline ? '0 0 8px #22c55e' : 'none'};
-      "></span>`;
+        const statusDot = `<span style="
+          display:inline-block;
+          width:8px;
+          height:8px;
+          margin-right:6px;
+          border-radius:50%;
+          background-color:${isOnline ? '#22c55e' : '#9ca3af'};
+          box-shadow:${isOnline ? '0 0 8px #22c55e' : 'none'};
+        "></span>`;
 
-      const div = document.createElement("div");
-      div.className = "chat-message";
-      div.innerHTML = `${statusDot}<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
-      chatBox.appendChild(div);
+        const div = document.createElement("div");
+        div.className = "chat-message";
+        div.innerHTML = `${statusDot}<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
+        chatBox.appendChild(div);
+      });
+      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
     });
-    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
-  });
-}
+  }
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    const uid = user.uid;
-    db.collection("users").doc(uid).get().then(doc => {
-      if (doc.exists) {
-        const username = doc.data().username || user.email || "Anon";
-        currentUsername = username;
-        userDocId = uid;
-        userCircle.textContent = username.charAt(0).toUpperCase();
-        updatePresence(uid, username);
-        monitorPresence();
-      }
-    });
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      const uid = user.uid;
+      db.collection("users").doc(uid).get().then(doc => {
+        if (doc.exists) {
+          const username = doc.data().username || user.email || "Anon";
+          currentUsername = username;
+          userDocId = uid;
+          userCircle.textContent = username.charAt(0).toUpperCase();
+          updatePresence(uid, username);
+          monitorPresence();
 
-    // Live user presence map
-    db.collection("presence").onSnapshot(snapshot => {
-      const now = Date.now();
-      onlineUserMap = {};
-      snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        const isOnline = data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
-        if (data.username) {
-          onlineUserMap[data.username] = isOnline;
+          renderChatMessages(); // ✅ render after login
         }
       });
-      onlineUsersCount.textContent = `Online Users: ${Object.values(onlineUserMap).filter(Boolean).length}`;
-      renderChatMessages();
-    });
 
-  } else {
-    window.location.href = "/auth.html";
-  }
-});
+      // ✅ live updates as messages are added
+      db.collection("chat").orderBy("timestamp")
+        .onSnapshot(() => renderChatMessages());
 
-    function sendChatMessage() {
-      const message = chatInput.value.trim();
-      if (message) {
-        db.collection("chat").add({
-          username: currentUsername,
-          text: message,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        chatInput.value = "";
-        chatInput.focus();
-      }
+    } else {
+      window.location.href = "/auth.html";
     }
+  });
 
-    sendMessage.addEventListener("click", sendChatMessage);
-    chatInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendChatMessage();
-    });
+  function sendChatMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+      db.collection("chat").add({
+        username: currentUsername,
+        text: message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      chatInput.value = "";
+      chatInput.focus();
+    }
+  }
+
+  sendMessage.addEventListener("click", sendChatMessage);
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendChatMessage();
+  });
 
    // Map token symbols to correct CoinGecko chart IDs
 const idFixMap = {
