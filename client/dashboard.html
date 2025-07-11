@@ -8,6 +8,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
   <style>
     html, body {
   height: 100%;
@@ -302,6 +304,23 @@ footer {
   margin-left: 50px; /* ✅ Push it right, away from left-nav */
   flex: 1;
 }
+.tooltip {
+      position: absolute;
+      padding: 6px 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 13px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      }
+      #heatmap svg {
+  width: 100%;
+  height: 100%;
+}
+
 
 
   </style>
@@ -342,10 +361,11 @@ footer {
         <h4>Top Volume Tokens</h4>
         <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
       </div>
-      <div class="heatmap-section">
-        <h4>Market Heatmap</h4>
-        <div id="heatmap"></div>
-      </div>
+      <div id="heatmap">
+  <svg width="500" height="500"></svg>
+</div>
+<div class="tooltip" id="tooltip" style="position:absolute; opacity:0;"></div>
+
     </div>
 
     <div class="chart-section">
@@ -850,60 +870,75 @@ function renderCalendar(events) {
 }
 
 // HEATMAP
-    async function loadRadialHeatmap() {
-  const tokens = ['BTC', 'ETH', 'XRP', 'SOL', 'DOGE', 'ADA', 'AVAX', 'LINK', 'DOT', 'UNI'];
-  const price_changes = [2.36, 4.33, 2.81, -6.68, 9.39, -1.25, 5.7, -3.3, 1.9, -0.5];
-  const volumes = [3.88, 8.66, 9.58, 5.04, 1.79, 4.5, 3.2, 6.7, 5.3, 2.9];
+  function loadD3Heatmap() {
+  const data = [
+    { symbol: 'BTC', change: 3.2, volume: 80 },
+    { symbol: 'ETH', change: -1.1, volume: 60 },
+    { symbol: 'LTC', change: 0.0, volume: 20 },
+    { symbol: 'BNB', change: 0.6, volume: 30 },
+    { symbol: 'ADA', change: -0.5, volume: 35 },
+    { symbol: 'XRP', change: 0.2, volume: 50 },
+    { symbol: 'DOGE', change: -0.8, volume: 25 },
+    { symbol: 'DOT', change: 1.5, volume: 40 }
+  ];
 
-  const colors = price_changes.map(change => {
-    if (change > 0) return 'rgba(16, 185, 129, 0.85)';   // vibrant green
-    if (change < 0) return 'rgba(239, 68, 68, 0.85)';     // stronger red
-    return 'rgba(156, 163, 175, 0.85)';                   // neutral gray
-  });
+  const width = 500, height = 500, radius = 200, arcOuter = radius, arcInner = 100;
 
-  const angleStep = 360 / tokens.length;
-  const traces = tokens.map((token, i) => {
-    const baseRadius = 3;
-    const outerRadius = baseRadius + volumes[i] / 2;  // scale volume radius
+  const svg = d3.select('#heatmap svg')
+    .append('g')
+    .attr('transform', `translate(${width / 2},${height / 2})`);
 
-    const thetaStart = i * angleStep;
-    const thetaEnd = thetaStart + angleStep * 0.9; // small gap between wedges
+  const pie = d3.pie().value(d => d.volume).sort(null);
+  const arc = d3.arc().innerRadius(arcInner).outerRadius(arcOuter);
+  const tooltip = d3.select('#tooltip');
 
-    const hoverText = `${token}<br>Change: ${price_changes[i].toFixed(2)}%<br>Volume: ${volumes[i].toFixed(2)}B`;
+  const color = d => d.change > 0 ? '#16a34a' : d.change < 0 ? '#dc2626' : '#9ca3af';
 
-    return {
-      type: 'scatterpolar',
-      r: [baseRadius, outerRadius, outerRadius, baseRadius, baseRadius],
-      theta: [thetaStart, thetaStart, thetaEnd, thetaEnd, thetaStart],
-      fill: 'toself',
-      fillcolor: colors[i],
-      line: { color: 'white', width: 2 },
-      text: hoverText,
-      hovertemplate: '%{text}<extra></extra>',
-      showlegend: false
-    };
-  });
+  const g = svg.selectAll('.arc')
+    .data(pie(data))
+    .enter()
+    .append('g')
+    .attr('class', 'arc');
 
-  Plotly.newPlot('heatmap', traces, {
-    title: '',
-    polar: {
-      radialaxis: { visible: false },
-      angularaxis: { visible: false }
-    },
-    showlegend: false,
-    paper_bgcolor: '#ffffff',
-    plot_bgcolor: '#ffffff',
-    height: 600,
-    margin: { t: 40, b: 20, l: 20, r: 20 },
-    font: {
-      family: 'Inter, sans-serif',
-      size: 13,
-      color: '#111827'
-    }
-  }, {
-    displayModeBar: false,
-    responsive: true
-  });
+  g.append('path')
+    .attr('d', arc)
+    .attr('fill', d => color(d.data))
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 2)
+    .on('mouseover', function (event, d) {
+      const el = d3.select(this);
+      el.raise();
+      el.transition().duration(200).attr('transform', `translate(${arc.centroid(d)[0] * 0.07}, ${arc.centroid(d)[1] * 0.07})`);
+
+      tooltip.style('opacity', 1)
+        .html(`<strong>${d.data.symbol}</strong><br>${d.data.change >= 0 ? '+' : ''}${d.data.change}%`)
+        .style('left', (event.pageX + 10) + 'px')
+        .style('top', (event.pageY - 30) + 'px');
+    })
+    .on('mousemove', event => {
+      tooltip.style('left', (event.pageX + 10) + 'px')
+        .style('top', (event.pageY - 30) + 'px');
+    })
+    .on('mouseout', function () {
+      d3.select(this).transition().duration(200).attr('transform', 'translate(0,0)');
+      tooltip.style('opacity', 0);
+    });
+
+  g.append('text')
+    .attr('transform', d => `translate(${arc.centroid(d)})`)
+    .attr('text-anchor', 'middle')
+    .attr('alignment-baseline', 'middle')
+    .text(d => d.data.symbol)
+    .style('fill', '#fff')
+    .style('font-size', '12px')
+    .style('pointer-events', 'none');
+
+  svg.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 6)
+    .style('font-size', '18px')
+    .style('font-weight', '600')
+    .text('Token Heatmap');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -917,7 +952,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(loadExtraMarketData, 60000); // refresh every 60s
 
    load7DayCalendar();
-   loadRadialHeatmap();
+   loadD3Heatmap();
 });
 
 
