@@ -83,8 +83,9 @@
 #heatmap {
   background-color: #ffffff !important;
   padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden; /* Smooth corners */
 }
 
 
@@ -624,23 +625,24 @@ const trace = {
   marker: {
   colors: data.map(c => c.price_change_percentage_24h),
   colorscale: [
-    [0, '#b91c1c'],     // improved red
-    [0.5, '#f3f4f6'],   // neutral center
-    [1, '#059669']      // improved green
+     [0, '#fca5a5'],  // soft red
+     [0.5, '#f1f5f9'], // light neutral
+     [1, '#86efac']   // soft green
   ],
   cmin: -10,
   cmax: 10,
   colorbar: false,
   line: { width: 1, color: '#e5e7eb' }
 },
-  textinfo: 'label+value',
+  textinfo: 'label+value+percent entry',
   textposition: 'middle center', // ✅ Add this line for better alignment
   branchvalues: 'total',
+  hovertemplate: '%{label}<br>Price Change: %{color:.2f}%<extra></extra>',
   textfont: {
-    size: 14,
-    color: '#111827',
-    family: 'Inter, sans-serif'
-  },
+  size: 13,
+  color: '#1e293b',
+  family: 'Inter, sans-serif'
+},
   outsidetextfont: {
     size: 14,
     color: '#111827'
@@ -675,12 +677,13 @@ setTimeout(() => {
     data: [trace]
   }, {
     transition: {
-      duration: 1000,
-      easing: 'cubic-in-out'
+      duration: 800,
+      easing: 'ease-in-out'
     },
     frame: { duration: 1000, redraw: false }
   });
 }, 200);
+
 
   } catch (e) {
     console.error('Error fetching market data', e);
@@ -723,7 +726,14 @@ async function loadTokenChart(tokenId, symbol) {
   y: prices,
   type: 'scatter',
   mode: 'lines',
-  line: { color: '#3b82f6', width: 2 }
+  line: {
+  width: 1,
+  color: '#e5e7eb'
+},
+tiling: {
+  pad: 4,
+  packing: 'squarify'
+}
 }], {
   title: `${symbol}/USD - 24h`,
   margin: { t: 40, l: 40, r: 10, b: 30 },
