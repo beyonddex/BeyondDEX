@@ -83,13 +83,17 @@
   font-size: 14px;
 }
 #heatmap {
-      background-color: #ffffff !important;
-      padding: 12px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      height: 600px;
-}
+    background-color: #ffffff !important;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    height: 620px; /* Slightly taller to accommodate the larger SVG */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
 
 
     #marketList {
@@ -316,10 +320,12 @@ footer {
       opacity: 0;
       transition: opacity 0.2s;
       }
-      #heatmap svg {
-  width: 100%;
-  height: 100%;
-}
+     #heatmap svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
 
 
 
@@ -972,7 +978,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(loadExtraMarketData, 60000); // refresh every 60s
 
    load7DayCalendar();
-   
+
    loadD3Heatmap();
 setInterval(loadD3Heatmap, 60000); // update every 60s
 });
