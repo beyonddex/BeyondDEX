@@ -452,6 +452,7 @@ footer {
 
     let currentUsername = "";
     let userDocId = "";
+    let onlineUserMap = {};
 
     userCircle.addEventListener("click", () => {
       dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
@@ -470,25 +471,46 @@ footer {
 
 
     function updatePresence(uid, username) {
-      userDocId = uid;
-      db.collection("presence").doc(uid).set({ username, lastActive: firebase.firestore.Timestamp.now() }, { merge: true });
-    }
+  userDocId = uid;
+  db.collection("presence").doc(uid).set({
+    username,
+    lastActive: firebase.firestore.Timestamp.now()
+  }, { merge: true });
+}
 
     function monitorPresence() {
-      setInterval(() => {
-        if (userDocId && currentUsername) updatePresence(userDocId, currentUsername);
-      }, 30000);
-
-      db.collection("presence").onSnapshot(snapshot => {
-        const now = Date.now();
-        const onlineUsers = snapshot.docs.filter(doc => {
-          const data = doc.data();
-          return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
-        });
-        onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
-      });
+  setInterval(() => {
+    if (userDocId && currentUsername) {
+      updatePresence(userDocId, currentUsername);
     }
-let onlineUserMap = {};
+  }, 30000); // updates every 30s
+
+  db.collection("presence").onSnapshot(snapshot => {
+    const now = Date.now();
+    onlineUserMap = {}; // reset map
+
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const lastActive = data.lastActive?.toDate().getTime();
+
+      if (lastActive) {
+        const diffMs = now - lastActive;
+
+        if (diffMs < 5 * 60 * 1000) { // 5 minutes = 300000ms
+          onlineUserMap[data.username] = true; // ✅ online
+        } else {
+          onlineUserMap[data.username] = false; // ⛔ idle/offline
+        }
+      }
+    });
+
+    onlineUsersCount.textContent = `Online Users: ${
+      Object.values(onlineUserMap).filter(v => v).length
+    }`;
+
+    renderChatMessages(); // 🔄 update dot colors
+  });
+}
 
  function renderChatMessages() {
     db.collection("chat").orderBy("timestamp").get().then(snapshot => {
