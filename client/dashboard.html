@@ -9,6 +9,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script>
+
 
   <style>
     html, body {
@@ -327,8 +329,28 @@ footer {
     height: 100%;
     display: block;
   }
+  #symbolSuggestions {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1000;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  display: none;
+}
 
+.suggestion-item {
+  padding: 8px;
+  cursor: pointer;
+}
 
+.suggestion-item:hover {
+  background: #f0f0f0;
+}
 
 
   </style>
@@ -378,7 +400,13 @@ footer {
 
     <div class="chart-section">
       <h4>Price Chart</h4>
-      <div id="tokenChartInner" style="width:100%; height:400px; margin-bottom: 30px;"></div>
+      <div style="position:relative;">
+        <input type="text" id="symbolSearch" placeholder="Search symbol (e.g. BTCUSDT)" style="margin-bottom:10px;padding:6px 8px;width:100%;border:1px solid #ccc;border-radius:4px;font-size:14px;">
+       <div id="symbolSuggestions"></div>
+      </div>
+    <div class="tradingview-widget-container" style="width:100%; height:400px; margin-bottom: 30px;">
+        <div id="tradingview_chart"></div>
+      </div>
 
       <div id="newsSection">
         <h4>Latest Crypto News</h4>
@@ -596,6 +624,25 @@ const idFixMap = {
   ada: 'cardano',
   ton: 'the-open-network' // example for TON
 };
+function loadTokenChart(symbol, displaySymbol) {
+      if (!symbol) return;
+      const container = document.getElementById("tradingview_chart");
+      container.innerHTML = "";
+      new TradingView.widget({
+        width: "100%",
+        height: 400,
+        symbol: `BINANCE:${symbol.toUpperCase()}`,
+        interval: "30",
+        timezone: "Etc/UTC",
+        theme: "light",
+        style: "1",
+        locale: "en",
+        toolbar_bg: "#f1f3f6",
+        hide_side_toolbar: false,
+        allow_symbol_change: true,
+        container_id: "tradingview_chart"
+      });
+    }
 
 async function loadMarketData() {
   try {
@@ -676,68 +723,6 @@ async function loadMarketData() {
   }
 }
 
-// Chart Loader
-async function loadTokenChart(tokenId, symbol) {
-  const chartEl = document.getElementById('tokenChartInner');
-  if (!chartEl) return;
-
-  // Show loading indicator (non-destructive)
-  if (!chartEl.querySelector('.loading-indicator')) {
-    const loader = document.createElement('div');
-    loader.className = 'loading-indicator';
-    loader.innerText = 'Loading chart...';
-    loader.style.textAlign = 'center';
-    loader.style.paddingTop = '100px';
-    loader.style.color = '#888';
-    loader.style.fontSize = '14px';
-    chartEl.appendChild(loader);
-  }
-
-  try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=1`
-    );
-    const data = await res.json();
-
-    if (!data.prices || data.prices.length === 0) {
-      console.error(`No price data for ${symbol}`);
-      return;
-    }
-
-    const times = data.prices.map(p => new Date(p[0]));
-    const prices = data.prices.map(p => p[1]);
-
-    await Plotly.react(chartEl, [{
-  x: times,
-  y: prices,
-  type: 'scatter',
-  mode: 'lines',
-  line: {
-  width: 1,
-  color: '#e5e7eb'
-},
-tiling: {
-  pad: 4,
-  packing: 'squarify'
-}
-}], {
-  title: `${symbol}/USD - 24h`,
-  margin: { t: 40, l: 40, r: 10, b: 30 },
-  paper_bgcolor: '#fff',
-  plot_bgcolor: '#fff',
-  font: { family: 'Inter, sans-serif', color: '#000' },
-  height: 400  // 👈 Add this line to fix vertical height
-}, {
-  displayModeBar: false
-});
-
-  } catch (e) {
-    console.error(`Error loading chart for ${tokenId}`, e);
-  } finally {
-    const loader = chartEl.querySelector('.loading-indicator');
-    if (loader) loader.remove();
-  }
-}
 function getRelativeTime(timestamp) {
   if (!timestamp) return 'just now';
 
@@ -1014,7 +999,110 @@ function renderCalendar(events) {
   }
 }
 
+let allSymbols = []; // will store fetched pairs
+
+// 1. Fetch Binance trading pairs (spot)
+async function fetchSymbols() {
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/exchangeInfo');
+    const json = await res.json();
+    allSymbols = json.symbols
+      .filter(s => s.status === "TRADING")
+      .map(s => s.symbol); // e.g. BTCUSDT
+  } catch (err) {
+    console.error("Failed to fetch symbols", err);
+  }
+}
+
+// 2. Filter and show suggestions
+function showSuggestions(input) {
+  const dropdown = document.getElementById("symbolSuggestions");
+  const term = input.trim().toUpperCase();
+  dropdown.innerHTML = "";
+
+  if (!term || term.length < 2) {
+    dropdown.style.display = "none";
+    return;
+  }
+
+  const matches = allSymbols.filter(sym => sym.startsWith(term)).slice(0, 6); // limit to 6
+
+  if (matches.length === 0) {
+    dropdown.style.display = "none";
+    return;
+  }
+
+  matches.forEach(sym => {
+    const div = document.createElement("div");
+    div.className = "suggestion-item";
+    div.textContent = sym;
+    div.addEventListener("click", () => {
+      document.getElementById("symbolSearch").value = sym;
+      loadTokenChart(sym, sym);
+      dropdown.style.display = "none";
+    });
+    dropdown.appendChild(div);
+  });
+
+  dropdown.style.display = "block";
+}
+
+// ... your previous code remains unchanged above ...
+
+const searchInput = document.getElementById("symbolSearch");
+let selectedIndex = -1; // for arrow key navigation
+
+searchInput.addEventListener("input", () => {
+  showSuggestions(searchInput.value);
+  selectedIndex = -1; // reset index on input
+});
+
+searchInput.addEventListener("keydown", e => {
+  const dropdown = document.getElementById("symbolSuggestions");
+  const items = dropdown.querySelectorAll(".suggestion-item");
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    if (selectedIndex < items.length - 1) {
+      selectedIndex++;
+      updateActiveSuggestion(items);
+    }
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    if (selectedIndex > 0) {
+      selectedIndex--;
+      updateActiveSuggestion(items);
+    }
+  } else if (e.key === "Enter") {
+    if (selectedIndex >= 0 && items[selectedIndex]) {
+      e.preventDefault();
+      const symbol = items[selectedIndex].textContent;
+      searchInput.value = symbol;
+      loadTokenChart(symbol, symbol);
+      dropdown.style.display = "none";
+    } else {
+      const input = searchInput.value.trim().toUpperCase();
+      if (input.length >= 4) {
+        loadTokenChart(input, input);
+        dropdown.style.display = "none";
+      }
+    }
+  }
+});
+
+function updateActiveSuggestion(items) {
+  items.forEach((item, idx) => {
+    item.style.backgroundColor = idx === selectedIndex ? "#e0e0e0" : "";
+  });
+  if (items[selectedIndex]) {
+    items[selectedIndex].scrollIntoView({ block: "nearest" });
+  }
+}
+
+
 window.addEventListener('DOMContentLoaded', () => {
+  fetchSymbols(); // 🔥 get Binance trading pairs
+
   loadCryptoNews();
   setInterval(loadCryptoNews, 60000);
 
@@ -1029,9 +1117,7 @@ window.addEventListener('DOMContentLoaded', () => {
    loadD3Heatmap();
 setInterval(loadD3Heatmap, 60000); // update every 60s
 });
-
-
-  </script>
+</script>
 </body>
 </html>
 
