@@ -545,29 +545,27 @@ footer {
   }
 
   auth.onAuthStateChanged(user => {
-    if (user) {
-      const uid = user.uid;
-      db.collection("users").doc(uid).get().then(doc => {
-        if (doc.exists) {
-          const username = doc.data().username || user.email || "Anon";
-          currentUsername = username;
-          userDocId = uid;
-          userCircle.textContent = username.charAt(0).toUpperCase();
-          updatePresence(uid, username);
-          monitorPresence();
+  if (user) {
+    const uid = user.uid;
+    db.collection("users").doc(uid).get().then(doc => {
+      if (doc.exists) {
+        const username = doc.data().username || user.email || "Anon";
+        currentUsername = username;
+        userDocId = uid;
+        userCircle.textContent = username.charAt(0).toUpperCase();
+        updatePresence(uid, username);
+        monitorPresence();
 
-          
-        }
-      });
-
-      // ✅ live updates as messages are added
-      db.collection("chat").orderBy("timestamp")
-        .onSnapshot(() => renderChatMessages());
-
-    } else {
-      window.location.href = "/auth.html";
-    }
-  });
+        // ✅ Add this so others' messages appear in real-time
+        db.collection("chat")
+          .orderBy("timestamp")
+          .onSnapshot(() => renderChatMessages());
+      }
+    });
+  } else {
+    window.location.href = "/auth.html";
+  }
+});
 
   function sendChatMessage() {
     const message = chatInput.value.trim();
@@ -977,7 +975,6 @@ function renderCalendar(events) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  fetchSymbols(); // 🔥 get Binance trading pairs
 
   loadCryptoNews();
   setInterval(loadCryptoNews, 60000);
