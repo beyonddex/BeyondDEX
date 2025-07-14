@@ -647,15 +647,12 @@ function loadTokenChart(symbol) {
 
   const upper = symbol.toUpperCase();
 
-  // Prefer a USDT pair if available
   let matchedPair = binanceSymbols.find(p => p === `${upper}USDT`);
 
-  // Fallback: Find any pair that starts with the symbol (e.g., BTCBUSD)
   if (!matchedPair) {
     matchedPair = binanceSymbols.find(p => p.startsWith(upper));
   }
 
-  // Final fallback
   if (!matchedPair) {
     matchedPair = 'BTCUSDT';
   }
@@ -751,11 +748,11 @@ async function loadMarketData() {
 
   // Load first token chart by default
   if (index === 0 && !selectedTokenId) {
-    selectedTokenId = fixedId;
-    li.classList.add('active');
-    li.style.backgroundColor = '#e0e0e0';
-    loadTokenChart(fixedId, coin.symbol.toUpperCase());
-  }
+  selectedTokenId = fixedId;
+  li.classList.add('active');
+  li.style.backgroundColor = '#e0e0e0';
+  loadTokenChart(coin.symbol); // ✅ Just pass the actual symbol
+}
 
   if (fixedId === selectedTokenId) {
     li.classList.add('active');
