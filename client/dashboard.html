@@ -647,8 +647,18 @@ function loadTokenChart(symbol) {
 
   const upper = symbol.toUpperCase();
 
-  // Try to find a valid trading pair that starts with the symbol (e.g., BTCUSDT, BTCBUSD)
-  const matchedPair = binanceSymbols.find(p => p.startsWith(upper)) || 'BTCUSDT';
+  // Prefer a USDT pair if available
+  let matchedPair = binanceSymbols.find(p => p === `${upper}USDT`);
+
+  // Fallback: Find any pair that starts with the symbol (e.g., BTCBUSD)
+  if (!matchedPair) {
+    matchedPair = binanceSymbols.find(p => p.startsWith(upper));
+  }
+
+  // Final fallback
+  if (!matchedPair) {
+    matchedPair = 'BTCUSDT';
+  }
 
   new TradingView.widget({
     width: "100%",
@@ -731,8 +741,8 @@ async function loadMarketData() {
     }, 300);
 
     console.log(`Clicked token: ${coin.symbol} → ID used: ${fixedId}`);
-    const pair = `${coin.symbol.toUpperCase()}USDT`;
-    loadTokenChart(pair);
+    loadTokenChart(coin.symbol);
+
   });
 
   list.appendChild(li);
