@@ -480,12 +480,37 @@ footer {
 }
 
     function monitorPresence() {
+  let lastInteraction = Date.now();
+
+  // Reset timer on user activity
+  function resetIdleTimer() {
+    lastInteraction = Date.now();
+  }
+
+  ['mousemove', 'keydown', 'click', 'scroll'].forEach(evt =>
+    window.addEventListener(evt, resetIdleTimer)
+  );
+
+  // Update presence only if user is not idle
   setInterval(() => {
-    if (userDocId && currentUsername) {
+    const now = Date.now();
+    const idleDuration = now - lastInteraction;
+    if (userDocId && currentUsername && idleDuration < 3 * 60 * 1000) {
       updatePresence(userDocId, currentUsername);
     }
   }, 30000);
 
+  // Mark user offline on tab close or refresh
+  window.addEventListener("beforeunload", () => {
+    if (userDocId) {
+      db.collection("presence").doc(userDocId).set({
+        username: currentUsername,
+        lastActive: firebase.firestore.Timestamp.fromDate(new Date(Date.now() - 4 * 60 * 1000)) // 4 minutes ago = guarantees "offline"
+      }, { merge: true });
+    }
+  });
+
+  // Realtime listener for presence updates
   db.collection("presence").onSnapshot(snapshot => {
     const now = Date.now();
     onlineUserMap = {};
@@ -495,7 +520,7 @@ footer {
       const lastActive = data.lastActive?.toDate().getTime();
 
       if (lastActive) {
-        const isOnline = now - lastActive < 5 * 60 * 1000;
+        const isOnline = now - lastActive < 3 * 60 * 1000;
         onlineUserMap[doc.id] = {
           username: data.username,
           isOnline
@@ -510,6 +535,7 @@ footer {
     renderChatMessages();
   });
 }
+
 
  function renderChatMessages() {
     db.collection("chat").orderBy("timestamp").get().then(snapshot => {
@@ -599,25 +625,51 @@ const idFixMap = {
   ada: 'cardano',
   ton: 'the-open-network' // example for TON
 };
-function loadTokenChart(symbol, displaySymbol) {
-      if (!symbol) return;
-      const container = document.getElementById("tradingview_chart");
-      container.innerHTML = "";
-      new TradingView.widget({
-        width: "100%",
-        height: 400,
-        symbol: `BINANCE:${symbol.toUpperCase()}`,
-        interval: "30",
-        timezone: "Etc/UTC",
-        theme: "light",
-        style: "1",
-        locale: "en",
-        toolbar_bg: "#f1f3f6",
-        hide_side_toolbar: false,
-        allow_symbol_change: true,
-        container_id: "tradingview_chart"
-      });
-    }
+let binanceSymbols = [];
+
+// 1. Fetch all available Binance spot trading pairs (once at page load)
+async function fetchBinanceSymbols() {
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/exchangeInfo');
+    const json = await res.json();
+    binanceSymbols = json.symbols.map(s => s.symbol); // ['BTCUSDT', 'ETHUSDT', ...]
+  } catch (e) {
+    console.error("Failed to fetch Binance trading pairs", e);
+  }
+}
+
+// 2. Format and load TradingView chart with validation
+function loadTokenChart(symbol) {
+  if (!symbol) return;
+
+  const container = document.getElementById("tradingview_chart");
+  container.innerHTML = "";
+
+  const upper = symbol.toUpperCase();
+  const testPair = `${upper}USDT`;
+
+  // Validate symbol exists in Binance pair list
+  const validatedSymbol = binanceSymbols.includes(testPair) ? testPair : 'BTCUSDT';
+
+  new TradingView.widget({
+    width: "100%",
+    height: 400,
+    symbol: `BINANCE:${validatedSymbol}`,
+    interval: "30",
+    timezone: "Etc/UTC",
+    theme: "light",
+    style: "1",
+    locale: "en",
+    toolbar_bg: "#f1f3f6",
+    hide_side_toolbar: false,
+    allow_symbol_change: true,
+    container_id: "tradingview_chart"
+  });
+}
+
+
+let selectedTokenId = null;
+
 
 async function loadMarketData() {
   try {
@@ -627,7 +679,9 @@ async function loadMarketData() {
     const data = await res.json();
 
     const list = document.getElementById('marketList');
+    const previousScroll = list.scrollTop; // 🧠 Save scroll position
     list.innerHTML = '';
+
 
     const chartContainer = document.getElementById('tokenChartInner');
     if (!chartContainer) {
@@ -637,61 +691,67 @@ async function loadMarketData() {
     }
 
     data.forEach((coin, index) => {
-      const change = coin.price_change_percentage_24h;
-      const changeClass = change >= 0 ? 'market-up' : 'market-down';
-      const changeSymbol = change >= 0 ? '▲' : '▼';
-      const absChange = Math.abs(change);
+  const change = coin.price_change_percentage_24h;
+  const changeClass = change >= 0 ? 'market-up' : 'market-down';
+  const changeSymbol = change >= 0 ? '▲' : '▼';
+  const absChange = Math.abs(change);
+  const fixedId = idFixMap[coin.symbol.toLowerCase()] || coin.id; // ✅ DECLARE ONCE
 
-      const li = document.createElement('li');
-      li.classList.add('token-entry');
-      li.setAttribute('data-id', coin.id);
-      li.innerHTML = `
-        <strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()}
-        <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/>
-        <small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>
-      `;
+  const li = document.createElement('li');
+  li.classList.add('token-entry');
+  li.setAttribute('data-id', coin.id);
+  li.innerHTML = `
+    <strong>${coin.symbol.toUpperCase()}</strong> — $${coin.current_price.toLocaleString()}
+    <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/>
+    <small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>
+  `;
 
-      li.addEventListener('mouseover', () => {
-        if (!li.classList.contains('active')) li.style.backgroundColor = '#f0f0f0';
-      });
-
-      li.addEventListener('mouseout', () => {
-        if (!li.classList.contains('active')) li.style.backgroundColor = '';
-      });
-
-      li.addEventListener('click', () => {
-  document.querySelectorAll('.token-entry').forEach(el => {
-    el.classList.remove('active');
-    el.style.backgroundColor = '';
-    el.style.transition = 'background-color 0.4s ease';
+  li.addEventListener('mouseover', () => {
+    if (!li.classList.contains('active')) li.style.backgroundColor = '#f0f0f0';
   });
 
-  li.classList.add('active');
-  li.style.backgroundColor = '#e0e0e0';
-  li.style.transition = 'background-color 0.4s ease, transform 0.3s ease';
-  li.style.transform = 'scale(1.02)';
+  li.addEventListener('mouseout', () => {
+    if (!li.classList.contains('active')) li.style.backgroundColor = '';
+  });
 
-  setTimeout(() => {
-    li.style.transform = 'scale(1)';
-  }, 300);
+  li.addEventListener('click', () => {
+    selectedTokenId = fixedId;
 
-  const fixedId = idFixMap[coin.symbol.toLowerCase()] || coin.id;
-  console.log(`Clicked token: ${coin.symbol} → ID used: ${fixedId}`);
-  loadTokenChart(fixedId, coin.symbol.toUpperCase());
-});
-
-
-      list.appendChild(li);
-
-      // Load first token chart by default
-      if (index === 0) {
-        li.classList.add('active');
-        li.style.backgroundColor = '#e0e0e0';
-        const fixedId = idFixMap[coin.symbol.toLowerCase()] || coin.id;
-        console.log(`Auto-load token: ${coin.symbol} → ID used: ${fixedId}`);
-        loadTokenChart(fixedId, coin.symbol.toUpperCase());
-      }
+    document.querySelectorAll('.token-entry').forEach(el => {
+      el.classList.remove('active');
+      el.style.backgroundColor = '';
+      el.style.transition = 'background-color 0.4s ease';
     });
+
+    li.classList.add('active');
+    li.style.backgroundColor = '#e0e0e0';
+    li.style.transition = 'background-color 0.4s ease, transform 0.3s ease';
+    li.style.transform = 'scale(1.02)';
+    setTimeout(() => {
+      li.style.transform = 'scale(1)';
+    }, 300);
+
+    console.log(`Clicked token: ${coin.symbol} → ID used: ${fixedId}`);
+    loadTokenChart(coin.symbol);
+  });
+
+  list.appendChild(li);
+  list.scrollTop = previousScroll; // ✅ Restore scroll position
+
+
+  // Load first token chart by default
+  if (index === 0 && !selectedTokenId) {
+    selectedTokenId = fixedId;
+    li.classList.add('active');
+    li.style.backgroundColor = '#e0e0e0';
+    loadTokenChart(fixedId, coin.symbol.toUpperCase());
+  }
+
+  if (fixedId === selectedTokenId) {
+    li.classList.add('active');
+    li.style.backgroundColor = '#e0e0e0';
+  }
+});
 
   } catch (e) {
     console.error('Error fetching market data', e);
@@ -979,6 +1039,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadCryptoNews();
   setInterval(loadCryptoNews, 60000);
 
+  fetchBinanceSymbols(); // Load trading pairs list on startup
   loadMarketData();
   setInterval(loadMarketData, 30000);
 
