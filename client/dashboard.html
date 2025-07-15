@@ -883,6 +883,8 @@ function renderCalendar(events) {
   const ul = document.getElementById('econCalendarList');
   ul.innerHTML = '';
 
+  events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
   const PREVIEW_HEIGHT = 500; // same as CSS height
   const ESTIMATED_ITEM_HEIGHT = 42; // px per event (adjust if needed)
   const MAX_EVENTS = Math.floor(PREVIEW_HEIGHT / ESTIMATED_ITEM_HEIGHT);
