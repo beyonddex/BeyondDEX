@@ -630,7 +630,7 @@ let binanceSymbols = [];
 // 1. Fetch all available Binance spot trading pairs (once at page load)
 async function fetchBinanceSymbols() {
   try {
-    const res = await fetch('https://api.binance.com/api/v3/exchangeInfo');
+    const res = await fetch('https://beyonddex-backend.onrender.com/api/binance-symbols');
     const json = await res.json();
     binanceSymbols = json.symbols.map(s => s.symbol); // ['BTCUSDT', 'ETHUSDT', ...]
   } catch (e) {
