@@ -170,6 +170,12 @@
       color: #999;
       border-top: 1px solid #e0e0e0;
     }
+    .event-info img.flag {
+  width: 20px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
   </style>
 </head>
 <body>
@@ -188,9 +194,9 @@
 
 <div class="main-content">
   <div class="left-nav">
-    <button onclick="window.location.href='dashboard.html'">📊 Overview</button>
+    <button onclick="window.location.href='dashboard.html'">📊 Overview - Basic</button>
+    <button onclick="window.location.href='dashboard.html'">📊 Overview - Pro</button>
     <button onclick="window.location.href='calendar.html'">📅 Economic Calendar</button>
-    <button onclick="window.location.href='dex.html'">💱 DEX</button>
   </div>
 
   <div class="calendar-section">
@@ -326,36 +332,57 @@
     renderCalendar(events);
   }
 
-  function renderCalendar(events) {
-    const ul = document.getElementById('econCalendarList');
-    ul.innerHTML = '';
-    let lastDate = '';
-    events.forEach(e => {
-      if (e.date !== lastDate) {
-        const dateLi = document.createElement('li');
-        dateLi.innerHTML = `<h3>${new Date(e.date).toLocaleDateString(undefined, {
-          weekday: 'long', month: 'long', day: 'numeric'
-        })}</h3>`;
-        ul.appendChild(dateLi);
-        lastDate = e.date;
-      }
+  const countryCodeMap = {
+  'United States': 'US',
+  'Canada': 'CA',
+  'Australia': 'AU',
+  'Germany': 'DE',
+  'France': 'FR',
+  'United Kingdom': 'GB',
+  'Japan': 'JP',
+  'China': 'CN',
+  'Switzerland': 'CH',
+  'South Korea': 'KR',
+  'New Zealand': 'NZ',
+  'Italy': 'IT',
+  'Spain': 'ES',
+  'India': 'IN',
+  'Brazil': 'BR',
+  // Add more mappings as needed
+};
 
-      const li = document.createElement('li');
-      li.className = 'economic-event';
+function renderCalendar(events) {
+  const ul = document.getElementById('econCalendarList');
+  ul.innerHTML = '';
+  let lastDate = '';
 
-      const impactClass = e.impact?.toLowerCase() ? `impact-${e.impact.toLowerCase()}` : '';
+  events.forEach(e => {
+    if (e.date !== lastDate) {
+      const dateLi = document.createElement('li');
+      dateLi.innerHTML = `<h3>${new Date(e.date).toLocaleDateString(undefined, {
+        weekday: 'long', month: 'long', day: 'numeric'
+      })}</h3>`;
+      ul.appendChild(dateLi);
+      lastDate = e.date;
+    }
 
-      li.innerHTML = `
-        <span class="event-time">${e.time}</span>
-        <span class="event-info">
-          <img class="flag" src="https://countryflagsapi.com/png/${e.country}" alt="${e.country}">
-          <span class="event-name">${e.event}</span>
-        </span>
-        <span class="${impactClass}">${e.impact}</span>
-      `;
-      ul.appendChild(li);
-    });
-  }
+    const impactClass = e.impact?.toLowerCase() ? `impact-${e.impact.toLowerCase()}` : '';
+    const countryCode = countryCodeMap[e.country] || 'UN'; // fallback
+    const flagURL = `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
+
+    const li = document.createElement('li');
+    li.className = 'economic-event';
+    li.innerHTML = `
+      <span class="event-time">${e.time || ''}</span>
+      <span class="event-info">
+        <img class="flag" src="${flagURL}" alt="${e.country}" onerror="this.src='https://flagcdn.com/24x18/un.png'">
+        <span class="event-name">${e.event}</span>
+      </span>
+      <span class="${impactClass}">${e.impact || ''}</span>
+    `;
+    ul.appendChild(li);
+  });
+}
 
   window.addEventListener('DOMContentLoaded', loadCalendar);
 </script>
