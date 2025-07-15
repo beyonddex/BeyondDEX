@@ -647,15 +647,15 @@ function loadTokenChart(symbol) {
 
   const upper = symbol.toUpperCase();
 
+  // ❗ Wait until binanceSymbols is loaded
+  if (!binanceSymbols.length) {
+    console.warn("Binance symbols not loaded yet, skipping chart load.");
+    return;
+  }
+
   let matchedPair = binanceSymbols.find(p => p === `${upper}USDT`);
-
-  if (!matchedPair) {
-    matchedPair = binanceSymbols.find(p => p.startsWith(upper));
-  }
-
-  if (!matchedPair) {
-    matchedPair = 'BTCUSDT';
-  }
+  if (!matchedPair) matchedPair = binanceSymbols.find(p => p.startsWith(upper));
+  if (!matchedPair) matchedPair = 'BTCUSDT';
 
   new TradingView.widget({
     width: "100%",
@@ -751,7 +751,9 @@ async function loadMarketData() {
   selectedTokenId = fixedId;
   li.classList.add('active');
   li.style.backgroundColor = '#e0e0e0';
-  loadTokenChart(coin.symbol); // ✅ Just pass the actual symbol
+  setTimeout(() => {
+  loadTokenChart(coin.symbol);
+}, 100); // small delay after symbols fetch
 }
 
   if (fixedId === selectedTokenId) {
