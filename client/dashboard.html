@@ -1042,21 +1042,21 @@ function renderCalendar(events) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  (async () => {
+    await fetchBinanceSymbols(); // ✅ ensure symbols are ready before anything else
+    loadMarketData();
+    setInterval(loadMarketData, 30000);
 
-  loadCryptoNews();
-  setInterval(loadCryptoNews, 60000);
+    loadCryptoNews();
+    setInterval(loadCryptoNews, 60000);
 
-  fetchBinanceSymbols(); // Load trading pairs list on startup
-  loadMarketData();
-  setInterval(loadMarketData, 30000);
+    loadExtraMarketData();
+    setInterval(loadExtraMarketData, 60000);
 
-  loadExtraMarketData(); // <-- 🔥 Add this
-  setInterval(loadExtraMarketData, 60000); // refresh every 60s
-
-   load7DayCalendar();
-
-   loadD3Heatmap();
-setInterval(loadD3Heatmap, 60000); // update every 60s
+    load7DayCalendar();
+    loadD3Heatmap();
+    setInterval(loadD3Heatmap, 60000);
+  })();
 });
 </script>
 </body>
