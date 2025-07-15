@@ -294,6 +294,8 @@
 
   let currentUsername = '';
   let userDocId = '';
+  let onlineUserMap = {};
+
 
   const chatBox = document.getElementById("chatBox");
   const chatInput = document.getElementById("chatInput");
@@ -309,19 +311,69 @@
   }
 
   function monitorPresence() {
-    setInterval(() => {
-      if (userDocId && currentUsername) updatePresence(userDocId, currentUsername);
-    }, 30000);
+  setInterval(() => {
+    if (userDocId && currentUsername) {
+      updatePresence(userDocId, currentUsername);
+    }
+  }, 30000);
 
-    db.collection("presence").onSnapshot(snapshot => {
-      const now = Date.now();
-      const onlineUsers = snapshot.docs.filter(doc => {
-        const data = doc.data();
-        return data.lastActive && (now - data.lastActive.toDate().getTime()) < 3 * 60 * 1000;
-      });
-      onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
+  db.collection("presence").onSnapshot(snapshot => {
+    const now = Date.now();
+    onlineUserMap = {};
+
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const lastActive = data.lastActive?.toDate().getTime();
+      if (lastActive) {
+        const isOnline = now - lastActive < 3 * 60 * 1000;
+        onlineUserMap[doc.id] = {
+          username: data.username,
+          isOnline
+        };
+      }
     });
-  }
+
+    onlineUsersCount.textContent = `Online Users: ${
+      Object.values(onlineUserMap).filter(u => u.isOnline).length
+    }`;
+
+    renderChatMessages(); // ✅ refresh chat with presence dots
+  });
+}
+function renderChatMessages() {
+  db.collection("chat").orderBy("timestamp").get().then(snapshot => {
+    chatBox.innerHTML = "";
+    snapshot.forEach(doc => {
+      const { username, text, timestamp } = doc.data();
+      const timeStr = timestamp ? getRelativeTime(timestamp) : "";
+
+      let isOnline = false;
+      for (let uid in onlineUserMap) {
+        if (onlineUserMap[uid].username === username) {
+          isOnline = onlineUserMap[uid].isOnline;
+          break;
+        }
+      }
+
+      const statusDot = `<span style="
+        display:inline-block;
+        width:8px;
+        height:8px;
+        margin-right:6px;
+        border-radius:50%;
+        background-color:${isOnline ? '#22c55e' : '#9ca3af'};
+        box-shadow:${isOnline ? '0 0 8px #22c55e' : 'none'};
+      "></span>`;
+
+      const div = document.createElement("div");
+      div.className = "chat-message";
+      div.innerHTML = `${statusDot}<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
+      chatBox.appendChild(div);
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+}
 
   auth.onAuthStateChanged(user => {
     if (user) {
