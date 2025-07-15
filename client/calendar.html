@@ -20,23 +20,20 @@
       min-height: 100vh;
     }
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 40px;
-      background: #fff;
-      border-bottom: 1px solid #e0e0e0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    .logo img { height: 40px; }
-    .nav-links a {
-      margin-left: 20px;
-      text-decoration: none;
-      color: #000;
-      font-weight: 500;
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+.logo-container img { height: 50px; }
+    .nav-links a { margin-left: 20px; text-decoration: none; color: #000; font-weight: 500; }
 
     .main-content {
       display: flex;
@@ -180,21 +177,62 @@
   align-items: center;
   margin-bottom: 10px;
 }
+.user-container { position: relative; margin-left: auto; }
+.user-circle {
+  width: 40px;
+  height: 40px;
+  background: #000;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+}
+.dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  display: none;
+  min-width: 120px;
+  z-index: 1000;
+}
+.dropdown a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #000;
+  font-size: 14px;
+}
+.dropdown a:hover {
+  background: #f0f0f0;
+}
 
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">
+  <div class="logo-container">
     <a href="index.html"><img src="assets/bdx.png" alt="BeyondDEX Logo" /></a>
   </div>
-  <div class="nav-links">
-    <a href="dashboard.html">Dashboard</a>
-    <a href="dex.html">DEX</a>
-    <a href="calendar.html">Calendar</a>
-    <a href="auth.html">Login</a>
+  <div class="nav-links" id="navLinks">
+  <a href="dashboard.html">Dashboard</a>
+  <a href="dex.html">DEX</a>
+  <a href="calendar.html">Calendar</a>
+</div>
+<div class="user-container" style="position: relative;">
+  <div class="user-circle" id="userCircle" style="display: none;">?</div>
+  <div class="dropdown" id="dropdownMenu" style="display: none;">
+    <a href="#" id="logout">Log Out</a>
   </div>
+</div>
 </header>
 
 <div class="main-content">
@@ -240,6 +278,9 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const userCircle = document.getElementById("userCircle");
+  const dropdownMenu = document.getElementById("dropdownMenu");
+
 
   let currentUsername = '';
   let userDocId = '';
@@ -282,6 +323,10 @@
           userDocId = uid;
           updatePresence(uid, username);
           monitorPresence();
+
+          // ✅ Show user circle
+          userCircle.style.display = "flex";
+          userCircle.textContent = username.charAt(0).toUpperCase();
         }
       });
 
@@ -411,6 +456,25 @@ events.sort((a, b) => new Date(a.date) - new Date(b.date));
 }
 
   window.addEventListener('DOMContentLoaded', loadCalendar);
+
+  // 🔻 Logout dropdown toggle behavior
+userCircle.addEventListener("click", () => {
+  dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+});
+
+window.addEventListener("click", (e) => {
+  if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+    dropdownMenu.style.display = "none";
+  }
+});
+
+document.getElementById("logout").addEventListener("click", () => {
+  if (userDocId) {
+    db.collection("presence").doc(userDocId).delete();
+  }
+  auth.signOut().then(() => window.location.href = "/auth.html");
+});
+
 </script>
 
 </body>
