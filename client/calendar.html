@@ -175,6 +175,11 @@
   vertical-align: middle;
   margin-right: 6px;
 }
+.economic-event {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
 
   </style>
 </head>
@@ -261,7 +266,7 @@
       const now = Date.now();
       const onlineUsers = snapshot.docs.filter(doc => {
         const data = doc.data();
-        return data.lastActive && (now - data.lastActive.toDate().getTime()) < 60000;
+        return data.lastActive && (now - data.lastActive.toDate().getTime()) < 3 * 60 * 1000;
       });
       onlineUsersCount.textContent = `Online Users: ${onlineUsers.length}`;
     });
@@ -356,6 +361,8 @@ function renderCalendar(events) {
   ul.innerHTML = '';
   let lastDate = '';
 
+events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
   events.forEach(e => {
     if (e.date !== lastDate) {
       const dateLi = document.createElement('li');
@@ -375,7 +382,7 @@ function renderCalendar(events) {
     li.innerHTML = `
       <span class="event-time">${e.time || ''}</span>
       <span class="event-info">
-        <img class="flag" src="${flagURL}" alt="${e.country}" onerror="this.src='https://flagcdn.com/24x18/un.png'">
+        <img class="flag" src="${flagURL}" alt="${e.country}" onerror="this.style.display='none'">
         <span class="event-name">${e.event}</span>
       </span>
       <span class="${impactClass}">${e.impact || ''}</span>
