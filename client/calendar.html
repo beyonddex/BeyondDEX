@@ -393,7 +393,7 @@ events.sort((a, b) => new Date(a.date) - new Date(b.date));
     }
 
     const impactClass = e.impact?.toLowerCase() ? `impact-${e.impact.toLowerCase()}` : '';
-    const countryCode = countryCodeMap[e.country] || 'UN'; // fallback
+    const countryCode = countryCodeMap[e.country] || e.country || 'UN';
     const flagURL = `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
 
     const li = document.createElement('li');
