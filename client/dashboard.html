@@ -306,6 +306,26 @@ footer {
   margin-bottom: 16px;
   transition: all 0.3s ease;
 }
+.main-content {
+  display: flex;
+  gap: 24px; 
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 32px;
+  box-sizing: border-box;
+}
+.left-column,
+.middle-column,
+.right-column {
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.left-column   { flex-basis: 22%; }
+.middle-column { flex-basis: 52%; }
+.right-column  { flex-basis: 26%; }
+
 
 
   </style>
@@ -337,7 +357,7 @@ footer {
       <button>📊 Overview - Pro</button>
       <button onclick="window.location.href='calendar.html'">📅 Economic Calendar</button>
     </div>
-
+<div class="main-content">
   <div class="dashboard-main-content">
   <div class="market-panel">
     <div class="token-heatmap">
@@ -345,7 +365,7 @@ footer {
         <h4>Top Volume Tokens</h4>
         <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
       </div>
-      <div id="heatmap" class="card">
+      <div id="heatmap">
   <svg width="500" height="500"></svg>
 </div>
 <div class="tooltip" id="tooltip" style="position:absolute; opacity:0;"></div>
@@ -400,7 +420,7 @@ footer {
     </div>
   </div>
 </main>    
-
+</div>
   </div>
 <footer style="text-align:center; padding: 20px; font-size: 13px; color: #999;">
   © 2025 BeyondDEX. All rights reserved.
