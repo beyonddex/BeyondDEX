@@ -278,7 +278,7 @@ footer {
 .dashboard-main-content {
   display: flex;
   gap: 12px;
-  margin-left: 20px; /* ✅ Push it right, away from left-nav */
+  margin-left: 10px; /* ✅ Push it right, away from left-nav */
   flex: 1;
 }
 .tooltip {
@@ -712,6 +712,10 @@ async function loadMarketData() {
     <span class="${changeClass}">${changeSymbol} ${absChange.toFixed(2)}%</span><br/>
     <small style="color:#666;">Vol: $${coin.total_volume.toLocaleString()}</small>
   `;
+  if (index === 0 && !selectedTokenId) {
+  selectedTokenId = fixedId;
+  loadTokenChart(coin.symbol); // 👈 loads chart for top token
+}
 
   li.addEventListener('mouseover', () => {
     if (!li.classList.contains('active')) li.style.backgroundColor = '#f0f0f0';
