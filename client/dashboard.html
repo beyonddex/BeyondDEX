@@ -721,28 +721,6 @@ async function loadMarketData() {
     if (!li.classList.contains('active')) li.style.backgroundColor = '';
   });
 
-  li.addEventListener('click', () => {
-    selectedTokenId = fixedId;
-
-    document.querySelectorAll('.token-entry').forEach(el => {
-      el.classList.remove('active');
-      el.style.backgroundColor = '';
-      el.style.transition = 'background-color 0.4s ease';
-    });
-
-    li.classList.add('active');
-    li.style.backgroundColor = '#e0e0e0';
-    li.style.transition = 'background-color 0.4s ease, transform 0.3s ease';
-    li.style.transform = 'scale(1.02)';
-    setTimeout(() => {
-      li.style.transform = 'scale(1)';
-    }, 300);
-
-    console.log(`Clicked token: ${coin.symbol} → ID used: ${fixedId}`);
-    loadTokenChart(coin.symbol);
-
-  });
-
   list.appendChild(li);
   list.scrollTop = previousScroll; // ✅ Restore scroll position
 
