@@ -723,22 +723,6 @@ async function loadMarketData() {
 
   list.appendChild(li);
   list.scrollTop = previousScroll; // ✅ Restore scroll position
-
-
-  // Load first token chart by default
-  if (index === 0 && !selectedTokenId) {
-  selectedTokenId = fixedId;
-  li.classList.add('active');
-  li.style.backgroundColor = '#e0e0e0';
-  setTimeout(() => {
-  loadTokenChart(coin.symbol);
-}, 100); // small delay after symbols fetch
-}
-
-  if (fixedId === selectedTokenId) {
-    li.classList.add('active');
-    li.style.backgroundColor = '#e0e0e0';
-  }
 });
 
   } catch (e) {
