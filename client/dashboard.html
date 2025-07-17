@@ -351,7 +351,11 @@ footer {
 .left-column,
 .middle-column,
 .right-column {
-  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 16px;
 }
 .left-column { flex-basis: 26%; }
 .middle-column { flex-basis: 48%; }
