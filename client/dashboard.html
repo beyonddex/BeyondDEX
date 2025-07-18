@@ -299,11 +299,9 @@ footer {
       transition: opacity 0.2s;
       }
      #heatmap {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 12px;
-  box-sizing: border-box;
+  flex: 1;
+  min-height: 200px;
+  max-height: 100%;
 }
 
 
@@ -405,8 +403,6 @@ footer {
   z-index: 100;
   opacity: 0.9;
 }
-
-
 
   </style>
 </head>
@@ -1022,12 +1018,20 @@ function renderCalendar(events) {
       volume: coin.total_volume || 1
     }));
 
-    const width = 400, height = 400, radius = 170, arcInner = 90;
+    // Get container dimensions
+    const container = document.getElementById('heatmap');
+    const rect = container.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.width; // maintain square
 
-    const hoverScale = 1.07; 
-    const svgContainer = d3.select('#heatmap svg');
-    svgContainer.selectAll("*").remove(); // clear previous
-    const svg = svgContainer
+    const radius = width / 2.5;
+    const arcInner = radius / 1.8;
+
+    // Clear any previous SVG
+    d3.select('#heatmap svg').remove();
+
+    const svgContainer = d3.select('#heatmap')
+      .append('svg')
       .attr('viewBox', `0 0 ${width} ${height}`)
       .append('g')
       .attr('transform', `translate(${width / 2}, ${height / 2})`);
@@ -1038,7 +1042,7 @@ function renderCalendar(events) {
 
     const color = d => d.change > 0 ? '#22c55e' : d.change < 0 ? '#ef4444' : '#9ca3af';
 
-    const g = svg.selectAll('.arc')
+    const g = svgContainer.selectAll('.arc')
       .data(pie(processedData))
       .enter()
       .append('g')
@@ -1052,12 +1056,14 @@ function renderCalendar(events) {
       .on('mouseover', function (event, d) {
         d3.select(this).transition().duration(200).attr('transform', () => {
           const [x, y] = arc.centroid(d);
-          return `translate(${x * (hoverScale - 1)},${y * (hoverScale - 1)})`;
+          return `translate(${x * 0.07},${y * 0.07})`;
         });
       })
       .on('mousemove', event => {
-        tooltip.style('left', (event.pageX + 10) + 'px')
-          .style('top', (event.pageY - 30) + 'px');
+        tooltip
+          .style('left', (event.pageX + 10) + 'px')
+          .style('top', (event.pageY - 30) + 'px')
+          .style('opacity', 1);
       })
       .on('mouseout', function () {
         d3.select(this).transition().duration(200).attr('transform', 'translate(0,0)');
