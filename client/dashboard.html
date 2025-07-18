@@ -370,58 +370,80 @@ footer {
   flex-direction:column;
   height:100%;
 }
+.modern-theme {
+  --bg: #0d0d0d;
+  --bg-alt: #1a1a1a;
+  --text: #f5f5f5;
+  --card-bg: #181818;
+  --border: #2a2a2a;
+  --accent: #3b82f6;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --font: 'Inter', sans-serif;
+}
+
+.modern-theme body,
+.modern-theme .page-wrapper,
+.modern-theme .dashboard-content,
+.modern-theme .left-nav,
+.modern-theme .sidebar,
+.modern-theme .card,
+.modern-theme .chat-box,
+.modern-theme .chat-input input {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  transition: background 0.3s, color 0.3s;
+}
+
+.modern-theme .card,
+.modern-theme .chat-box,
+.modern-theme .sidebar,
+.modern-theme .left-nav {
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.modern-theme header,
+.modern-theme footer {
+  background-color: var(--bg);
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+
+.modern-theme .left-nav button {
+  color: var(--text);
+}
+.modern-theme .left-nav button:hover {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.modern-theme .chat-input input {
+  background-color: var(--bg-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.modern-theme .chat-input button {
+  background: var(--accent);
+  color: white;
+  border: none;
+}
+
+.modern-theme .economic-event,
+.modern-theme .event-time,
+.modern-theme .event-name {
+  color: var(--text);
+}
+
+.modern-theme .event-info img.flag {
+  filter: brightness(0.8);
+}
 
   </style>
-  <style>
-  body {
-    background-color: #0f0f0f;
-    color: #f0f0f0;
-  }
-
-  .card, .market-data-box, .market-insights-box, .economic-calendar-box, .chat-box, .left-nav, .sidebar {
-    background-color: #1c1c1c !important;
-    color: #f0f0f0 !important;
-    border-color: #333 !important;
-  }
-
-  .card h4, .left-nav button, .market-data-box h4, .market-insights-box h4, .economic-calendar-box h4 {
-    color: #ffffff;
-  }
-
-  .chat-input input {
-    background: #2a2a2a;
-    color: #ffffff;
-    border: 1px solid #444;
-  }
-
-  .chat-input button {
-    background-color: #3b82f6;
-    color: white;
-  }
-
-  .left-nav button:hover {
-    background: #333;
-  }
-
-  .market-up {
-    color: #22c55e !important;
-  }
-
-  .market-down {
-    color: #ef4444 !important;
-  }
-
-  a {
-    color: #3b82f6;
-  }
-
-  footer {
-    color: #777 !important;
-    border-top: 1px solid #333 !important;
-  }
-</style>
 </head>
-<body>
+<body class="modern-theme">
   <div class="page-wrapper">
   <header>
     <div class="logo-container">
