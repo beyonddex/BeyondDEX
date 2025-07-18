@@ -7,257 +7,187 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+    body {
       font-family: 'Inter', sans-serif;
-      background: #fff;
-      color: #000;
+      background-color: #fafafa;
+      color: #111;
       overflow-x: hidden;
     }
-
     header {
+      padding: 20px 60px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 40px;
-      border-bottom: 1px solid #e0e0e0;
-      position: sticky;
-      top: 0;
-      background: white;
-      z-index: 999;
-    }
-
-    .logo-container img {
-      height: 60px;
-    }
-
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: #000;
-      font-weight: 500;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border: 1px solid black;
-      background: white;
-      color: black;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-      background: black;
-      color: white;
-    }
-
-    .profile-wrapper {
+      background-color: #ffffff;
+      border-bottom: 1px solid #ddd;
       position: relative;
+      z-index: 10;
     }
-
-    .profile-circle {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: black;
-      color: white;
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #000;
+    }
+    .cta {
+      background-color: #111;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .cta:hover {
+      background-color: #333;
+    }
+    .main-section {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 100px 60px;
+      align-items: center;
+      background: #f5f5f5;
+      overflow: hidden;
+    }
+    .main-section::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      left: -100px;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 123, 255, 0.1), transparent 60%),
+                  radial-gradient(circle at 70% 70%, rgba(255, 0, 150, 0.1), transparent 60%);
+      animation: floatBG 10s ease-in-out infinite;
+      z-index: 0;
+    }
+    @keyframes floatBG {
+      0%, 100% {
+        transform: translate(0px, 0px);
+      }
+      50% {
+        transform: translate(-50px, 50px);
+      }
+    }
+    .text-column, .image-column {
+      position: relative;
+      z-index: 1;
+    }
+    .text-column {
+      flex: 1 1 500px;
+      padding-right: 40px;
+    }
+    .text-column h1 {
+      font-size: 2.75rem;
+      margin-bottom: 20px;
+      color: #111;
+    }
+    .text-column p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    .image-column {
+      flex: 1 1 500px;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-weight: bold;
-      cursor: pointer;
     }
-
-    .logout-dropdown {
-      display: none;
-      position: absolute;
-      top: 45px;
-      right: 0;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .logout-dropdown div {
-      padding: 10px;
-      cursor: pointer;
-    }
-
-    .hero {
-      padding: 120px 40px 60px;
-      text-align: center;
-      position: relative;
-    }
-
-    .hero h1 {
-      font-size: 56px;
-      margin-bottom: 20px;
-      line-height: 1.2;
-    }
-
-    .hero p {
-      font-size: 22px;
-      margin-bottom: 40px;
-      color: #333;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .highlight {
-      font-weight: 600;
-      border-bottom: 2px solid black;
-      display: inline-block;
-      margin: 0 5px;
-    }
-
-    .feature-row {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      gap: 40px;
-      padding: 60px 40px;
-      background: #f9f9f9;
-      flex-wrap: wrap;
-    }
-
-    .feature-text {
-      max-width: 500px;
-    }
-
-    .feature-text h2 {
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
-
-    .feature-text p {
-      font-size: 18px;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .feature-box {
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 20px;
-      max-width: 360px;
-      background: white;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    }
-
-    .feature-box h3 {
-      font-size: 20px;
-      margin-bottom: 15px;
-    }
-
-    .feature-box ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .feature-box li {
-      margin-bottom: 10px;
-      position: relative;
-      padding-left: 20px;
-      font-size: 16px;
-    }
-
-    .feature-box li::before {
-      content: "✔";
-      position: absolute;
-      left: 0;
-      color: green;
-    }
-
-    .hero-graphic {
+    .image-placeholder {
       width: 100%;
-      max-width: 800px;
-      margin: 60px auto;
-      border: 1px solid #e0e0e0;
+      max-width: 520px;
+      height: 320px;
+      background: #dcdcdc;
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1rem;
+      color: #666;
+      box-shadow: 0 0 12px rgba(0,0,0,0.06);
     }
-
-    footer {
+    .affiliate-section {
+      padding: 80px 60px;
+      background: #ffffff;
       text-align: center;
-      padding: 40px 20px;
-      font-size: 14px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #eee;
+    }
+    .affiliate-section h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    .affiliate-section p {
+      font-size: 1.1rem;
+      max-width: 800px;
+      margin: 0 auto 30px;
+      color: #333;
+    }
+    .affiliate-section a {
+      display: inline-block;
+      margin-top: 10px;
+      font-weight: 600;
+      color: #111;
+      text-decoration: underline;
+    }
+    footer {
+      padding: 40px 0;
+      text-align: center;
+      color: #888;
+      font-size: 0.9rem;
+      border-top: 1px solid #ddd;
+      background: #fff;
     }
   </style>
 </head>
 <body>
   <header>
     <div class="logo-container">
-      <a href="/">
-        <img src="assets/bdx.png" alt="BeyondDEX Logo" />
-      </a>
+      <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
     </div>
-    <nav id="nav">
-      <a href="/">Home</a>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
       <a href="/dex.html">DEX</a>
       <a href="/dashboard.html">Dashboard</a>
-      <a href="/auth.html" class="btn" id="authBtn">Login / Register</a>
-    </nav>
+    </div>
+    <div class="user-container">
+      <div class="user-circle" id="userCircle">?</div>
+      <div class="dropdown" id="dropdownMenu">
+        <a href="#" id="logout">Log Out</a>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <div class="hero">
-      <h1>
-        A <span class="highlight">Clearer</span> View<br />
-        of <span class="highlight">Crypto</span> Trading
-      </h1>
-      <p>
-        BeyondDEX delivers radical simplicity, transparent trades,
-        and global economic insights — all in one decentralized platform.
-      </p>
-      <button class="btn">Launch DEX</button>
+  <section class="main-section">
+    <div class="text-column">
+      <h1>Your Daily Crypto Edge</h1>
+      <p>BeyondDEX is your institutional-grade trading assistant — delivering the most important on-chain, macro, sentiment, and volatility signals into a clean, 60-second daily report.
+      <br/><br/>
+      Designed like a hedge fund desk note. Built for traders who demand clarity over clutter.</p>
+      <button class="cta">Access Pro Reports</button>
     </div>
+    <div class="image-column">
+      <div class="image-placeholder">[ Insert Dashboard Screenshot Here ]</div>
+    </div>
+  </section>
 
-    <div class="feature-row">
-      <div class="feature-text">
-        <h2>BeyondDEX Elevates Traders</h2>
-        <p>
-          We go beyond swaps. BeyondDEX empowers traders with high-quality macro data,
-          real-time alerts, and token intelligence — all through a sleek, accessible dashboard.
-          Whether you're a seasoned DeFi veteran or just starting out, our tools are built
-          to give you an edge without complexity.
-        </p>
-        <a href="/dashboard.html" class="btn">Explore Dashboard – $15/mo</a>
-      </div>
-      <div class="feature-box">
-        <h3>Included with Subscription</h3>
-        <ul>
-          <li>Live macroeconomic event tracking</li>
-          <li>Customizable trade alerts</li>
-          <li>Risk ratings and token audit scores</li>
-          <li>Portfolio tracking tools</li>
-          <li>Early access to trading strategies</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="hero-graphic">
-      <p style="margin: 0; font-weight: 500;">Live Swap Preview</p>
-      <img src="https://dummyimage.com/700x300/ffffff/000000&text=Swap+UI+Preview" alt="Swap UI Preview" style="width: 100%; margin-top: 15px; border-radius: 8px;">
-    </div>
-  </main>
+  <section class="affiliate-section">
+    <h2>Join Our Affiliate Program</h2>
+    <p>Help us grow the BeyondDEX community and earn recurring income.
+    As an affiliate, you'll receive 30% of the revenue for every user you refer — each month they stay subscribed. Getting started is easy: sign up, get your unique code, and start earning.</p>
+    <a href="/affiliate">Learn more about the affiliate program →</a>
+  </section>
 
   <footer>
-    &copy; 2025 BeyondDEX. All rights reserved.<br />
-    <a href="mailto:team@beyonddex.io">team@beyonddex.io</a>
+    &copy; 2025 BeyondDEX. All rights reserved.
   </footer>
 
   <script>
