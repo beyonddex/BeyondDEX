@@ -68,3 +68,145 @@ header {
 .dropdown a:hover {
   background: #f0f0f0;
 }
+/* Modern Apple-style dashboard overrides */
+body, html {
+  background-color: #f5f6f8;
+  font-family: 'Inter', sans-serif;
+  color: #111;
+}
+
+/* Elevate card look */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Top nav */
+header {
+  background: #ffffff;
+  padding: 16px 32px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .nav-links a {
+  color: #444;
+  margin: 0 16px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+header .nav-links a:hover {
+  color: #000;
+}
+
+/* Sidebar */
+.left-nav {
+  background: #f7f8fa;
+  border-right: 1px solid #e5e7eb;
+  padding: 24px 16px;
+}
+
+.left-nav button {
+  background: none;
+  border: none;
+  color: #333;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+.left-nav button:hover {
+  background: #e5e7eb;
+}
+
+/* Chat styling */
+.chat-box {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 14px;
+  height: 100%;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+}
+.chat-input input {
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  padding: 10px;
+  border-radius: 8px;
+}
+.chat-input button {
+  background: #3b82f6;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+.chat-input button:hover {
+  background: #2563eb;
+}
+
+/* Heatmap container */
+#heatmap {
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 16px;
+}
+
+/* Economic calendar */
+.economic-calendar-preview,
+.market-data-box,
+.market-insights-box {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+/* Fonts and details */
+h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 12px;
+}
+li {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Online user dot refinement */
+.chat-message span[style*="background-color"] {
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px rgba(34,197,94,0.5);
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 24px;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Scrollbars (optional aesthetic) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
