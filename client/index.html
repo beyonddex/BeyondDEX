@@ -197,37 +197,15 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    auth.onAuthStateChanged(async user => {
-      const nav = document.getElementById("nav");
-      const authBtn = document.getElementById("authBtn");
-      if (user) {
-        const doc = await db.collection("users").doc(user.uid).get();
-        const username = doc.exists ? doc.data().username : "U";
-        const initial = username.charAt(0).toUpperCase();
-
-        const profile = document.createElement("div");
-        profile.classList.add("profile-wrapper");
-        profile.innerHTML = `
-          <div class="profile-circle" id="profileCircle">${initial}</div>
-          <div class="logout-dropdown" id="logoutDropdown">
-            <div id="logoutBtn">Log out</div>
-          </div>
-        `;
-        nav.replaceChild(profile, authBtn);
-
-        const dropdown = profile.querySelector("#logoutDropdown");
-        const circle = profile.querySelector("#profileCircle");
-        const logout = profile.querySelector("#logoutBtn");
-
-        circle.addEventListener("click", () => {
-          dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-        });
-
-        logout.addEventListener("click", () => {
-          auth.signOut().then(() => location.reload());
-        });
-      }
-    });
+     auth.onAuthStateChanged(async user => {
+    if (user) {
+      const doc = await db.collection("users").doc(user.uid).get();
+      const username = doc.exists ? doc.data().username : "U";
+      const initial = username.charAt(0).toUpperCase();
+      const userCircle = document.getElementById("userCircle");
+      if (userCircle) userCircle.textContent = initial;
+    }
+  });
   </script>
 </body>
 </html>
