@@ -68,18 +68,6 @@
   flex-direction: column;
   font-size: 14px;
 }
-#heatmap {
-  background-color: #ffffff !important;
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  height: 480px; /* reduced to prevent overflow */
-  width: 100%; /* ensure responsiveness */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
     #marketList {
       max-height: none;
@@ -116,11 +104,8 @@
 
 
     .token-heatmap {
-  flex: 1;
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex: 0 0 auto; /* 🛠️ Prevent from stretching */
+  width: 100%;
 }
 
     .volume-section {
@@ -299,9 +284,12 @@ footer {
       transition: opacity 0.2s;
       }
      #heatmap {
+  background-color: #ffffff !important;
   flex: 1;
   min-height: 200px;
   max-height: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -336,6 +324,7 @@ footer {
   flex-direction: column;
   gap: 16px;
   min-height: 0;
+  max-height: 100%; /* 🛠️ Prevents overflow */
 }
 .middle-column,
 .right-column {
