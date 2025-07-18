@@ -375,6 +375,49 @@ footer {
 .middle-column > .card:last-child {
   margin-bottom: 0;
 }
+.left-nav {
+  width: 80px;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+  border-right: 1px solid #e0e0e0;
+}
+
+.nav-link {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  transition: background 0.2s ease;
+}
+
+.nav-link:hover {
+  background: #eaeaea;
+}
+
+.nav-icon {
+  width: 28px;
+  height: 28px;
+}
+.nav-link[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 80px;
+  background: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  opacity: 0.9;
+}
+
 
 
   </style>
@@ -402,9 +445,13 @@ footer {
     <main>
     <div class="dashboard-row">
     <div class="left-nav">
-      <button onclick="window.location.href='dashboard.html'">Dashboard</button>
-      <button onclick="window.location.href='calendar.html'">📅 Economic Calendar</button>
-    </div>
+  <a href="dashboard.html" class="nav-link" title="Dashboard">
+    <img src="assets/dashboard.png" alt="Dashboard" class="nav-icon" />
+  </a>
+  <a href="calendar.html" class="nav-link" title="Calendar">
+    <img src="assets/calendar.png" alt="Calendar" class="nav-icon" />
+  </a>
+</div>
 <div class="main-content">
   <div class="left-column">
       <div class="market-panel">
