@@ -206,6 +206,24 @@
       if (userCircle) userCircle.textContent = initial;
     }
   });
+  const userCircle = document.getElementById("userCircle");
+const dropdownMenu = document.getElementById("dropdownMenu");
+
+userCircle.addEventListener("click", () => {
+  dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+});
+
+window.addEventListener("click", e => {
+  if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+    dropdownMenu.style.display = "none";
+  }
+});
+
+document.getElementById("logout").addEventListener("click", () => {
+  auth.signOut().then(() => {
+    location.reload();
+  });
+});
   </script>
 </body>
 </html>
