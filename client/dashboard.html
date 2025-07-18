@@ -345,12 +345,18 @@ footer {
   display: flex;
   flex-direction: row;
   width:100%;
+  flex:1;
   height:100%;
   gap: 24px;
   margin: 0 auto;
   box-sizing: border-box;
+  min-height:0;
 }
-.left-column,
+.left-column
+{
+  overflow-y: auto;
+  max-height: calc(100vh - 160px); /* header + footer buffer */
+}
 .middle-column,
 .right-column {
   display: flex;
