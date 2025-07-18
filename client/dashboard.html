@@ -358,16 +358,23 @@ footer {
   justify-content: flex-start;
   align-items: stretch;
   gap: 16px;
+  flex: 1; /* ✅ allow it to grow within the main-content */
+  min-height: 0; /* ✅ prevent overflow issues in flexbox */
 }
 .left-column { flex-basis: 26%; }
 .middle-column { flex-basis: 48%; }
 .right-column { flex-basis: 26%; }
 .chat-wrapper {
-  flex-basis: 26%;
-  min-width: 250px;
-  display:flex;
-  flex-direction:column;
-  height:100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.chat-box {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 
