@@ -1100,9 +1100,9 @@ function renderCalendar(events) {
 
 async function loadWhaleData() {
   try {
-    const res = await fetch('/api/whale-wallet');
+    const res = await fetch('https://beyonddex-backend.onrender.com/api/whale-wallet');
     const data = await res.json();
-
+ 
     const container = document.getElementById('whale-data');
     container.innerHTML = ''; // Clear previous content
 
