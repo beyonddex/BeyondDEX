@@ -138,6 +138,13 @@
   border-radius: 12px;
   box-shadow: 0 0 12px rgba(0,0,0,0.06);
 }
+.text-wrapper {
+  background: transparent;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 transparent; /* Optional: placeholder for future shadow */
+}
+
   </style>
 </head>
 <body>
@@ -160,12 +167,13 @@
 
   <section class="main-section">
     <div class="text-column">
-      <h1>Your Daily Crypto Edge</h1>
-      <p>BeyondDEX is your institutional-grade trading assistant — delivering the most important on-chain, macro, sentiment, and volatility signals into a clean, 60-second daily report.
-      <br/><br/>
-      Designed like a hedge fund desk note. Built for traders who demand clarity over clutter.</p>
-      <button class="cta">Access Pro Reports</button>
-    </div>
+  <div class="text-wrapper">
+    <h1>Your Daily Crypto Edge</h1>
+    <p>BeyondDEX is your institutional-grade trading assistant — delivering the most important on-chain, macro, sentiment, and volatility signals into a clean, 60-second daily report.<br><br>
+    Designed like a hedge fund desk note. Built for traders who demand clarity over clutter.</p>
+    <button class="cta">Access Pro Reports</button>
+  </div>
+</div>
     <div class="image-wrapper">
        <img src="assets/dashboard-fix.png" alt="BeyondDEX Dashboard Screenshot">
     </div>
