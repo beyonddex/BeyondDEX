@@ -473,10 +473,11 @@ footer {
     </ul>
   </div>
 
-  <div class="market-insights-box card">
-  <h4>Whale Wallet Tracker</h4>
-  <div id="whale-data" style="font-size: 14px; margin-top: 10px;">Loading...</div>
+  <div id="whale-tx-data" class="card">
+  <h4>Recent Whale Transactions</h4>
+  <p>Loading...</p>
 </div>
+
  <div class="economic-calendar-preview card">
   <h4>Upcoming Economic Events</h4>
   <ul id="econCalendarList"></ul>
@@ -1098,49 +1099,36 @@ function renderCalendar(events) {
   }
 }
 
-async function loadWhaleData() {
+async function loadWhaleTransactions() {
   try {
-    const res = await fetch('https://beyonddex-backend.onrender.com/api/whale-wallet');
+    const res = await fetch('https://beyonddex-backend.onrender.com/api/whale-transactions');
     const data = await res.json();
- 
-    const container = document.getElementById('whale-data');
-    container.innerHTML = ''; // Clear previous content
 
-    data.forEach(chainInfo => {
-      const chainDiv = document.createElement('div');
-      chainDiv.classList.add('chain-section');
+    const container = document.getElementById('whale-tx-data');
+    container.innerHTML = '';
 
-      const title = document.createElement('h4');
-      title.textContent = chainInfo.chain.toUpperCase();
-      chainDiv.appendChild(title);
-
-      const ul = document.createElement('ul');
-
-      if (chainInfo.whales.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = 'No whales found.';
-        ul.appendChild(li);
-      } else {
-        chainInfo.whales.forEach(wallet => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            🐋 <strong>${wallet.symbol || 'Token'}</strong> — $${wallet.value_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}<br/>
-            <small style="color:#888;">${wallet.address}</small>
-          `;
-          ul.appendChild(li);
-        });
-      }
-
-      chainDiv.appendChild(ul);
-      container.appendChild(chainDiv);
-    });
-
-  } catch (err) {
-    console.error('Error loading whale data:', err);
-    const container = document.getElementById('whale-data');
-    if (container) {
-      container.textContent = 'Failed to load whale wallet data.';
+    if (!data.length) {
+      container.textContent = 'No recent whale transactions found.';
+      return;
     }
+
+    data.forEach(tx => {
+      const div = document.createElement('div');
+      div.classList.add('tx-entry');
+      div.innerHTML = `
+        <strong>Hash:</strong> ${tx.tx_hash}<br/>
+        <strong>From:</strong> ${tx.from_address}<br/>
+        <strong>To:</strong> ${tx.to_address}<br/>
+        <strong>Value:</strong> $${Number(tx.value_usd).toLocaleString(undefined, {maximumFractionDigits: 2})}<br/>
+        <small style="color: gray;">${new Date(tx.timestamp).toLocaleString()}</small>
+        <hr/>
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Error loading whale transactions:', err);
+    const container = document.getElementById('whale-tx-data');
+    if (container) container.textContent = 'Failed to load whale transaction data.';
   }
 }
 
@@ -1160,7 +1148,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(loadD3Heatmap, 60000);
 
     
-    loadWhaleData();
+     loadWhaleTransactions();
   })();
 </script>
 </body>
