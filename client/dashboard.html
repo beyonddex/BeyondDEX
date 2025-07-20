@@ -474,11 +474,9 @@ footer {
   </div>
 
   <div class="market-insights-box card">
-    <h4>Whale Wallet Tracker (Coming Soon)</h4>
-    <p style="font-size: 13px; color: #555; line-height: 1.4;">
-      Stay tuned for whale wallet trackers to help you analyze market sentiment and big-money moves.
-    </p>
-  </div>
+  <h4>Whale Wallet Tracker</h4>
+  <div id="whaleWalletSection" style="font-size: 14px; margin-top: 10px;"></div>
+</div>
  <div class="economic-calendar-preview card">
   <h4>Upcoming Economic Events</h4>
   <ul id="econCalendarList"></ul>
@@ -1100,6 +1098,60 @@ function renderCalendar(events) {
   }
 }
 
+async function loadWhaleData() {
+  try {
+    const res = await fetch('/api/whale-wallets');
+    const data = await res.json();
+
+    const container = document.getElementById('whale-data');
+    container.innerHTML = ''; // Clear previous content
+
+    data.forEach(chain => {
+      const chainDiv = document.createElement('div');
+      chainDiv.classList.add('chain-section');
+      chainDiv.style.marginBottom = '12px';
+
+      const title = document.createElement('h4');
+      title.textContent = chain.chain.toUpperCase();
+      chainDiv.appendChild(title);
+
+      if (!chain.whales || chain.whales.length === 0) {
+        const empty = document.createElement('p');
+        empty.textContent = 'No whale wallets found.';
+        empty.style.fontSize = '13px';
+        empty.style.color = '#888';
+        chainDiv.appendChild(empty);
+      } else {
+        const ul = document.createElement('ul');
+        ul.style.listStyle = 'none';
+        ul.style.padding = '0';
+
+        chain.whales.forEach(w => {
+          const li = document.createElement('li');
+          li.style.marginBottom = '6px';
+
+          li.innerHTML = `
+            <strong>${w.symbol}</strong> – ${w.token}<br/>
+            <small style="color: #666;">${w.address.slice(0, 6)}...${w.address.slice(-4)}</small><br/>
+            <span style="color: #22c55e;">$${Number(w.value_usd).toLocaleString()}</span>
+          `;
+
+          ul.appendChild(li);
+        });
+
+        chainDiv.appendChild(ul);
+      }
+
+      container.appendChild(chainDiv);
+    });
+
+  } catch (err) {
+    console.error('Error loading whale data:', err);
+    document.getElementById('whale-data').textContent = 'Failed to load whale data.';
+  }
+}
+
+
 window.addEventListener('DOMContentLoaded', () => {
     loadMarketData();
     setInterval(loadMarketData, 30000);
@@ -1113,6 +1165,9 @@ window.addEventListener('DOMContentLoaded', () => {
     load7DayCalendar();
     loadD3Heatmap();
     setInterval(loadD3Heatmap, 60000);
+
+    
+    loadWhaleData();
   })();
 </script>
 </body>
