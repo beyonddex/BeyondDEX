@@ -473,7 +473,7 @@ footer {
     </ul>
   </div>
 
-  <div id="whale-tx-data" class="card">
+  <div id="whale-transactions" class="card">
   <h4>Recent Whale Transactions</h4>
   <p>Loading...</p>
 </div>
@@ -1104,20 +1104,20 @@ async function loadWhaleTransactions() {
     const res = await fetch('https://beyonddex-backend.onrender.com/api/whale-transactions');
     const data = await res.json();
 
-    const container = document.getElementById('whale-data');
-    container.innerHTML = ''; // Clear previous
+    const container = document.getElementById('whale-transactions');
+    container.innerHTML = '';
 
     data.forEach(chainInfo => {
       const chainDiv = document.createElement('div');
       chainDiv.classList.add('chain-section');
 
-      const title = document.createElement('h4');
+      const title = document.createElement('h5');
       title.textContent = chainInfo.chain.toUpperCase();
       chainDiv.appendChild(title);
 
       const ul = document.createElement('ul');
 
-      if (chainInfo.whaleTxs.length === 0) {
+      if (!chainInfo.whaleTxs || chainInfo.whaleTxs.length === 0) {
         const li = document.createElement('li');
         li.textContent = 'No whale transactions found.';
         ul.appendChild(li);
@@ -1125,10 +1125,11 @@ async function loadWhaleTransactions() {
         chainInfo.whaleTxs.forEach(tx => {
           const li = document.createElement('li');
           li.innerHTML = `
-            🐋 <strong>$${tx.value_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong><br/>
-            From: <code>${tx.from.slice(0, 6)}...${tx.from.slice(-4)}</code><br/>
-            To: <code>${tx.to.slice(0, 6)}...${tx.to.slice(-4)}</code><br/>
-            <small style="color: #888">${new Date(tx.timestamp).toLocaleString()}</small>
+            🐋 <strong>${tx.value_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD</strong><br/>
+            <small>From: ${tx.from}<br/>
+            To: ${tx.to}<br/>
+            Time: ${new Date(tx.timestamp).toLocaleString()}</small><br/>
+            <a href="https://etherscan.io/tx/${tx.hash}" target="_blank">View TX</a>
           `;
           ul.appendChild(li);
         });
@@ -1139,14 +1140,11 @@ async function loadWhaleTransactions() {
     });
 
   } catch (err) {
-    console.error('❌ Error loading whale transactions:', err);
-    const container = document.getElementById('whale-data');
-    if (container) {
-      container.textContent = 'Failed to load whale transaction data.';
-    }
+    console.error('Error loading whale transactions:', err);
+    const container = document.getElementById('whale-transactions');
+    if (container) container.textContent = 'Failed to load whale transactions.';
   }
 }
-
 
 window.addEventListener('DOMContentLoaded', () => {
     loadMarketData();
