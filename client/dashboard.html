@@ -473,9 +473,9 @@ footer {
     </ul>
   </div>
 
-  <div id="whale-transactions" class="card">
-  <h4>Recent Whale Transactions</h4>
-  <p>Loading...</p>
+  <div id="whale-section" class="card">
+  <h2>🐳 Whale Transactions</h2>
+  <div id="whale-list">Loading...</div>
 </div>
 
  <div class="economic-calendar-preview card">
@@ -1099,65 +1099,31 @@ function renderCalendar(events) {
   }
 }
 
-async function loadWhaleTransactions() {
-  try {
-    const res = await fetch('https://beyonddex-backend.onrender.com/api/whale-transactions');
+async function loadWhaleTxs() {
+    const res = await fetch("/api/whales");
     const data = await res.json();
+    const container = document.getElementById("whale-list");
 
-    const container = document.getElementById('whale-transactions');
-    container.innerHTML = '';
+    if (!data.length) {
+      container.innerHTML = "No recent whale transactions.";
+      return;
+    }
 
-    const explorerMap = {
-      'eth-mainnet': 'https://etherscan.io/tx/',
-      'polygon-mainnet': 'https://polygonscan.com/tx/',
-      'bsc-mainnet': 'https://bscscan.com/tx/',
-      'arbitrum-mainnet': 'https://arbiscan.io/tx/',
-      'optimism-mainnet': 'https://optimistic.etherscan.io/tx/',
-      'base-mainnet': 'https://basescan.org/tx/',
-      'avalanche-mainnet': 'https://snowtrace.io/tx/',
-      'fantom-mainnet': 'https://ftmscan.com/tx/'
-    };
+    container.innerHTML = ""; // Clear previous
 
-    data.forEach(chainInfo => {
-      const chainDiv = document.createElement('div');
-      chainDiv.classList.add('chain-section');
-
-      const title = document.createElement('h5');
-      title.textContent = chainInfo.chain.toUpperCase();
-      chainDiv.appendChild(title);
-
-      const ul = document.createElement('ul');
-
-      if (!chainInfo.whaleTxs || chainInfo.whaleTxs.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = 'No whale transactions found.';
-        ul.appendChild(li);
-      } else {
-        chainInfo.whaleTxs.forEach(tx => {
-          const li = document.createElement('li');
-          const explorerBase = explorerMap[chainInfo.chain] || 'https://etherscan.io/tx/';
-          li.innerHTML = `
-            🐋 <strong>${tx.value_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD</strong><br/>
-            <small>From: ${tx.from}<br/>
-            To: ${tx.to}<br/>
-            Token: ${tx.token}<br/>
-            Time: ${new Date(tx.timestamp).toLocaleString()}</small><br/>
-            <a href="${explorerBase}${tx.hash}" target="_blank">View TX</a>
-          `;
-          ul.appendChild(li);
-        });
-      }
-
-      chainDiv.appendChild(ul);
-      container.appendChild(chainDiv);
+    data.slice(0, 10).forEach(tx => {
+      const div = document.createElement("div");
+      div.classList.add("whale-tx");
+      div.innerHTML = `
+        <div><strong>$${tx.usdValue}</strong> moved</div>
+        <div>From: ${tx.fromLabel} (${tx.from.slice(0, 6)}...)</div>
+        <div>To: ${tx.toLabel} (${tx.to.slice(0, 6)}...)</div>
+        <div><a href="https://etherscan.io/tx/${tx.txHash}" target="_blank">View</a></div>
+      `;
+      container.appendChild(div);
     });
-
-  } catch (err) {
-    console.error('Error loading whale transactions:', err);
-    const container = document.getElementById('whale-transactions');
-    if (container) container.textContent = 'Failed to load whale transactions.';
   }
-}
+
 
 window.addEventListener('DOMContentLoaded', () => {
     loadMarketData();
@@ -1174,7 +1140,8 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(loadD3Heatmap, 60000);
 
     
-     loadWhaleTransactions();
+     loadWhaleTxs();
+     setInterval(loadWhaleTxs, 30 * 60 * 1000);
   })();
 </script>
 </body>
