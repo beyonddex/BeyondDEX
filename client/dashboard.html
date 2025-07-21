@@ -1107,6 +1107,17 @@ async function loadWhaleTransactions() {
     const container = document.getElementById('whale-transactions');
     container.innerHTML = '';
 
+    const explorerMap = {
+      'eth-mainnet': 'https://etherscan.io/tx/',
+      'polygon-mainnet': 'https://polygonscan.com/tx/',
+      'bsc-mainnet': 'https://bscscan.com/tx/',
+      'arbitrum-mainnet': 'https://arbiscan.io/tx/',
+      'optimism-mainnet': 'https://optimistic.etherscan.io/tx/',
+      'base-mainnet': 'https://basescan.org/tx/',
+      'avalanche-mainnet': 'https://snowtrace.io/tx/',
+      'fantom-mainnet': 'https://ftmscan.com/tx/'
+    };
+
     data.forEach(chainInfo => {
       const chainDiv = document.createElement('div');
       chainDiv.classList.add('chain-section');
@@ -1124,12 +1135,14 @@ async function loadWhaleTransactions() {
       } else {
         chainInfo.whaleTxs.forEach(tx => {
           const li = document.createElement('li');
+          const explorerBase = explorerMap[chainInfo.chain] || 'https://etherscan.io/tx/';
           li.innerHTML = `
             🐋 <strong>${tx.value_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD</strong><br/>
             <small>From: ${tx.from}<br/>
             To: ${tx.to}<br/>
+            Token: ${tx.token}<br/>
             Time: ${new Date(tx.timestamp).toLocaleString()}</small><br/>
-            <a href="https://etherscan.io/tx/${tx.hash}" target="_blank">View TX</a>
+            <a href="${explorerBase}${tx.hash}" target="_blank">View TX</a>
           `;
           ul.appendChild(li);
         });
