@@ -1100,7 +1100,7 @@ function renderCalendar(events) {
 }
 
 async function loadWhaleTxs() {
-    const res = await fetch("/routes/whale-transactions");
+    const res = await fetch("/api/whales");
     const data = await res.json();
     const container = document.getElementById("whale-list");
 
