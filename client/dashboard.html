@@ -434,10 +434,15 @@ footer {
             <h4>Top Volume Tokens</h4>
             <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
           </div>
-          <div class="card">
-            <h3>Exchange Flow (Coming Soon)</h3>
-          <!-- content -->
-          </div>
+          <div class="card" id="exchange-flow-card">
+  <h3>ETH Exchange Flows</h3>
+  <div id="exchange-totals" class="flow-totals">
+    <!-- Totals will be injected here -->
+  </div>
+  <div id="exchange-whale-list" class="whale-txs">
+    <!-- Whale transfers will be listed here -->
+  </div>
+</div>
           <div class="card heatmap-card" id="heatmap">
       <svg viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
@@ -1135,6 +1140,43 @@ async function loadWhaleTxs() {
   }
 }
 
+ async function loadExchangeFlow(hours = 24) {
+    try {
+      const res = await fetch(`https://beyonddex-backend.onrender.com/api/exchange-flow?hours=${hours}`);
+      const data = await res.json();
+
+      // Totals
+      const totalsEl = document.getElementById("exchange-totals");
+      totalsEl.innerHTML = "";
+      for (const [exchange, { inflow, outflow }] of Object.entries(data.totals)) {
+        const div = document.createElement("div");
+        div.classList.add("flow-total");
+        div.innerHTML = `
+          <strong>${exchange}</strong> — 
+          <span style="color:green;">In: $${inflow.toLocaleString()}</span> /
+          <span style="color:red;">Out: $${outflow.toLocaleString()}</span>
+        `;
+        totalsEl.appendChild(div);
+      }
+
+      // Whale Transfers
+      const whaleEl = document.getElementById("exchange-whale-list");
+      whaleEl.innerHTML = "";
+      data.transactions.slice(0, 10).forEach(tx => {
+        const div = document.createElement("div");
+        div.classList.add("whale-tx");
+        div.innerHTML = `
+          <div><strong>$${tx.usdValue}</strong> ${tx.direction.toUpperCase()}</div>
+          <div>${tx.exchange} — ${new Date(tx.timestamp).toLocaleString()}</div>
+          <div><a href="https://etherscan.io/tx/${tx.txHash}" target="_blank">View</a></div>
+        `;
+        whaleEl.appendChild(div);
+      });
+    } catch (err) {
+      console.error("❌ Failed to load exchange flow data:", err.message);
+    }
+  }
+
 
 window.addEventListener('DOMContentLoaded', () => {
     loadMarketData();
@@ -1153,6 +1195,8 @@ window.addEventListener('DOMContentLoaded', () => {
     
      loadWhaleTxs();
      setInterval(loadWhaleTxs, 30 * 60 * 1000);
+
+     loadExchangeFlow();
   })();
 </script>
 </body>
