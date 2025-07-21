@@ -393,6 +393,39 @@ footer {
   z-index: 100;
   opacity: 0.9;
 }
+#whale-section.card {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    margin-top: 1rem;
+    font-family: 'Inter', sans-serif;
+  }
+
+  #whale-list .tx-card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  #whale-list .tx-card:hover {
+    background: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  #whale-list code {
+    font-family: monospace;
+    background: #eee;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+
+  h2 {
+    margin-bottom: 1rem;
+  }
 
   </style>
 </head>
@@ -1104,40 +1137,30 @@ function renderCalendar(events) {
   }
 }
 
-async function loadWhaleTxs() {
-  const container = document.getElementById("whale-list");
-  container.innerHTML = "Loading...";
+async function fetchWhaleTransfers() {
+  const res = await fetch('/api/whale-transfers');
+  const data = await res.json();
 
-  try {
-    const res = await fetch("https://beyonddex-backend.onrender.com/api/whales");
-    if (!res.ok) {
-      throw new Error(`API Error: ${res.status}`);
-    }
-    const data = await res.json();
+  const container = document.getElementById('whale-list');
+  container.innerHTML = '';
 
-    if (!data.length) {
-      container.innerHTML = "No recent whale transactions.";
-      return;
-    }
-    container.innerHTML = ""; // Clear previous entries
+  data.forEach(tx => {
+    const el = document.createElement('div');
+    el.className = 'tx-card';
+    el.innerHTML = `
+      <p><strong>${tx.symbol}</strong> - ${tx.name}</p>
+      <p>${tx.amount} ${tx.symbol} (~$${tx.usd_value.toLocaleString()})</p>
+      <p>From: <code>${shorten(tx.from)}</code></p>
+      <p>To: <code>${shorten(tx.to)}</code></p>
+      <p><small>${new Date(tx.timestamp).toLocaleString()}</small></p>
+      <hr/>
+    `;
+    container.appendChild(el);
+  });
+}
 
-    data.slice(0, 10).forEach(tx => {
-      const div = document.createElement("div");
-      div.classList.add("whale-tx");
-      div.innerHTML = `
-        <div><strong>$${tx.usdValue}</strong> moved</div>
-        <div>From: ${tx.from?.slice(0, 6)}...${tx.from?.slice(-4)}</div>
-        <div>To: ${tx.to?.slice(0, 6)}...${tx.to?.slice(-4)}</div>
-        <div><a href="https://etherscan.io/tx/${tx.txHash}" target="_blank">View</a></div>
-      `;
-
-      container.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error("❌ Failed to load whale transactions:", err);
-    container.innerHTML = "Error loading whale transactions.";
-  }
+function shorten(addr) {
+  return addr.slice(0, 6) + '...' + addr.slice(-4);
 }
 
  async function loadExchangeFlow(hours = 24) {
@@ -1198,8 +1221,8 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(loadD3Heatmap, 60000);
 
     
-     loadWhaleTxs();
-     setInterval(loadWhaleTxs, 30 * 60 * 1000);
+     fetchWhaleTransfers();
+setInterval(fetchWhaleTransfers, 30 * 60 * 1000);
 
      loadExchangeFlow();
   })();
