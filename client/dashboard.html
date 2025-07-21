@@ -1141,41 +1141,41 @@ async function loadWhaleTxs() {
 }
 
  async function loadExchangeFlow(hours = 24) {
-    try {
-      const res = await fetch(`https://beyonddex-backend.onrender.com/api/exchange-flow?hours=${hours}`);
-      const data = await res.json();
+  try {
+    const res = await fetch(`https://beyonddex-backend.onrender.com/api/exchange-flow?hours=${hours}`);
+    const data = await res.json();
 
-      // Totals
-      const totalsEl = document.getElementById("exchange-totals");
-      totalsEl.innerHTML = "";
-      for (const [exchange, { inflow, outflow }] of Object.entries(data.totals)) {
-        const div = document.createElement("div");
-        div.classList.add("flow-total");
-        div.innerHTML = `
-          <strong>${exchange}</strong> — 
-          <span style="color:green;">In: $${inflow.toLocaleString()}</span> /
-          <span style="color:red;">Out: $${outflow.toLocaleString()}</span>
-        `;
-        totalsEl.appendChild(div);
-      }
-
-      // Whale Transfers
-      const whaleEl = document.getElementById("exchange-whale-list");
-      whaleEl.innerHTML = "";
-      data.transactions.slice(0, 10).forEach(tx => {
-        const div = document.createElement("div");
-        div.classList.add("whale-tx");
-        div.innerHTML = `
-  <div>${entry.exchange} — ${entry.direction.toUpperCase()}</div>
-  <div><strong>$${entry.usdValue?.toFixed(2) || 0}</strong> ${entry.direction.toUpperCase()}</div>
-  <div>${entry.exchange} — ${new Date(entry.timestamp).toLocaleString()}</div>
-`;
-        whaleEl.appendChild(div);
-      });
-    } catch (err) {
-      console.error("❌ Failed to load exchange flow data:", err.message);
+    // Totals
+    const totalsEl = document.getElementById("exchange-totals");
+    totalsEl.innerHTML = "";
+    for (const [exchange, { inflow, outflow }] of Object.entries(data.totals)) {
+      const div = document.createElement("div");
+      div.classList.add("flow-total");
+      div.innerHTML = `
+        <strong>${exchange}</strong> — 
+        <span style="color:green;">In: $${inflow.toLocaleString()}</span> /
+        <span style="color:red;">Out: $${outflow.toLocaleString()}</span>
+      `;
+      totalsEl.appendChild(div);
     }
+
+    // Whale Transfers
+    const whaleEl = document.getElementById("exchange-whale-list");
+    whaleEl.innerHTML = "";
+    data.transactions.slice(0, 10).forEach(tx => {
+      const div = document.createElement("div");
+      div.classList.add("whale-tx");
+      div.innerHTML = `
+        <div>${tx.exchange} — ${tx.direction.toUpperCase()}</div>
+        <div><strong>$${tx.value?.toFixed(2) || 0}</strong> ${tx.direction.toUpperCase()}</div>
+        <div>${tx.exchange} — ${new Date(tx.timestamp).toLocaleString()}</div>
+      `;
+      whaleEl.appendChild(div);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load exchange flow data:", err.message);
   }
+}
 
 
 window.addEventListener('DOMContentLoaded', () => {
