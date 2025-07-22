@@ -1109,34 +1109,49 @@ function renderCalendar(events) {
 }
 
 async function loadWhaleData() {
-    try {
-      const res = await fetch("/api/whale-transfers");
-      const whaleData = await res.json();
+  const whaleList = document.getElementById("whale-list");
 
-      const whaleList = document.getElementById("whale-list");
-      whaleList.innerHTML = ""; // Clear loading...
+  try {
+    const res = await fetch("/api/whale-transfers");
 
-      if (!whaleData.length) {
-        whaleList.innerHTML = "<p>No recent whale transfers found.</p>";
-        return;
-      }
-
-      whaleData.forEach(tx => {
-        const div = document.createElement("div");
-        div.classList.add("whale-tx");
-        div.innerHTML = `
-          <strong>${tx.symbol || "Unknown"}:</strong> ${tx.amount.toFixed(2)} ($${tx.usd_value.toLocaleString()})<br>
-          From: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)} → To: ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}<br>
-          Tx: <a href="https://etherscan.io/tx/${tx.tx_hash}" target="_blank">${tx.tx_hash.slice(0, 10)}...</a><br>
-          <small>${new Date(tx.timestamp).toLocaleString()}</small>
-        `;
-        whaleList.appendChild(div);
-      });
-    } catch (err) {
-      console.error("❌ Error loading whale data:", err);
-      document.getElementById("whale-list").innerText = "Error loading whale transactions.";
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error(`❌ Failed to fetch whale data: ${res.status} - ${errText}`);
+      whaleList.innerHTML = `<p style="color: red;">Error loading whale data. (${res.status})</p>`;
+      return;
     }
+
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      console.error("❌ Invalid whale data structure:", data);
+      whaleList.innerHTML = `<p style="color: red;">Invalid whale data format.</p>`;
+      return;
+    }
+
+    whaleList.innerHTML = "";
+    if (data.length === 0) {
+      whaleList.innerHTML = "<p>No large whale transfers found.</p>";
+      return;
+    }
+
+    for (const tx of data) {
+      const item = document.createElement("div");
+      item.className = "whale-transaction";
+      item.innerHTML = `
+        <strong>${tx.symbol || "Unknown Token"}</strong><br>
+        $${tx.usd_value.toLocaleString()} moved from 
+        <span style="color:#3b82f6;">${tx.from.slice(0, 6)}...${tx.from.slice(-4)}</span> to 
+        <span style="color:#10b981;">${tx.to.slice(0, 6)}...${tx.to.slice(-4)}</span>
+        <div style="font-size:12px;color:gray;">${new Date(tx.timestamp).toLocaleString()}</div>
+        <hr>
+      `;
+      whaleList.appendChild(item);
+    }
+  } catch (err) {
+    console.error("❌ Error loading whale data:", err);
+    whaleList.innerHTML = `<p style="color: red;">Whale data could not be loaded.</p>`;
   }
+}
 
  async function loadExchangeFlow(hours = 24) {
   try {
@@ -1199,7 +1214,7 @@ window.addEventListener('DOMContentLoaded', () => {
      loadWhaleData();
 
      loadExchangeFlow();
-  })();
+  });
 </script>
 
 </body>
