@@ -546,35 +546,6 @@ footer {
 </footer>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
-  // Try anonymous login (or replace with real login)
-  signInAnonymously(auth).catch(console.error);
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        const res = await fetch("/api/whale-transfers");
-        const whaleData = await res.json();
-
-        await setDoc(doc(db, "whale_transfers_cache", "latest"), {
-          timestamp: Date.now(),
-          data: whaleData
-        });
-
-        console.log("✅ Whale data saved to Firestore:", whaleData);
-      } catch (err) {
-        console.error("❌ Error saving whale data:", err);
-      }
-    } else {
-      console.warn("🚫 User not authenticated.");
-    }
-  });
-  
-</script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
@@ -586,10 +557,26 @@ footer {
       measurementId: "G-6SH111LB7J"
     };
 
-    
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+     // ✅ Sign in anonymously for whale-transfer cache
+  auth.signInAnonymously().catch(console.error);
+
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) return;
+
+    try {
+      const res = await fetch("/api/whale-transfers");
+      const data = await res.json();
+
+      await db.collection("whale_transfers_cache").doc("latest").set({
+        timestamp: Date.now(),
+        data
+      });
+
+      console.log("✅ Whale data saved:", data);
+    } catch (err) {
+      console.error("❌ Error saving whale data:", err);
+    }
+  });
 
 
     //chat stuff for firebase
