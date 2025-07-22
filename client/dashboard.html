@@ -545,26 +545,13 @@ footer {
   © 2025 BeyondDEX. All rights reserved.
 </footer>
 </div>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
-    };
+
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-      // Try anonymous login (or replace with real login)
+  // Try anonymous login (or replace with real login)
   signInAnonymously(auth).catch(console.error);
 
   onAuthStateChanged(auth, async (user) => {
@@ -586,6 +573,24 @@ footer {
       console.warn("🚫 User not authenticated.");
     }
   });
+  
+</script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+      authDomain: "beyonddex-be653.firebaseapp.com",
+      projectId: "beyonddex-be653",
+      storageBucket: "beyonddex-be653.firebasestorage.app",
+      messagingSenderId: "687411546401",
+      appId: "1:687411546401:web:ec71401e52751d3e121660",
+      measurementId: "G-6SH111LB7J"
+    };
+
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
 
     //chat stuff for firebase
     const userCircle = document.getElementById("userCircle");
@@ -1261,6 +1266,7 @@ window.addEventListener('DOMContentLoaded', () => {
      loadExchangeFlow();
   })();
 </script>
+
 </body>
 </html>
 
