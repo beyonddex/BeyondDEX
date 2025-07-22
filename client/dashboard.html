@@ -1110,7 +1110,7 @@ function renderCalendar(events) {
 
 async function loadWhaleData() {
     try {
-      const res = await fetch("/api/whale-transfers");
+      const res = await fetch("https://your-app-name.onrender.com/api/whale-transfers");
       const whaleData = await res.json();
 
       const whaleList = document.getElementById("whale-list");
