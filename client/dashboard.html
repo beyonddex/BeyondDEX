@@ -393,39 +393,6 @@ footer {
   z-index: 100;
   opacity: 0.9;
 }
-#whale-section.card {
-    background: #ffffff;
-    padding: 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    margin-top: 1rem;
-    font-family: 'Inter', sans-serif;
-  }
-
-  #whale-list .tx-card {
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-  }
-
-  #whale-list .tx-card:hover {
-    background: #f0f0f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  }
-
-  #whale-list code {
-    font-family: monospace;
-    background: #eee;
-    padding: 2px 6px;
-    border-radius: 6px;
-  }
-
-  h2 {
-    margin-bottom: 1rem;
-  }
 
   </style>
 </head>
@@ -561,27 +528,6 @@ footer {
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-//anon sigh in for whale-transfers cache
-    auth.signInAnonymously().catch(console.error);
-
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) return;
-
-    try {
-      const res = await fetch("/api/whale-transfers");
-      const data = await res.json();
-
-      await db.collection("whale_transfers_cache").doc("latest").set({
-      timestamp: Date.now(),
-      data: whaleData
-      });
-
-      console.log("✅ Whale data saved:", data);
-    } catch (err) {
-      console.error("❌ Error saving whale data:", err);
-    }
-  });
 
 
     //chat stuff for firebase
@@ -1163,35 +1109,32 @@ function renderCalendar(events) {
 }
 
 async function loadWhaleData() {
-    const whaleList = document.getElementById("whale-list");
-    whaleList.textContent = "Loading...";
-
     try {
-      const docRef = doc(db, "whale_transfers_cache", "latest");
-      const docSnap = await getDoc(docRef);
+      const res = await fetch("/api/whale-transfers");
+      const whaleData = await res.json();
 
-      if (docSnap.exists()) {
-        const data = docSnap.data().data;
+      const whaleList = document.getElementById("whale-list");
+      whaleList.innerHTML = ""; // Clear loading...
 
-        if (!data || data.length === 0) {
-          whaleList.textContent = "No whale transactions found.";
-          return;
-        }
-
-        whaleList.innerHTML = data.map(tx => `
-          <div class="whale-tx">
-            <b>${tx.symbol}</b> — ${tx.amount.toFixed(2)} (${tx.usd_value.toLocaleString("en-US", { style: "currency", currency: "USD" })})<br>
-            From: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)} → ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}<br>
-            <small>${new Date(tx.timestamp).toLocaleString()}</small>
-          </div>
-          <hr />
-        `).join("");
-      } else {
-        whaleList.textContent = "No data available.";
+      if (!whaleData.length) {
+        whaleList.innerHTML = "<p>No recent whale transfers found.</p>";
+        return;
       }
+
+      whaleData.forEach(tx => {
+        const div = document.createElement("div");
+        div.classList.add("whale-tx");
+        div.innerHTML = `
+          <strong>${tx.symbol || "Unknown"}:</strong> ${tx.amount.toFixed(2)} ($${tx.usd_value.toLocaleString()})<br>
+          From: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)} → To: ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}<br>
+          Tx: <a href="https://etherscan.io/tx/${tx.tx_hash}" target="_blank">${tx.tx_hash.slice(0, 10)}...</a><br>
+          <small>${new Date(tx.timestamp).toLocaleString()}</small>
+        `;
+        whaleList.appendChild(div);
+      });
     } catch (err) {
       console.error("❌ Error loading whale data:", err);
-      whaleList.textContent = "Failed to load data.";
+      document.getElementById("whale-list").innerText = "Error loading whale transactions.";
     }
   }
 
