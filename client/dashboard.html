@@ -557,8 +557,13 @@ footer {
       measurementId: "G-6SH111LB7J"
     };
 
-     // ✅ Sign in anonymously for whale-transfer cache
-  auth.signInAnonymously().catch(console.error);
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+//anon sigh in for whale-transfers cache
+    auth.signInAnonymously().catch(console.error);
 
   auth.onAuthStateChanged(async (user) => {
     if (!user) return;
