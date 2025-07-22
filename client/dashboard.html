@@ -573,8 +573,8 @@ footer {
       const data = await res.json();
 
       await db.collection("whale_transfers_cache").doc("latest").set({
-        timestamp: Date.now(),
-        data
+      timestamp: Date.now(),
+      data: whaleData
       });
 
       console.log("✅ Whale data saved:", data);
