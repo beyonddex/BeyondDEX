@@ -530,7 +530,6 @@ footer {
     const db = firebase.firestore();
 
 
-    //chat stuff for firebase
     const userCircle = document.getElementById("userCircle");
     const dropdownMenu = document.getElementById("dropdownMenu");
     const chatBox = document.getElementById("chatBox");
@@ -538,13 +537,16 @@ footer {
     const sendMessage = document.getElementById("sendMessage");
     const onlineUsersCount = document.getElementById("onlineUsersCount");
 
+
     let currentUsername = "";
     let userDocId = "";
     let onlineUserMap = {};
 
+
     userCircle.addEventListener("click", () => {
       dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     });
+
 
     window.addEventListener("click", e => {
       if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
@@ -552,10 +554,13 @@ footer {
       }
     });
 
+
     document.getElementById("logout").addEventListener("click", () => {
       if (userDocId) db.collection("presence").doc(userDocId).delete();
       auth.signOut().then(() => window.location.href = "/auth.html");
     });
+
+
 
 
     function updatePresence(uid, username) {
@@ -566,17 +571,21 @@ footer {
   }, { merge: true });
 }
 
+
     function monitorPresence() {
   let lastInteraction = Date.now();
+
 
   // Reset timer on user activity
   function resetIdleTimer() {
     lastInteraction = Date.now();
   }
 
+
   ['mousemove', 'keydown', 'click', 'scroll'].forEach(evt =>
     window.addEventListener(evt, resetIdleTimer)
   );
+
 
   // Update presence only if user is not idle
   setInterval(() => {
@@ -586,6 +595,7 @@ footer {
       updatePresence(userDocId, currentUsername);
     }
   }, 30000);
+
 
   // Mark user offline on tab close or refresh
   window.addEventListener("beforeunload", () => {
@@ -597,14 +607,17 @@ footer {
     }
   });
 
+
   // Realtime listener for presence updates
   db.collection("presence").onSnapshot(snapshot => {
     const now = Date.now();
     onlineUserMap = {};
 
+
     snapshot.docs.forEach(doc => {
       const data = doc.data();
       const lastActive = data.lastActive?.toDate().getTime();
+
 
       if (lastActive) {
         const isOnline = now - lastActive < 3 * 60 * 1000;
@@ -615,13 +628,17 @@ footer {
       }
     });
 
+
     onlineUsersCount.textContent = `Online Users: ${
       Object.values(onlineUserMap).filter(u => u.isOnline).length
     }`;
 
+
     renderChatMessages();
   });
 }
+
+
 
 
  function renderChatMessages() {
@@ -638,6 +655,7 @@ footer {
             }
           }
 
+
         const statusDot = `<span style="
           display:inline-block;
           width:8px;
@@ -648,6 +666,7 @@ footer {
           box-shadow:${isOnline ? '0 0 8px #22c55e' : 'none'};
         "></span>`;
 
+
         const div = document.createElement("div");
         div.className = "chat-message";
         div.innerHTML = `${statusDot}<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
@@ -656,6 +675,7 @@ footer {
       chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
     });
   }
+
 
   auth.onAuthStateChanged(user => {
   if (user) {
@@ -669,6 +689,7 @@ footer {
         updatePresence(uid, username);
         monitorPresence();
 
+
         // ✅ Add this so others' messages appear in real-time
         db.collection("chat")
           .orderBy("timestamp")
@@ -679,6 +700,7 @@ footer {
     window.location.href = "/auth.html";
   }
 });
+
 
   function sendChatMessage() {
     const message = chatInput.value.trim();
@@ -693,10 +715,12 @@ footer {
     }
   }
 
+
   sendMessage.addEventListener("click", sendChatMessage);
   chatInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendChatMessage();
   });
+
 
    // Map token symbols to correct CoinGecko chart IDs
 const idFixMap = {
