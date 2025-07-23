@@ -393,6 +393,45 @@ footer {
   z-index: 100;
   opacity: 0.9;
 }
+.whale-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #f9f9f9;
+  transition: background 0.2s ease;
+}
+.whale-card:hover {
+  background: #f1f1f1;
+}
+
+.whale-amount {
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.usd-value {
+  color: #555;
+  font-weight: normal;
+}
+
+.wallets span,
+.tx-hash a {
+  font-family: monospace;
+  color: #333;
+  text-decoration: none;
+}
+
+.tx-hash a:hover {
+  text-decoration: underline;
+}
+
+.timestamp {
+  display: block;
+  margin-top: 5px;
+  color: #888;
+  font-size: 0.85em;
+}
 
   </style>
 </head>
@@ -1109,34 +1148,56 @@ function renderCalendar(events) {
 }
 
 async function loadWhaleData() {
-    try {
-      const res = await fetch("https://beyonddex-backend.onrender.com/api/whale-transfers");
-      const whaleData = await res.json();
+  try {
+    const res = await fetch("https://beyonddex-backend.onrender.com/api/whale-transfers");
+    const whaleData = await res.json();
 
-      const whaleList = document.getElementById("whale-list");
-      whaleList.innerHTML = ""; // Clear loading...
+    const whaleList = document.getElementById("whale-list");
+    whaleList.innerHTML = ""; // Clear loading...
 
-      if (!whaleData.length) {
-        whaleList.innerHTML = "<p>No recent whale transfers found.</p>";
-        return;
-      }
-
-      whaleData.forEach(tx => {
-        const div = document.createElement("div");
-        div.classList.add("whale-tx");
-        div.innerHTML = `
-          <strong>${tx.symbol || "Unknown"}:</strong> ${tx.amount.toFixed(2)} ($${tx.usd_value.toLocaleString()})<br>
-          From: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)} → To: ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}<br>
-          Tx: <a href="https://etherscan.io/tx/${tx.tx_hash}" target="_blank">${tx.tx_hash.slice(0, 10)}...</a><br>
-          <small>${new Date(tx.timestamp).toLocaleString()}</small>
-        `;
-        whaleList.appendChild(div);
-      });
-    } catch (err) {
-      console.error("❌ Error loading whale data:", err);
-      document.getElementById("whale-list").innerText = "Error loading whale transactions.";
+    if (!whaleData.length) {
+      whaleList.innerHTML = "<p>No recent whale transfers found.</p>";
+      return;
     }
+
+    // Sort by USD value descending
+    const sorted = whaleData.sort((a, b) => b.usd_value - a.usd_value);
+    const top3 = sorted.slice(0, 3);
+
+    top3.forEach(tx => {
+      const div = document.createElement("div");
+      div.classList.add("whale-card");
+
+      div.innerHTML = `
+        <div class="whale-info">
+          <div class="whale-amount">
+            <strong>${tx.symbol || "Unknown"}:</strong> ${tx.amount.toFixed(2)} 
+            <span class="usd-value">($${tx.usd_value.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
+          </div>
+          <div class="wallets">
+            From: <span title="${tx.from}">${tx.from.slice(0, 6)}...${tx.from.slice(-4)}</span><br>
+            To: <span title="${tx.to}">${tx.to.slice(0, 6)}...${tx.to.slice(-4)}</span>
+          </div>
+          <div class="tx-hash">
+            Tx: 
+            <a href="https://etherscan.io/tx/${tx.tx_hash}" 
+               target="_blank" 
+               title="${tx.tx_hash}">
+               ${tx.tx_hash.slice(0, 10)}...
+            </a>
+          </div>
+          <small class="timestamp">${new Date(tx.timestamp).toLocaleString()}</small>
+        </div>
+      `;
+
+      whaleList.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("❌ Error loading whale data:", err);
+    document.getElementById("whale-list").innerText = "Error loading whale transactions.";
   }
+}
 
  async function loadExchangeFlow(hours = 24) {
   try {
