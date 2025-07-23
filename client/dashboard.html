@@ -393,22 +393,22 @@ footer {
   z-index: 100;
   opacity: 0.9;
 }
-.whale-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 10px;
-  background: #f9f9f9;
+.whale-entry {
+  padding: 10px 0;
   position: relative;
-  transition: background 0.2s ease;
+  font-size: 0.95em;
 }
 
-.whale-card:hover {
-  background: #f1f1f1;
+.whale-entry:not(:last-child)::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background-color: #ccc;
+  margin: 12px 20px 0 20px; /* top margin and side gaps */
 }
 
 .whale-summary {
-  font-size: 1.1em;
+  font-weight: 500;
 }
 
 .usd-value {
@@ -426,13 +426,13 @@ footer {
 
 .whale-details {
   display: none;
-  font-size: 0.9em;
-  margin-top: 8px;
+  font-size: 0.85em;
+  margin-top: 6px;
   font-family: monospace;
-  color: #333;
+  color: #444;
 }
 
-.whale-card:hover .whale-details {
+.whale-entry:hover .whale-details {
   display: block;
 }
 
@@ -1168,7 +1168,7 @@ async function loadWhaleData() {
 
     top3.forEach(tx => {
       const div = document.createElement("div");
-      div.classList.add("whale-card");
+      div.classList.add("whale-entry");  
       div.innerHTML = `
         <div class="whale-summary">
           <strong>${tx.symbol || "Unknown"}:</strong> ${tx.amount.toFixed(2)} 
