@@ -964,10 +964,10 @@ async function loadCryptoNews() {
           <a href="${article.url}" target="_blank" style="font-size:14px; font-weight:500; color:#0f172a; text-decoration:none;">
             ${article.title}
           </a>
-          <div style="display:flex; align-items:center; justify-content:space-between;">
-            <span style="font-size:12px; color:#666;">${timeAgo}</span>
-            ${tagInfo ? `<span class="news-tag" style="background:${tagInfo.color};">${tagInfo.tag}</span>` : ""}
-          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:12px; color:#666;">${timeAgo}</span>
+          ${tagInfo ? `<span class="news-tag" style="background:${tagInfo.color};">${tagInfo.tag}</span>` : ""}
+        </div>
         </div>
       `;
       newsList.appendChild(li);
