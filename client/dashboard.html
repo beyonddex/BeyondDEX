@@ -519,7 +519,8 @@ footer {
   </div>
 
   <div id="whale-section" class="card">
-  <h2>🐳 Whale Transactions</h2>
+  <h2>Whale Transactions</h2>
+  <div id="whale-last-updated" style="font-size:12px;color:#666;margin-top:4px;"></div>
   <div id="whale-list">Loading...</div>
 </div>
 
@@ -1186,6 +1187,10 @@ async function loadWhaleData() {
       `;
       whaleList.appendChild(div);
     });
+
+     // ✅ Update last updated timestamp
+    document.getElementById("whale-last-updated").textContent =
+      `Last updated: ${new Date().toLocaleTimeString()}`;
 
   } catch (err) {
     console.error("❌ Error loading whale data:", err);
