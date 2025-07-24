@@ -399,46 +399,38 @@ footer {
   z-index: 100;
   opacity: 0.9;
 }
-.whale-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 10px;
-  background: #f9f9f9;
-  position: relative;
-  transition: background 0.2s ease;
+.whale-entry {
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  padding: 12px 0;
+  margin: 0;
+  border-bottom: 1px solid #e5e7eb; /* Divider line between items */
+  cursor: pointer; /* Show clickable hint */
 }
 
-.whale-card:hover {
-  background: #f1f1f1;
+.whale-entry:last-child {
+  border-bottom: none; /* No line after last */
 }
 
 .whale-summary {
-  font-size: 1.1em;
-}
-
-.usd-value {
-  color: #555;
-  font-weight: normal;
-  margin-left: 4px;
-}
-
-.timestamp {
-  display: block;
-  color: #888;
-  font-size: 0.85em;
-  margin-top: 5px;
+  font-size: 0.95em;
+  font-weight: 500;
 }
 
 .whale-details {
   display: none;
-  font-size: 0.9em;
-  margin-top: 8px;
+  font-size: 0.85em;
+  margin-top: 6px;
   font-family: monospace;
-  color: #333;
+  color: #444;
 }
 
-.whale-card:hover .whale-details {
+.whale-entry:hover {
+  background: #f9fafb; /* Subtle hover tone */
+}
+
+.whale-entry:hover .whale-details {
   display: block;
 }
 
@@ -483,7 +475,7 @@ footer {
             <ul id="marketList" style="list-style:none; padding:0; margin: 0;"></ul>
           </div>
           <div class="card" id="exchange-flow-card">
-  <h3>ETH Exchange Flows</h3>
+  <h3>Exchange Flows (Coming Soon)</h3>
   <div id="exchange-totals" class="flow-totals">
     <!-- Totals will be injected here -->
   </div>
