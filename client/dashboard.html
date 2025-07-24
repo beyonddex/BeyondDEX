@@ -455,6 +455,15 @@ footer {
 .whale-entry:hover .whale-details {
   display: block;
 }
+.news-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
   </style>
 </head>
@@ -1242,6 +1251,49 @@ async function loadWhaleData() {
   } catch (err) {
     console.error("❌ Failed to load exchange flow data:", err.message);
   }
+}
+
+// Tag rules with vibrant colors
+const newsTags = [
+  { keyword: ["pump", "surge", "bullish", "gain", "rally", "up"], tag: "Bullish", color: "#16a34a" }, // green
+  { keyword: ["drop", "dump", "bearish", "crash", "fall", "down"], tag: "Bearish", color: "#dc2626" }, // red
+  { keyword: ["hack", "exploit", "breach"], tag: "Hack", color: "#f59e0b" }, // orange
+  { keyword: ["chain", "on-chain", "defi"], tag: "On-Chain", color: "#2563eb" }, // blue
+  { keyword: ["breaking", "urgent", "important"], tag: "Important", color: "#9333ea" } // purple
+];
+
+// Detect tag based on title
+function getNewsTag(title) {
+  const lowerTitle = title.toLowerCase();
+  for (const { keyword, tag, color } of newsTags) {
+    if (keyword.some(word => lowerTitle.includes(word))) {
+      return { tag, color };
+    }
+  }
+  return null;
+}
+
+// Render news with tag badges
+function renderCryptoNews(news) {
+  const newsList = document.getElementById("cryptoNewsList");
+  newsList.innerHTML = "";
+
+  news.forEach(item => {
+    const tagInfo = getNewsTag(item.title);
+
+    const li = document.createElement("li");
+    li.style.marginBottom = "12px";
+    li.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <span style="flex:1; font-size:14px; font-weight:500;">${item.title}</span>
+        <div style="display:flex; align-items:center; gap:6px; white-space:nowrap;">
+          <span style="font-size:12px; color:#666;">${item.relativeTime}</span>
+          ${tagInfo ? `<span class="news-tag" style="background:${tagInfo.color};">${tagInfo.tag}</span>` : ""}
+        </div>
+      </div>
+    `;
+    newsList.appendChild(li);
+  });
 }
 
 
