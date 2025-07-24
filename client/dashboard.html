@@ -161,6 +161,7 @@ h2, h3, h4 {
   list-style: none;
   margin: 0;
   padding: 0;
+  overflow:hidden;
 }
 
 .economic-event {
@@ -978,31 +979,13 @@ function renderCalendar(events) {
   const ul = document.getElementById('econCalendarList');
   ul.innerHTML = '';
 
+  // Sort by date
   events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const PREVIEW_HEIGHT = 500; // same as CSS height
-  const ESTIMATED_ITEM_HEIGHT = 42; // px per event (adjust if needed)
-  const MAX_EVENTS = Math.floor(PREVIEW_HEIGHT / ESTIMATED_ITEM_HEIGHT);
-
-  let visibleEvents = [];
+  const MAX_EVENTS = 6; // ✅ Limit visible events
+  const visibleEvents = events.slice(0, MAX_EVENTS);
   let lastDate = '';
-  let count = 0;
 
-  for (let i = 0; i < events.length; i++) {
-    const e = events[i];
-
-    // If it's a new date, count the header too
-    if (e.date !== lastDate) count++;
-
-    if (count >= MAX_EVENTS) break;
-
-    visibleEvents.push(e);
-    lastDate = e.date;
-    count++;
-  }
-
-  // Now render visibleEvents with grouped dates
-  lastDate = '';
   visibleEvents.forEach(e => {
     if (e.date !== lastDate) {
       const dateLi = document.createElement('li');
@@ -1037,8 +1020,8 @@ function renderCalendar(events) {
     ul.appendChild(li);
   });
 
-  // Show "See more" link if events were cut
-  if (events.length > visibleEvents.length) {
+  // ✅ Add "See full calendar" link
+  if (events.length > MAX_EVENTS) {
     const moreLi = document.createElement('li');
     moreLi.innerHTML = `<a href="calendar.html" style="text-decoration: underline; font-size: 13px; color: #3b82f6;">See full calendar →</a>`;
     moreLi.style.marginTop = '10px';
