@@ -323,6 +323,7 @@ footer {
   margin: 0 auto;
   box-sizing: border-box;
   min-height:0;
+  overflow:hidden;
 }
 .left-column
 {
@@ -333,7 +334,15 @@ footer {
   min-height: 0;
   max-height: 100%; /* 🛠️ Prevents overflow */
 }
-.middle-column,
+.middle-column{
+  flex-basis: 48%;
+  flex-shrink: 0; /* Do not shrink below this size */
+  max-width: 48%; /* ✅ Stop it from expanding beyond its share */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
 .right-column {
   display: flex;
   flex-direction: column;
@@ -532,7 +541,7 @@ footer {
 <div class="middle-column">
     <div class="chart-section card">
       <h4>Price Chart</h4>
-        <div class="tradingview-widget-container" style="width:100%; height:400px; margin-bottom: 30px;">
+        <div class="tradingview-widget-container" style="width:100%; height:350px; margin-bottom: 30px;">
           <div id="tradingview_chart"></div>
         </div>
     </div>
