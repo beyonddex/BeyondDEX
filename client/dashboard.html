@@ -339,9 +339,30 @@ footer {
   flex-direction: column;
   justify-content: flex-start;
   align-items: stretch;
+  grid-template-rows: 1fr 1fr 1.5fr; /* Market, Whale, Calendar */
   gap: 8px;
   flex: 1; /* ✅ allow it to grow within the main-content */
   min-height: 0; /* ✅ prevent overflow issues in flexbox */
+}
+.right-column section {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+.right-column * {
+  font-size: clamp(10px, 0.8vw, 14px); /* Shrinks if needed */
+  line-height: 1.2;
+  word-wrap: break-word;
+}
+
+.right-column h3 {
+  font-size: clamp(12px, 1vw, 16px);
+  margin-bottom: 4px;
 }
 .left-column { flex-basis: 26%; }
 .middle-column { flex-basis: 48%; }
