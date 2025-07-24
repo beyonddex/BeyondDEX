@@ -480,6 +480,17 @@ footer {
   transform: scale(1.05);
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
+.fg-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 12px;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-left: 6px;
+}
 
   </style>
 </head>
@@ -985,12 +996,22 @@ async function loadCryptoNews() {
     console.error('Failed to load crypto news:', e);
   }
 }
+function getFGTag(value) {
+  const num = parseInt(value);
+  if (isNaN(num)) return null;
+
+  if (num >= 80) return { text: "Extreme Greed", color: "#16a34a" }; // bright green
+  if (num >= 60) return { text: "Greed", color: "#22c55e" };
+  if (num >= 40) return { text: "Neutral", color: "#6366f1" }; // blue
+  if (num >= 20) return { text: "Fear", color: "#f59e0b" }; // orange
+  return { text: "Extreme Fear", color: "#dc2626" }; // red
+}
 async function loadExtraMarketData() {
   try {
     const res = await fetch('https://beyonddex-backend.onrender.com/api/market-data');
     const data = await res.json();
 
-    const { btcDom, ethDom, btcEthRatio, fundingRate, openInterest, fearGreed, totalMarketCap } = data;
+    const { btcDom, ethDom, btcEthRatio, fundingRate, fearGreed, totalMarketCap } = data;
 
     // Apply text + color class to a target span
     const updateSpan = (id, value) => {
@@ -1009,7 +1030,14 @@ async function loadExtraMarketData() {
     document.getElementById('btcDominance').textContent = `${btcDom}%`;
     document.getElementById('ethDominance').textContent = `${ethDom}%`;
     document.getElementById('btcEthRatio').textContent = btcEthRatio;
-    document.getElementById('fearGreedIndex').textContent = fearGreed;
+
+    // ✅ Fear & Greed Tag
+    const fgTag = getFGTag(fearGreed);
+    const fgContainer = document.getElementById('fearGreedIndex');
+    fgContainer.innerHTML = `
+      ${fearGreed}
+      ${fgTag ? `<span class="fg-tag" style="background:${fgTag.color};">${fgTag.text}</span>` : ""}
+    `;
 
     updateSpan('fundingRate', fundingRate);
 
