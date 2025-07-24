@@ -930,8 +930,6 @@ const newsTags = [
   { keyword: ["hack", "exploit", "breach"], tag: "Hack", color: "#f59e0b" }, // orange
   { keyword: ["chain", "on-chain", "defi"], tag: "On-Chain", color: "#2563eb" }, // blue
   { keyword: ["breaking", "urgent", "important"], tag: "Important", color: "#9333ea" }, // purple
-  { keyword: ["regulation", "ban", "laws"], tag: "Regulation", color: "#0ea5e9" }, // cyan
-  { keyword: ["funding", "partnership", "launch"], tag: "Update", color: "#84cc16" } // lime
 ];
 
 // Detect tag based on title
@@ -944,6 +942,8 @@ function getNewsTag(title) {
   }
   return null;
 }
+
+// Render crypto news
 async function loadCryptoNews() {
   try {
     const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
@@ -953,21 +953,21 @@ async function loadCryptoNews() {
     newsList.innerHTML = '';
 
     const articles = json.Data.slice(0, 3); // Show 3 articles
-    articles.forEach(article => {
-      const tagInfo = getNewsTag(article.title);
+    articles.forEach((article, index) => {
       const timeAgo = getRelativeTime(article.published_on);
+      const tagInfo = getNewsTag(article.title);
 
       const li = document.createElement('li');
-      li.style.marginBottom = '12px';
+      li.style.padding = "12px 0";
+      li.style.borderBottom = index < articles.length - 1 ? "1px solid #e5e7eb" : "none";
+
       li.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:4px;">
-          <a href="${article.url}" target="_blank" style="font-size:14px; font-weight:500; color:#0f172a; text-decoration:none;">
-            ${article.title}
-          </a>
-          <div style="display:flex; align-items:center; gap:6px;">
-          <span style="font-size:12px; color:#666;">${timeAgo}</span>
-          ${tagInfo ? `<span class="news-tag" style="background:${tagInfo.color};">${tagInfo.tag}</span>` : ""}
-        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <a href="${article.url}" target="_blank" style="font-weight:500; font-size:14px; text-decoration:none; color:#1f2937;">${article.title}</a>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:12px; color:#666;">${timeAgo}</span>
+            ${tagInfo ? `<span class="news-tag" style="background:${tagInfo.color};">${tagInfo.tag}</span>` : ""}
+          </div>
         </div>
       `;
       newsList.appendChild(li);
