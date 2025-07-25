@@ -16,6 +16,7 @@ body, html {
 }
 
 /* Header */
+/* Header */
 header {
   display: flex;
   justify-content: space-between;
@@ -31,15 +32,27 @@ header {
   box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 }
 
+header .logo-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px; /* space between logo and links */
+}
+
 .logo-container img {
   height: 36px;
 }
 
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
 .nav-links a {
-  margin-left: 20px;
   text-decoration: none;
   color: #444;
   font-weight: 500;
+  font-size: 14px;
   transition: color 0.2s ease;
 }
 
