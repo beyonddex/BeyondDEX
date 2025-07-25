@@ -114,6 +114,7 @@ header {
   flex: 1;
   padding: 16px;
   box-sizing: border-box;
+  padding-bottom:40px;
 }
 
 .column {
