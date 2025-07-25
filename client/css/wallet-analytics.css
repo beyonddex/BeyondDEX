@@ -106,7 +106,6 @@ header {
   flex-direction: row;
   flex: 1;
   min-width: 0;
-  margin-bottom:40px;
 }
 
 .wallet-content {
