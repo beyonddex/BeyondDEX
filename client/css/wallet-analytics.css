@@ -97,6 +97,7 @@ header {
   display: flex;
   flex-direction: row;
   padding-top: 80px; /* space under header */
+  padding-bottom: 40px; /* consistent gap above footer */
   flex: 1;
 }
 
