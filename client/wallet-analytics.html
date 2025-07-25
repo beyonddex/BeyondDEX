@@ -290,14 +290,51 @@ document.getElementById("logout").addEventListener("click", () => {
   auth.signOut().then(() => window.location.href = "/auth.html");
 });
 
-// Wallet Analytics Placeholder Logic
-document.getElementById('analyzeWallet').addEventListener('click', () => {
-  const wallet = document.getElementById('walletSearch').value;
-  document.getElementById('walletAddress').textContent = wallet || '0xSampleAddress';
-  document.getElementById('walletTotalValue').textContent = '764,219';
-  document.getElementById('walletPnL').textContent = '+24,830';
-  document.getElementById('strategyInsights').textContent = 'Wallet focuses on DeFi yield farming and short-term scalping.';
-  document.getElementById('pnlByAssetList').innerHTML = '<li>ETH: +120%</li><li>USDC: +18%</li>';
+//WALLET ITEMS
+document.getElementById('analyzeWallet').addEventListener('click', async () => {
+  const wallet = document.getElementById('walletSearch').value.trim();
+  if (!wallet) return alert('Enter a wallet address');
+
+  // Show loading states
+  document.getElementById('walletAddress').textContent = 'Loading...';
+  document.getElementById('walletTotalValue').textContent = '...';
+  document.getElementById('walletPnL').textContent = 'Loading...';
+  document.getElementById('strategyInsights').textContent = 'Analyzing wallet strategy...';
+  document.getElementById('pnlByAssetList').innerHTML = '<li>Loading...</li>';
+
+  try {
+    // ✅ Fetch Wallet Snapshot
+    const snapshotRes = await fetch(`/api/wallet/${wallet}`);
+    const snapshot = await snapshotRes.json();
+
+    document.getElementById('walletAddress').textContent = snapshot.address || 'N/A';
+    document.getElementById('firstTx').textContent = snapshot.firstTransaction || 'N/A';
+    document.getElementById('isWhale').textContent = snapshot.isWhale ? 'Yes' : 'No';
+    document.getElementById('walletType').textContent = snapshot.walletType || 'N/A';
+    document.getElementById('walletTotalValue').textContent = snapshot.totalValue ? `$${snapshot.totalValue}` : '0';
+
+    // ✅ Fetch PnL
+    const pnlRes = await fetch(`/api/wallet/${wallet}/pnl`);
+    const pnlData = await pnlRes.json();
+    document.getElementById('walletPnL').textContent = `${pnlData.pnl}%`;
+
+    // ✅ Fetch Portfolio & Render
+    const portfolioRes = await fetch(`/api/wallet/${wallet}/portfolio`);
+    const portfolio = await portfolioRes.json();
+    const pnlList = document.getElementById('pnlByAssetList');
+    pnlList.innerHTML = portfolio.map(token => `
+      <li>${token.name}: $${token.value} (${token.balance})</li>
+    `).join('');
+
+    // ✅ Strategy Insights (Simple heuristic for now)
+    document.getElementById('strategyInsights').textContent =
+      snapshot.isWhale ? 'Likely long-term holder with large assets.' :
+      'Active wallet, possibly engaged in DeFi activity.';
+
+  } catch (error) {
+    console.error(error);
+    alert('Error fetching wallet analytics');
+  }
 });
 </script>
 </body>
