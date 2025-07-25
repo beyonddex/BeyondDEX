@@ -297,28 +297,36 @@ document.getElementById('analyzeWallet').addEventListener('click', async () => {
 
   // Show loading states
   document.getElementById('walletAddress').textContent = 'Loading...';
+  document.getElementById('firstTx').textContent = 'Loading...';
+  document.getElementById('walletType').textContent = 'Loading...';
+  document.getElementById('isWhale').textContent = 'Loading...';
   document.getElementById('walletTotalValue').textContent = '...';
   document.getElementById('walletPnL').textContent = 'Loading...';
   document.getElementById('strategyInsights').textContent = 'Analyzing wallet strategy...';
   document.getElementById('pnlByAssetList').innerHTML = '<li>Loading...</li>';
 
   try {
-    // ✅ Fetch Wallet Snapshot
+    // ✅ Wallet Snapshot
     const snapshotRes = await fetch(`/api/wallet/${wallet}`);
     const snapshot = await snapshotRes.json();
 
     document.getElementById('walletAddress').textContent = snapshot.address || 'N/A';
-    document.getElementById('firstTx').textContent = snapshot.firstTransaction || 'N/A';
-    document.getElementById('isWhale').textContent = snapshot.isWhale ? 'Yes' : 'No';
+    document.getElementById('firstTx').textContent =
+      snapshot.firstTransaction ? new Date(snapshot.firstTransaction).toLocaleDateString() : 'N/A';
     document.getElementById('walletType').textContent = snapshot.walletType || 'N/A';
-    document.getElementById('walletTotalValue').textContent = snapshot.totalValue ? `$${snapshot.totalValue}` : '0';
+    document.getElementById('isWhale').textContent = snapshot.isWhale ? 'Yes' : 'No';
+    document.getElementById('walletTotalValue').textContent = `$${Number(snapshot.totalValue).toLocaleString()}`;
 
-    // ✅ Fetch PnL
+    // ✅ Show breakdown for reference
+    document.getElementById('strategyInsights').textContent =
+      `On-chain: $${snapshot.breakdown.onChain.toFixed(2)}, DeFi: $${snapshot.breakdown.defi.toFixed(2)}`;
+
+    // ✅ PnL
     const pnlRes = await fetch(`/api/wallet/${wallet}/pnl`);
     const pnlData = await pnlRes.json();
     document.getElementById('walletPnL').textContent = `${pnlData.pnl}%`;
 
-    // ✅ Fetch Portfolio & Render
+    // ✅ Portfolio
     const portfolioRes = await fetch(`/api/wallet/${wallet}/portfolio`);
     const portfolio = await portfolioRes.json();
     const pnlList = document.getElementById('pnlByAssetList');
@@ -326,14 +334,18 @@ document.getElementById('analyzeWallet').addEventListener('click', async () => {
       <li>${token.name}: $${token.value} (${token.balance})</li>
     `).join('');
 
-    // ✅ Strategy Insights (Simple heuristic for now)
-    document.getElementById('strategyInsights').textContent =
-      snapshot.isWhale ? 'Likely long-term holder with large assets.' :
-      'Active wallet, possibly engaged in DeFi activity.';
+    // ✅ Strategy Insights
+    if (snapshot.isWhale) {
+      document.getElementById('strategyInsights').textContent =
+        'Whale detected: Likely a long-term holder or institutional wallet.';
+    } else if (portfolio.length > 5) {
+      document.getElementById('strategyInsights').textContent =
+        'Diverse portfolio: Likely DeFi or farming strategy.';
+    }
 
   } catch (error) {
     console.error(error);
-    alert('Error fetching wallet analytics');
+    alert('Failed to fetch wallet analytics');
   }
 });
 </script>
