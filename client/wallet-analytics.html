@@ -12,11 +12,10 @@
 </head>
 <body>
 <div class="page-wrapper">
+<!-- Header -->
 <header>
-  <div class="logo-nav">
-    <div class="logo-container">
-      <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo" /></a>
-    </div>
+  <div class="logo-container">
+    <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo" /></a>
     <div class="nav-links">
       <a href="/index.html">Home</a>
       <a href="/dex.html">DEX</a>
@@ -45,8 +44,9 @@
     </a>
   </div>
 
-  <!-- Main Content -->
+  <!-- Main Flex -->
   <div class="main-flex">
+    <!-- Wallet Columns -->
     <div class="wallet-content">
       <!-- Left Column -->
       <div class="column">
@@ -142,7 +142,7 @@ auth.onAuthStateChanged(async user => {
 
   if (user) {
     const doc = await db.collection("users").doc(user.uid).get();
-    const username = doc.exists ? doc.data().username : "U";
+    const username = doc.exists ? doc.data().username : user.email.split("@")[0];
     userCircle.textContent = username.charAt(0).toUpperCase();
 
     userCircle.addEventListener("click", () => {
@@ -166,8 +166,9 @@ const sendMessageBtn = document.getElementById("sendMessage");
 sendMessageBtn.addEventListener("click", async () => {
   const message = chatInput.value.trim();
   if (message && auth.currentUser) {
+    const username = auth.currentUser.displayName || auth.currentUser.email.split("@")[0] || "User";
     await db.collection("chat").add({
-      user: auth.currentUser.displayName || "Anonymous",
+      user: username,
       message,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -194,7 +195,7 @@ db.collection("presence").onSnapshot(snapshot => {
   onlineUsersCount.textContent = snapshot.size;
 });
 
-// Wallet Data Placeholder
+// Wallet Analytics Placeholder Logic
 document.getElementById('analyzeWallet').addEventListener('click', () => {
   const wallet = document.getElementById('walletSearch').value;
   document.getElementById('walletAddress').textContent = wallet || '0xSampleAddress';
