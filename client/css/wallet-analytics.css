@@ -254,8 +254,6 @@ h4 {
 .sidebar {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-width: 260px;
   max-height: calc(100vh - 120px); /* Adjust to leave room for header + margins */
   height: auto;
   min-height: 0;
@@ -264,6 +262,7 @@ h4 {
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.03);
   gap: 12px;
+  width:300px;
   flex-shrink: 0;
 }
 
