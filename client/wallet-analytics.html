@@ -12,6 +12,7 @@
 </head>
 <body>
 <div class="page-wrapper">
+<!-- Header -->
 <header>
   <div class="logo-nav">
     <div class="logo-container">
@@ -47,6 +48,7 @@
 
   <!-- Main Content -->
   <div class="main-flex">
+    <!-- Wallet Analytics -->
     <div class="wallet-content">
       <!-- Left Column -->
       <div class="column">
@@ -101,7 +103,7 @@
       </div>
     </div>
 
-    <!-- Sidebar Chat -->
+    <!-- Sidebar (Chat) -->
     <aside class="sidebar">
       <div class="card">
         <h4>Community Chat</h4>
@@ -122,14 +124,13 @@
 <script>
 // Firebase Config
 const firebaseConfig = {
-      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
-    };
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -194,7 +195,7 @@ db.collection("presence").onSnapshot(snapshot => {
   onlineUsersCount.textContent = snapshot.size;
 });
 
-// Wallet Data Placeholder
+// Wallet Analytics Placeholder Logic
 document.getElementById('analyzeWallet').addEventListener('click', () => {
   const wallet = document.getElementById('walletSearch').value;
   document.getElementById('walletAddress').textContent = wallet || '0xSampleAddress';
