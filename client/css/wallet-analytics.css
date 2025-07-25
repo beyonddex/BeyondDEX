@@ -1,22 +1,4 @@
-/* --------------------------------------
-   Global Base Styles
--------------------------------------- */
-body, html {
-  background-color: #f5f6f8;
-  font-family: 'Inter', sans-serif;
-  color: #111;
-  margin: 0;
-  padding: 0;
-}
-
-.page-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-/* Header */
-/* Header */
+/* ---------------- Global Header & Base ---------------- */
 header {
   display: flex;
   justify-content: space-between;
@@ -32,23 +14,12 @@ header {
   box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 }
 
-header .logo-nav {
-  display: flex;
-  align-items: center;
-  gap: 32px; /* space between logo and links */
-}
-
 .logo-container img {
-  height: 36px;
-}
-
-.nav-links {
-  display: flex;
-  gap: 20px;
-  align-items: center;
+  height: 50px;
 }
 
 .nav-links a {
+  margin-left: 20px;
   text-decoration: none;
   color: #444;
   font-weight: 500;
@@ -67,7 +38,7 @@ header .logo-nav {
 .user-circle {
   width: 40px;
   height: 40px;
-  background: #0f172a;
+  background: #000;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -103,7 +74,15 @@ header .logo-nav {
   background: #f0f0f0;
 }
 
-/* Footer */
+/* ---------------- Base Layout & Body ---------------- */
+body, html {
+  background-color: #f5f6f8;
+  font-family: 'Inter', sans-serif;
+  color: #111;
+  margin: 0;
+  padding: 0;
+}
+
 footer {
   border-top: 1px solid #e5e7eb;
   background: #ffffff;
@@ -113,18 +92,7 @@ footer {
   text-align: center;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-/* --------------------------------------
-   Sidebar Navigation
--------------------------------------- */
+/* ---------------- Sidebar Nav ---------------- */
 .left-nav {
   background: #fff;
   border-right: 1px solid #e5e7eb;
@@ -177,9 +145,7 @@ footer {
   opacity: 0.9;
 }
 
-/* --------------------------------------
-   Wallet Analytics Layout
--------------------------------------- */
+/* ---------------- Wallet Analytics Layout ---------------- */
 .dashboard-content {
   display: flex;
   flex-direction: row;
@@ -222,14 +188,12 @@ footer {
   border-left: 1px solid #e5e7eb;
 }
 
-/* --------------------------------------
-   Cards & Components
--------------------------------------- */
+/* ---------------- Cards & Inputs ---------------- */
 .card {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  padding: 20px;
+  padding: 24px;
   transition: all 0.2s ease-in-out;
 }
 
@@ -275,7 +239,6 @@ h4 {
   background: #1e293b;
 }
 
-/* Graph Placeholder */
 .placeholder-graph {
   background: #f9fafb;
   height: 220px;
@@ -288,17 +251,16 @@ h4 {
   font-style: italic;
 }
 
-/* --------------------------------------
-   Chat Box
--------------------------------------- */
+/* ---------------- Chat ---------------- */
 .chat-box {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 12px;
+  padding: 16px;
   font-size: 14px;
   height: 300px;
   overflow-y: auto;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
   margin-bottom: 10px;
 }
 
@@ -308,19 +270,19 @@ h4 {
 }
 
 .chat-input input {
-  flex: 1;
   background: #f9fafb;
   border: 1px solid #d1d5db;
   padding: 10px;
   border-radius: 8px;
+  flex: 1;
 }
 
 .chat-input button {
   background: #3b82f6;
-  color: #fff;
-  padding: 10px 14px;
-  border: none;
+  color: white;
+  padding: 10px 16px;
   border-radius: 8px;
+  border: none;
   font-weight: 600;
   transition: background 0.2s ease;
 }
@@ -329,9 +291,7 @@ h4 {
   background: #2563eb;
 }
 
-/* --------------------------------------
-   Responsive Behavior
--------------------------------------- */
+/* ---------------- Responsive ---------------- */
 @media (max-width: 1200px) {
   .wallet-content {
     flex-direction: column;
