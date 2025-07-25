@@ -321,10 +321,3 @@ h4 {
     margin-top: 16px;
   }
 }
-.left-nav {
-  padding-top: 80px; /* moves icons down below header */
-}
-
-.sidebar {
-  padding-top: 80px; /* moves chat section down below header */
-}

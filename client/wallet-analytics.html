@@ -103,16 +103,13 @@
 
     <!-- Sidebar Chat -->
     <aside class="sidebar">
-      <div class="card">
-        <h4>Community Chat</h4>
-        <div class="chat-box" id="chatBox"></div>
-        <div class="chat-input">
-          <input type="text" id="chatInput" placeholder="Type a message..." />
-          <button id="sendMessage">Send</button>
-        </div>
-        <div style="margin-top:10px; font-size:13px; color:#6b7280;">Online: <span id="onlineUsersCount">0</span></div>
-      </div>
-    </aside>
+    <div id="onlineUsersCount">Online Users: 0</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Type a message..." />
+      <button id="sendMessage">Send</button>
+    </div>
+  </aside>
   </div>
 </div>
 
@@ -120,79 +117,177 @@
 </div>
 
 <script>
-// Firebase Config
 const firebaseConfig = {
-      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
-    };
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+    apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+    authDomain: "beyonddex-be653.firebaseapp.com",
+    projectId: "beyonddex-be653",
+    storageBucket: "beyonddex-be653.firebasestorage.app",
+    messagingSenderId: "687411546401",
+    appId: "1:687411546401:web:ec71401e52751d3e121660",
+    measurementId: "G-6SH111LB7J"
+  };
 
-// Profile & Logout
-auth.onAuthStateChanged(async user => {
-  const nav = document.getElementById("dropdownMenu");
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
   const userCircle = document.getElementById("userCircle");
-  const logoutBtn = document.getElementById("logout");
+  const dropdownMenu = document.getElementById("dropdownMenu");
 
-  if (user) {
-    const doc = await db.collection("users").doc(user.uid).get();
-    const username = doc.exists ? doc.data().username : user.email.split("@")[0];
-    userCircle.textContent = username.charAt(0).toUpperCase();
 
-    userCircle.addEventListener("click", () => {
-      nav.style.display = nav.style.display === "block" ? "none" : "block";
-    });
+  let currentUsername = '';
+  let userDocId = '';
+  let onlineUserMap = {};
 
-    logoutBtn.addEventListener("click", e => {
-      e.preventDefault();
-      auth.signOut();
-    });
-  } else {
-    window.location.href = "login.html";
+
+  const chatBox = document.getElementById("chatBox");
+  const chatInput = document.getElementById("chatInput");
+  const sendMessage = document.getElementById("sendMessage");
+  const onlineUsersCount = document.getElementById("onlineUsersCount");
+
+  function updatePresence(uid, username) {
+    userDocId = uid;
+    db.collection("presence").doc(uid).set({
+      username,
+      lastActive: firebase.firestore.Timestamp.now()
+    }, { merge: true });
   }
-});
 
-// Chat Logic
-const chatBox = document.getElementById("chatBox");
-const chatInput = document.getElementById("chatInput");
-const sendMessageBtn = document.getElementById("sendMessage");
+  function monitorPresence() {
+  setInterval(() => {
+    if (userDocId && currentUsername) {
+      updatePresence(userDocId, currentUsername);
+    }
+  }, 30000);
 
-sendMessageBtn.addEventListener("click", async () => {
-  const message = chatInput.value.trim();
-  if (message && auth.currentUser) {
-    const username = auth.currentUser.displayName || auth.currentUser.email.split("@")[0] || "User";
-    await db.collection("chat").add({
-      user: username,
-      message,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  db.collection("presence").onSnapshot(snapshot => {
+    const now = Date.now();
+    onlineUserMap = {};
+
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const lastActive = data.lastActive?.toDate().getTime();
+      if (lastActive) {
+        const isOnline = now - lastActive < 3 * 60 * 1000;
+        onlineUserMap[doc.id] = {
+          username: data.username,
+          isOnline
+        };
+      }
     });
-    chatInput.value = "";
-  }
-});
 
-db.collection("chat")
-  .orderBy("timestamp", "desc")
-  .limit(50)
-  .onSnapshot(snapshot => {
+    onlineUsersCount.textContent = `Online Users: ${
+      Object.values(onlineUserMap).filter(u => u.isOnline).length
+    }`;
+
+    renderChatMessages(); // ✅ refresh chat with presence dots
+  });
+}
+function renderChatMessages() {
+  db.collection("chat").orderBy("timestamp").get().then(snapshot => {
     chatBox.innerHTML = "";
     snapshot.forEach(doc => {
-      const data = doc.data();
+      const { username, text, timestamp } = doc.data();
+      const timeStr = timestamp ? getRelativeTime(timestamp) : "";
+
+      let isOnline = false;
+      for (let uid in onlineUserMap) {
+        if (onlineUserMap[uid].username === username) {
+          isOnline = onlineUserMap[uid].isOnline;
+          break;
+        }
+      }
+
+      const statusDot = `<span style="
+        display:inline-block;
+        width:8px;
+        height:8px;
+        margin-right:6px;
+        border-radius:50%;
+        background-color:${isOnline ? '#22c55e' : '#9ca3af'};
+        box-shadow:${isOnline ? '0 0 8px #22c55e' : 'none'};
+      "></span>`;
+
       const div = document.createElement("div");
-      div.textContent = `${data.user}: ${data.message}`;
-      chatBox.prepend(div);
+      div.className = "chat-message";
+      div.innerHTML = `${statusDot}<strong>${username}</strong> <span style="color: gray; font-size: 12px;">${timeStr}</span>: ${text}`;
+      chatBox.appendChild(div);
     });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+}
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      const uid = user.uid;
+      db.collection("users").doc(uid).get().then(doc => {
+        if (doc.exists) {
+          const username = doc.data().username || user.email || "Anon";
+          currentUsername = username;
+          userDocId = uid;
+          updatePresence(uid, username);
+          monitorPresence();
+
+          // ✅ Show user circle
+          userCircle.style.display = "flex";
+          userCircle.textContent = username.charAt(0).toUpperCase();
+        }
+      });
+
+      db.collection("chat").orderBy("timestamp").onSnapshot(() => {
+  renderChatMessages();
+});
+
+    } else {
+      window.location.href = "/auth.html";
+    }
   });
 
-// Presence Tracking
-const onlineUsersCount = document.getElementById("onlineUsersCount");
-db.collection("presence").onSnapshot(snapshot => {
-  onlineUsersCount.textContent = snapshot.size;
+  function sendChatMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+      db.collection("chat").add({
+        username: currentUsername,
+        text: message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      chatInput.value = "";
+      chatInput.focus();
+    }
+  }
+
+  sendMessage.addEventListener("click", sendChatMessage);
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendChatMessage();
+  });
+
+  function getRelativeTime(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp.toDate().getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+    return timestamp.toDate().toLocaleDateString();
+  }
+
+  // 🔻 Logout dropdown toggle behavior
+userCircle.addEventListener("click", () => {
+  dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+});
+
+window.addEventListener("click", (e) => {
+  if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+    dropdownMenu.style.display = "none";
+  }
+});
+
+document.getElementById("logout").addEventListener("click", () => {
+  if (userDocId) {
+    db.collection("presence").doc(userDocId).delete();
+  }
+  auth.signOut().then(() => window.location.href = "/auth.html");
 });
 
 // Wallet Analytics Placeholder Logic
