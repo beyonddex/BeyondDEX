@@ -6,6 +6,9 @@
 <title>Wallet Analytics | BeyondDEX</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/wallet-analytics.css" />
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="page-wrapper">
@@ -35,7 +38,7 @@
     <a href="calendar.html" class="nav-link" title="Calendar">
       <img src="assets/calendar.png" alt="Calendar" class="nav-icon" />
     </a>
-    <a href="wallet-analytics.html" class="nav-link" title="Wallet Analytics">
+    <a href="wallet-analytics.html" class="nav-link active" title="Wallet Analytics">
       <img src="assets/wallet.png" alt="Wallet Analytics" class="nav-icon" />
     </a>
   </div>
@@ -96,15 +99,16 @@
       </div>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar Chat -->
     <aside class="sidebar">
       <div class="card">
-        <h4>Chat</h4>
+        <h4>Community Chat</h4>
         <div class="chat-box" id="chatBox"></div>
         <div class="chat-input">
           <input type="text" id="chatInput" placeholder="Type a message..." />
           <button id="sendMessage">Send</button>
         </div>
+        <div style="margin-top:10px; font-size:13px; color:#6b7280;">Online: <span id="onlineUsersCount">0</span></div>
       </div>
     </aside>
   </div>
@@ -114,18 +118,88 @@
 </div>
 
 <script>
-// Placeholder for dynamic data injection
+// Firebase Config
+const firebaseConfig = {
+      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+      authDomain: "beyonddex-be653.firebaseapp.com",
+      projectId: "beyonddex-be653",
+      storageBucket: "beyonddex-be653.firebasestorage.app",
+      messagingSenderId: "687411546401",
+      appId: "1:687411546401:web:ec71401e52751d3e121660",
+      measurementId: "G-6SH111LB7J"
+    };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Profile & Logout
+auth.onAuthStateChanged(async user => {
+  const nav = document.getElementById("dropdownMenu");
+  const userCircle = document.getElementById("userCircle");
+  const logoutBtn = document.getElementById("logout");
+
+  if (user) {
+    const doc = await db.collection("users").doc(user.uid).get();
+    const username = doc.exists ? doc.data().username : "U";
+    userCircle.textContent = username.charAt(0).toUpperCase();
+
+    userCircle.addEventListener("click", () => {
+      nav.style.display = nav.style.display === "block" ? "none" : "block";
+    });
+
+    logoutBtn.addEventListener("click", e => {
+      e.preventDefault();
+      auth.signOut();
+    });
+  } else {
+    window.location.href = "login.html";
+  }
+});
+
+// Chat Logic
+const chatBox = document.getElementById("chatBox");
+const chatInput = document.getElementById("chatInput");
+const sendMessageBtn = document.getElementById("sendMessage");
+
+sendMessageBtn.addEventListener("click", async () => {
+  const message = chatInput.value.trim();
+  if (message && auth.currentUser) {
+    await db.collection("chat").add({
+      user: auth.currentUser.displayName || "Anonymous",
+      message,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    chatInput.value = "";
+  }
+});
+
+db.collection("chat")
+  .orderBy("timestamp", "desc")
+  .limit(50)
+  .onSnapshot(snapshot => {
+    chatBox.innerHTML = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const div = document.createElement("div");
+      div.textContent = `${data.user}: ${data.message}`;
+      chatBox.prepend(div);
+    });
+  });
+
+// Presence Tracking
+const onlineUsersCount = document.getElementById("onlineUsersCount");
+db.collection("presence").onSnapshot(snapshot => {
+  onlineUsersCount.textContent = snapshot.size;
+});
+
+// Wallet Data Placeholder
 document.getElementById('analyzeWallet').addEventListener('click', () => {
   const wallet = document.getElementById('walletSearch').value;
-  console.log('Analyzing wallet:', wallet);
-
-  // Simulated API response
   document.getElementById('walletAddress').textContent = wallet || '0xSampleAddress';
   document.getElementById('walletTotalValue').textContent = '764,219';
   document.getElementById('walletPnL').textContent = '+24,830';
   document.getElementById('strategyInsights').textContent = 'Wallet focuses on DeFi yield farming and short-term scalping.';
-  const pnlList = document.getElementById('pnlByAssetList');
-  pnlList.innerHTML = '<li>ETH: +120%</li><li>USDC: +18%</li>';
+  document.getElementById('pnlByAssetList').innerHTML = '<li>ETH: +120%</li><li>USDC: +18%</li>';
 });
 </script>
 </body>
