@@ -103,7 +103,7 @@ header {
 .main-content {
   display: flex;
   margin-top: 80px;
-  padding: 24px; /* Matches dashboard spacing */
+  padding: 24px 0; 
   gap: 24px; /* Consistent spacing */
   height: calc(100vh - 80px);
 }
@@ -164,7 +164,7 @@ header {
 /* ========== CALENDAR SECTION (Aligned with Dashboard Cards) ========== */
 .calendar-section {
   flex: 1;
-  padding: 0; /* Use main-content padding */
+  padding-right: 24px; /* Use main-content padding */
   overflow-y: auto;
 }
 
