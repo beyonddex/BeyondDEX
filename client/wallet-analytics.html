@@ -308,6 +308,7 @@ document.getElementById('analyzeWallet').addEventListener('click', async () => {
   try {
     // ✅ Wallet Snapshot
     const snapshotRes = await fetch(`https://beyonddex-backend.onrender.com/api/wallet/${wallet}`);
+    if (!snapshotRes.ok) throw new Error('Snapshot fetch failed');
     const snapshot = await snapshotRes.json();
 
     document.getElementById('walletAddress').textContent = snapshot.address || 'N/A';
@@ -315,26 +316,35 @@ document.getElementById('analyzeWallet').addEventListener('click', async () => {
       snapshot.firstTransaction ? new Date(snapshot.firstTransaction).toLocaleDateString() : 'N/A';
     document.getElementById('walletType').textContent = snapshot.walletType || 'N/A';
     document.getElementById('isWhale').textContent = snapshot.isWhale ? 'Yes' : 'No';
-    document.getElementById('walletTotalValue').textContent = `$${Number(snapshot.totalValue).toLocaleString()}`;
+    document.getElementById('walletTotalValue').textContent =
+      snapshot.totalValue ? `$${Number(snapshot.totalValue).toLocaleString()}` : 'N/A';
 
-    // ✅ Show breakdown for reference
-    document.getElementById('strategyInsights').textContent =
-      `On-chain: $${snapshot.breakdown.onChain.toFixed(2)}, DeFi: $${snapshot.breakdown.defi.toFixed(2)}`;
+    // ✅ Strategy Insights - breakdown safe check
+    if (snapshot.breakdown && snapshot.breakdown.onChain !== null && snapshot.breakdown.defi !== null) {
+      document.getElementById('strategyInsights').textContent =
+        `On-chain: $${snapshot.breakdown.onChain.toFixed(2)}, DeFi: $${snapshot.breakdown.defi.toFixed(2)}`;
+    } else {
+      document.getElementById('strategyInsights').textContent = 'Breakdown data not available';
+    }
 
     // ✅ PnL
     const pnlRes = await fetch(`https://beyonddex-backend.onrender.com/api/wallet/${wallet}/pnl`);
+    if (!pnlRes.ok) throw new Error('PnL fetch failed');
     const pnlData = await pnlRes.json();
-    document.getElementById('walletPnL').textContent = `${pnlData.pnl}%`;
+    document.getElementById('walletPnL').textContent =
+      pnlData && pnlData.pnl !== null ? `${pnlData.pnl}%` : 'N/A';
 
     // ✅ Portfolio
     const portfolioRes = await fetch(`https://beyonddex-backend.onrender.com/api/wallet/${wallet}/portfolio`);
+    if (!portfolioRes.ok) throw new Error('Portfolio fetch failed');
     const portfolio = await portfolioRes.json();
-    const pnlList = document.getElementById('pnlByAssetList');
-    pnlList.innerHTML = portfolio.map(token => `
-      <li>${token.name}: $${token.value} (${token.balance})</li>
-    `).join('');
 
-    // ✅ Strategy Insights
+    const pnlList = document.getElementById('pnlByAssetList');
+    pnlList.innerHTML = (Array.isArray(portfolio) && portfolio.length > 0)
+      ? portfolio.map(token => `<li>${token.name}: $${token.value} (${token.balance})</li>`).join('')
+      : '<li>No portfolio data available</li>';
+
+    // ✅ Override insights based on conditions
     if (snapshot.isWhale) {
       document.getElementById('strategyInsights').textContent =
         'Whale detected: Likely a long-term holder or institutional wallet.';
@@ -344,10 +354,11 @@ document.getElementById('analyzeWallet').addEventListener('click', async () => {
     }
 
   } catch (error) {
-    console.error(error);
-    alert('Failed to fetch wallet analytics');
+    console.error('Analyze Wallet Error:', error);
+    alert('Failed to fetch wallet analytics. Please try again later.');
   }
 });
+
 </script>
 </body>
 </html>
