@@ -17,43 +17,43 @@ html {
   scroll-behavior: smooth;
 }
 
-/* ========== HEADER ========== */
+/* ========== HEADER (Matches Dashboard) ========== */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 16px 32px;
   background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e0e0e0;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 999;
   box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 }
 
-/* Logo + Nav links grouped */
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 32px;
 }
 
 .logo-container img {
-  height: 40px;
+  height: 50px;
 }
 
 .nav-links {
   display: flex;
-  gap: 16px;
+  gap: 20px;
 }
 
 .nav-links a {
-  font-size: 14px;
-  font-weight: 500;
   text-decoration: none;
-  color: #333;
+  color: #444;
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.2s ease;
 }
 .nav-links a:hover {
   color: #000;
@@ -104,47 +104,69 @@ header {
 .main-content {
   display: flex;
   align-items: flex-start;
-  margin-top: 80px; /* accounts for header */
+  margin-top: 80px; /* space for header */
   height: calc(100vh - 80px);
   overflow: hidden;
 }
 
-/* Slim Left Navigation */
+/* ========== LEFT NAV (Matches Dashboard) ========== */
 .left-nav {
   width: 80px;
-  background: #f7f8fa;
+  background: #fff;
   border-right: 1px solid #e5e7eb;
+  padding-top: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 0;
-  position: sticky;
-  top: 80px;
-  height: calc(100vh - 80px);
-  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .left-nav a.nav-link {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  position: relative;
 }
+
+.left-nav a.nav-link:hover {
+  background: #f1f5f9;
+}
+
 .left-nav img.nav-icon {
   width: 28px;
   height: 28px;
-  transition: transform 0.2s ease;
-}
-.left-nav img.nav-icon:hover {
-  transform: scale(1.1);
-}
-.left-nav a.active img {
-  border: 2px solid #3b82f6;
-  border-radius: 8px;
-  padding: 4px;
+  filter: grayscale(100%) brightness(80%);
 }
 
-/* Calendar Section */
+.left-nav a.active .nav-icon,
+.left-nav a.nav-link:hover .nav-icon {
+  filter: grayscale(0%) brightness(100%);
+}
+
+/* Tooltip */
+.left-nav a.nav-link[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 90px;
+  background: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  opacity: 0.9;
+}
+
+/* ========== CALENDAR SECTION ========== */
 .calendar-section {
   flex: 1;
-  padding: 40px;
+  padding: 32px;
   overflow-y: auto;
   height: calc(100vh - 80px);
 }
@@ -216,10 +238,10 @@ header {
   font-weight: 500;
 }
 
-/* Sidebar (Chat) */
+/* ========== SIDEBAR (CHAT) ========== */
 .sidebar {
   flex-shrink: 0;
-  width: 280px;
+  width: 300px;
   background: #fafafa;
   border-left: 1px solid #e5e7eb;
   padding: 16px;
@@ -227,7 +249,7 @@ header {
   top: 80px;
   height: calc(100vh - 80px);
   overflow-y: auto;
-  overflow-x: hidden; /* FIX horizontal scroll */
+  overflow-x: hidden; /* Fix horizontal scroll */
   display: flex;
   flex-direction: column;
 }
@@ -245,9 +267,9 @@ header {
   padding: 16px;
   font-size: 14px;
   overflow-y: auto;
-  overflow-x: hidden; /* FIX horizontal scroll */
-  word-wrap: break-word; /* Break long words */
-  white-space: normal; /* Wrap lines */
+  overflow-x: hidden; /* Fix horizontal scroll */
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 .chat-message {
@@ -259,6 +281,7 @@ header {
 .chat-input {
   display: flex;
   margin-top: 10px;
+  gap: 8px;
 }
 
 .chat-input input {
@@ -271,8 +294,7 @@ header {
 
 .chat-input button {
   padding: 10px 16px;
-  margin-left: 8px;
-  background: #3b82f6;
+  background: #0f172a;
   color: white;
   border-radius: 8px;
   border: none;
@@ -280,7 +302,7 @@ header {
   transition: background 0.2s ease;
 }
 .chat-input button:hover {
-  background: #2563eb;
+  background: #1e293b;
 }
 
 /* Footer */
