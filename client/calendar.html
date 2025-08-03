@@ -6,7 +6,7 @@
   <title>Economic Calendar | BeyondDEX</title>
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  
+
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -197,10 +197,17 @@
 </header>
 
 <div class="main-content">
+  <!-- Left Navigation -->
   <div class="left-nav">
-    <button onclick="window.location.href='dashboard.html'">📊 Overview - Basic</button>
-    <button onclick="window.location.href='dashboard.html'">📊 Overview - Pro</button>
-    <button onclick="window.location.href='calendar.html'">📅 Economic Calendar</button>
+    <a href="dashboard.html" class="nav-link" title="Dashboard">
+      <img src="assets/dashboard.png" alt="Dashboard" class="nav-icon" />
+    </a>
+    <a href="calendar.html" class="nav-link" title="Calendar">
+      <img src="assets/calendar.png" alt="Calendar" class="nav-icon" />
+    </a>
+    <a href="wallet-analytics.html" class="nav-link active" title="Wallet Analytics">
+      <img src="assets/wallet.png" alt="Wallet Analytics" class="nav-icon" />
+    </a>
   </div>
 
   <div class="calendar-section">
