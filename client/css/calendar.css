@@ -12,7 +12,7 @@ html, body {
   height: 100%;
 }
 
-/* Smooth scroll for anchor links */
+/* Smooth scroll */
 html {
   scroll-behavior: smooth;
 }
@@ -22,7 +22,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 32px;
+  padding: 16px 24px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   position: fixed;
@@ -33,16 +33,27 @@ header {
   box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 }
 
+/* Logo + Nav links grouped */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
 .logo-container img {
   height: 40px;
 }
 
+.nav-links {
+  display: flex;
+  gap: 16px;
+}
+
 .nav-links a {
-  margin: 0 16px;
-  text-decoration: none;
-  color: #444;
+  font-size: 14px;
   font-weight: 500;
-  transition: color 0.2s ease;
+  text-decoration: none;
+  color: #333;
 }
 .nav-links a:hover {
   color: #000;
@@ -98,30 +109,27 @@ header {
   overflow: hidden;
 }
 
-/* Left Navigation */
+/* Slim Left Navigation */
 .left-nav {
-  flex-shrink: 0;
-  width: 220px;
+  width: 80px;
   background: #f7f8fa;
   border-right: 1px solid #e5e7eb;
-  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
   position: sticky;
   top: 80px;
   height: calc(100vh - 80px);
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .left-nav a.nav-link {
-  margin-bottom: 16px;
-  display: block;
-  text-align: center;
+  margin-bottom: 20px;
 }
 .left-nav img.nav-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   transition: transform 0.2s ease;
 }
 .left-nav img.nav-icon:hover {
@@ -136,30 +144,35 @@ header {
 /* Calendar Section */
 .calendar-section {
   flex: 1;
-  padding: 30px;
+  padding: 40px;
   overflow-y: auto;
   height: calc(100vh - 80px);
 }
+
 .calendar-box {
   background: #ffffff;
-  padding: 30px;
+  padding: 40px;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
+
 .calendar-box h2 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
+
 .calendar-box h3 {
+  font-size: 18px;
   margin-top: 30px;
-  font-size: 16px;
   color: #111;
 }
+
 .calendar-box ul {
   list-style: none;
   padding: 0;
 }
+
 .economic-event {
   display: flex;
   justify-content: space-between;
@@ -167,25 +180,41 @@ header {
   padding: 12px 0;
   border-bottom: 1px solid #eee;
 }
+
 .event-time {
+  font-size: 15px;
   font-weight: bold;
   width: 70px;
 }
+
 .event-info {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .event-info img.flag {
   width: 20px;
 }
+
 .event-name {
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 500;
 }
-.impact-low { color: green; }
-.impact-medium { color: orange; }
-.impact-high { color: red; }
+
+.impact-low {
+  color: green;
+  font-weight: 500;
+}
+.impact-medium {
+  color: orange;
+  font-weight: 500;
+}
+.impact-high {
+  color: red;
+  font-weight: 500;
+}
 
 /* Sidebar (Chat) */
 .sidebar {
@@ -198,13 +227,16 @@ header {
   top: 80px;
   height: calc(100vh - 80px);
   overflow-y: auto;
+  overflow-x: hidden; /* FIX horizontal scroll */
   display: flex;
   flex-direction: column;
 }
+
 #onlineUsersCount {
   font-weight: 600;
   margin-bottom: 10px;
 }
+
 .chat-box {
   flex: 1;
   background: #ffffff;
@@ -213,11 +245,22 @@ header {
   padding: 16px;
   font-size: 14px;
   overflow-y: auto;
+  overflow-x: hidden; /* FIX horizontal scroll */
+  word-wrap: break-word; /* Break long words */
+  white-space: normal; /* Wrap lines */
 }
+
+.chat-message {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
 .chat-input {
   display: flex;
   margin-top: 10px;
 }
+
 .chat-input input {
   flex: 1;
   padding: 10px;
@@ -225,6 +268,7 @@ header {
   border: 1px solid #d1d5db;
   background: #f9fafb;
 }
+
 .chat-input button {
   padding: 10px 16px;
   margin-left: 8px;
@@ -262,10 +306,13 @@ footer {
 /* Tablets */
 @media (max-width: 1024px) {
   .left-nav {
-    width: 180px;
+    width: 70px;
   }
   .sidebar {
     width: 240px;
+  }
+  .calendar-section {
+    padding: 20px;
   }
 }
 
