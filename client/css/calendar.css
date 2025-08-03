@@ -12,7 +12,6 @@ html, body {
   height: 100%;
 }
 
-/* Smooth scroll */
 html {
   scroll-behavior: smooth;
 }
@@ -100,19 +99,19 @@ header {
   background: #f0f0f0;
 }
 
-/* ========== MAIN LAYOUT ========== */
+/* ========== MAIN LAYOUT (Matches Dashboard Padding) ========== */
 .main-content {
   display: flex;
-  align-items: flex-start;
-  margin-top: 80px; /* space for header */
+  margin-top: 80px;
+  padding: 24px; /* Matches dashboard spacing */
+  gap: 24px; /* Consistent spacing */
   height: calc(100vh - 80px);
-  overflow: hidden;
 }
 
 /* ========== LEFT NAV (Matches Dashboard) ========== */
 .left-nav {
   width: 80px;
-  background: #fff;
+  background: #f7f8fa; /* Match dashboard sidebar */
   border-right: 1px solid #e5e7eb;
   padding-top: 24px;
   display: flex;
@@ -134,7 +133,7 @@ header {
 }
 
 .left-nav a.nav-link:hover {
-  background: #f1f5f9;
+  background: #e5e7eb;
 }
 
 .left-nav img.nav-icon {
@@ -148,7 +147,6 @@ header {
   filter: grayscale(0%) brightness(100%);
 }
 
-/* Tooltip */
 .left-nav a.nav-link[title]:hover::after {
   content: attr(title);
   position: absolute;
@@ -163,30 +161,29 @@ header {
   opacity: 0.9;
 }
 
-/* ========== CALENDAR SECTION ========== */
+/* ========== CALENDAR SECTION (Aligned with Dashboard Cards) ========== */
 .calendar-section {
   flex: 1;
-  padding: 32px;
+  padding: 0; /* Use main-content padding */
   overflow-y: auto;
-  height: calc(100vh - 80px);
 }
 
 .calendar-box {
   background: #ffffff;
-  padding: 40px;
+  padding: 24px; /* Matches dashboard cards */
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
 }
 
 .calendar-box h2 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .calendar-box h3 {
-  font-size: 18px;
-  margin-top: 30px;
+  font-size: 16px;
+  margin-top: 20px;
   color: #111;
 }
 
@@ -204,7 +201,7 @@ header {
 }
 
 .event-time {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   width: 70px;
 }
@@ -221,7 +218,7 @@ header {
 }
 
 .event-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -238,7 +235,7 @@ header {
   font-weight: 500;
 }
 
-/* ========== SIDEBAR (CHAT) ========== */
+/* ========== SIDEBAR (CHAT Matches Dashboard) ========== */
 .sidebar {
   flex-shrink: 0;
   width: 300px;
@@ -267,9 +264,8 @@ header {
   padding: 16px;
   font-size: 14px;
   overflow-y: auto;
-  overflow-x: hidden; /* Fix horizontal scroll */
+  overflow-x: hidden;
   word-wrap: break-word;
-  white-space: normal;
 }
 
 .chat-message {
@@ -294,7 +290,7 @@ header {
 
 .chat-input button {
   padding: 10px 16px;
-  background: #0f172a;
+  background: #3b82f6; /* Matches dashboard primary button */
   color: white;
   border-radius: 8px;
   border: none;
@@ -302,7 +298,7 @@ header {
   transition: background 0.2s ease;
 }
 .chat-input button:hover {
-  background: #1e293b;
+  background: #2563eb;
 }
 
 /* Footer */
@@ -324,8 +320,6 @@ footer {
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
-
-/* Tablets */
 @media (max-width: 1024px) {
   .left-nav {
     width: 70px;
@@ -333,16 +327,13 @@ footer {
   .sidebar {
     width: 240px;
   }
-  .calendar-section {
-    padding: 20px;
-  }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;
     height: auto;
+    padding: 16px;
   }
   .left-nav {
     flex-direction: row;
@@ -354,8 +345,8 @@ footer {
     position: static;
   }
   .calendar-section {
+    padding: 0;
     height: auto;
-    padding: 20px;
   }
   .sidebar {
     width: 100%;
