@@ -31,7 +31,6 @@ header {
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 24px; /* Adjusted for tighter alignment */
 }
 
 .logo-container img {
@@ -45,7 +44,7 @@ header {
 .nav-links a {
   text-decoration: none;
   color: #444;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 16px;
   margin: 0 16px; /* Matches dashboard */
   transition: color 0.2s ease;
@@ -105,7 +104,7 @@ header {
   padding: 24px 0; /* no left/right padding */
   gap: 24px; /* consistent spacing between nav, content, and sidebar */
   flex: 1;
-  min-height: calc(100vh - 80px);
+  align-items: stretch;
 }
 
 .main-flex {
