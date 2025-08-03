@@ -44,7 +44,6 @@ header {
 
 .nav-links {
   display: flex;
-  gap: 20px;
 }
 
 .nav-links a {
