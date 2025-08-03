@@ -111,7 +111,7 @@ header {
 /* ========== LEFT NAV (Matches Dashboard) ========== */
 .left-nav {
   width: 80px;
-  background: #f7f8fa; /* Match dashboard sidebar */
+  background: #fff; /* Match dashboard sidebar */
   border-right: 1px solid #e5e7eb;
   padding-top: 24px;
   display: flex;
