@@ -288,16 +288,16 @@ header {
 }
 
 .chat-input button {
-  padding: 10px 16px;
-  background: #3b82f6; /* Matches dashboard primary button */
+  background: #0f172a; /* Dark gray/black */
   color: white;
+  padding: 10px 16px;
   border-radius: 8px;
   border: none;
   font-weight: 600;
   transition: background 0.2s ease;
 }
 .chat-input button:hover {
-  background: #2563eb;
+  background: #1e293b; /* Slightly lighter on hover */
 }
 
 /* Footer */
