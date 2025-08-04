@@ -297,42 +297,54 @@ document.getElementById('analyzeWallet').addEventListener('click', async () => {
 
   // Show loading states
   document.getElementById('walletAddress').textContent = 'Loading...';
-  document.getElementById('firstTx').textContent = 'Loading...';
-  document.getElementById('walletType').textContent = 'Loading...';
-  document.getElementById('isWhale').textContent = 'Loading...';
   document.getElementById('walletTotalValue').textContent = '...';
   document.getElementById('walletPnL').textContent = 'Loading...';
-  document.getElementById('strategyInsights').textContent = 'Analyzing wallet strategy...';
+  document.getElementById('strategyInsights').textContent = 'Analyzing wallet...';
   document.getElementById('pnlByAssetList').innerHTML = '<li>Loading...</li>';
 
   try {
-    // ✅ Wallet Snapshot (from Alchemy-enhanced backend)
+    // ✅ Fetch Snapshot
     const snapshotRes = await fetch(`https://beyonddex-backend.onrender.com/api/wallet/${wallet}`);
     if (!snapshotRes.ok) throw new Error('Snapshot fetch failed');
     const snapshot = await snapshotRes.json();
 
-    // ✅ Update UI
+    // ✅ Update basic info
     document.getElementById('walletAddress').textContent = snapshot.address || 'N/A';
     document.getElementById('walletTotalValue').textContent =
-      snapshot.totalValue ? `$${snapshot.totalValue.toLocaleString()}` : 'N/A';
+      snapshot.totalValue ? snapshot.totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : 'N/A';
 
-    // ETH balance and price
-    const ethInfo = `ETH: ${snapshot.ethBalance.toFixed(4)} (~$${snapshot.ethPrice.toLocaleString()})`;
-    document.getElementById('strategyInsights').textContent = ethInfo;
+    // ✅ ETH Info
+    if (snapshot.ethBalance && snapshot.ethPrice) {
+      document.getElementById('strategyInsights').textContent =
+        `ETH: ${snapshot.ethBalance.toFixed(4)} (~${(snapshot.ethBalance * snapshot.ethPrice).toLocaleString('en-US', {
+          style: 'currency', currency: 'USD'
+        })})`;
+    } else {
+      document.getElementById('strategyInsights').textContent = 'No ETH balance info available';
+    }
 
-    // ✅ Whale detection
-    document.getElementById('isWhale').textContent = snapshot.isWhale ? 'Yes' : 'No';
-    document.getElementById('walletType').textContent = snapshot.walletType || 'Standard';
+    // ✅ Whale detection (optional logic)
+    document.getElementById('isWhale').textContent = snapshot.totalValue > 1000000 ? 'Yes' : 'No';
+    document.getElementById('walletType').textContent =
+      snapshot.totalValue > 50000 ? 'Active Trader' : 'Standard';
 
-    // ✅ Tokens (from snapshot.tokens)
+    // ✅ Display tokens
     const pnlList = document.getElementById('pnlByAssetList');
-    pnlList.innerHTML = (Array.isArray(snapshot.tokens) && snapshot.tokens.length > 0)
-      ? snapshot.tokens.map(token => `
-          <li>${token.symbol}: ${token.balance} @ $${token.price} (Value: $${token.value.toLocaleString()})</li>
-        `).join('')
-      : '<li>No tokens found</li>';
+    if (snapshot.breakdown && Array.isArray(snapshot.breakdown.tokens) && snapshot.breakdown.tokens.length > 0) {
+      pnlList.innerHTML = snapshot.breakdown.tokens.map(token => `
+        <li style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <img src="${token.logo || 'assets/default-token.png'}" alt="${token.symbol}" style="width:20px;height:20px;border-radius:50%;" />
+          <span><strong>${token.symbol}</strong>: ${token.balance.toFixed(4)}</span>
+          <span style="margin-left:auto;color:#666;">${(token.valueUSD || 0).toLocaleString('en-US', {
+            style: 'currency', currency: 'USD'
+          })}</span>
+        </li>
+      `).join('');
+    } else {
+      pnlList.innerHTML = '<li>No tokens found</li>';
+    }
 
-    // ✅ PnL (mock for now)
+    // ✅ Fetch PnL
     const pnlRes = await fetch(`https://beyonddex-backend.onrender.com/api/wallet/${wallet}/pnl`);
     if (pnlRes.ok) {
       const pnlData = await pnlRes.json();
@@ -340,7 +352,6 @@ document.getElementById('analyzeWallet').addEventListener('click', async () => {
     } else {
       document.getElementById('walletPnL').textContent = 'N/A';
     }
-
   } catch (error) {
     console.error('Analyze Wallet Error:', error);
     alert('Failed to fetch wallet analytics. Please try again later.');
