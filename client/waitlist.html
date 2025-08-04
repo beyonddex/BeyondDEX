@@ -3,15 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Join the Waitlist | BeyondDEX</title>
+<title>Join Waitlist | BeyondDEX</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(-45deg, #0f172a, #1e293b, #111827, #1e3a8a);
-    background-size: 400% 400%;
-    animation: gradientBG 12s ease infinite;
-    color: #fff;
+    background: #fff;
+    color: #111;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,123 +17,122 @@
     height: 100vh;
     margin: 0;
     padding: 20px;
-    text-align: center;
-  }
-
-  @keyframes gradientBG {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
   }
 
   h1 {
-    font-size: 2.8rem;
-    margin-bottom: 16px;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
     opacity: 0;
     animation: fadeIn 1.2s ease forwards;
   }
 
   p {
-    font-size: 1.1rem;
-    color: #cbd5e1;
-    max-width: 600px;
-    margin-bottom: 32px;
-    line-height: 1.6;
+    font-size: 1.2rem;
+    color: #555;
+    max-width: 500px;
+    margin-bottom: 28px;
+    text-align: center;
+    line-height: 1.5;
     opacity: 0;
     animation: fadeIn 1.5s ease forwards;
-    animation-delay: 0.4s;
+    animation-delay: 0.3s;
   }
 
-  .waitlist-container {
-    background: rgba(30, 41, 59, 0.85);
-    padding: 40px 30px;
+  .waitlist-box {
+    background: #f9f9f9;
+    border: 1px solid #e5e7eb;
     border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-    max-width: 500px;
+    padding: 40px;
+    max-width: 400px;
     width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     opacity: 0;
-    animation: fadeIn 2s ease forwards;
-    animation-delay: 0.8s;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; transform: translateY(0);}
-    from { opacity: 0; transform: translateY(20px);}
+    animation: fadeIn 1.8s ease forwards;
+    animation-delay: 0.6s;
   }
 
   .countdown {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 600;
-    color: #38bdf8;
-    margin-bottom: 24px;
-  }
-
-  .email-input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
+    color: #333;
     margin-bottom: 20px;
   }
 
-  .cta-btn {
+  input[type="email"] {
     width: 100%;
     padding: 14px;
-    background: #3b82f6;
-    color: #fff;
-    border: none;
+    border: 1px solid #d1d5db;
     border-radius: 8px;
+    margin-bottom: 16px;
     font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease;
+    outline: none;
+    transition: border 0.2s;
   }
 
-  .cta-btn:hover {
-    background: #2563eb;
+  input[type="email"]:focus {
+    border-color: #111;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    background: #111;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background: #333;
   }
 
   .benefits {
     text-align: left;
     margin-top: 24px;
     font-size: 0.95rem;
-    color: #94a3b8;
+    color: #444;
   }
 
   .benefits li {
     margin-bottom: 10px;
     list-style: none;
-    padding-left: 20px;
     position: relative;
+    padding-left: 16px;
   }
 
   .benefits li::before {
-    content: "✓";
+    content: "•";
     position: absolute;
     left: 0;
-    color: #3b82f6;
+    color: #111;
     font-weight: bold;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px);}
+    to { opacity: 1; transform: translateY(0);}
   }
 </style>
 </head>
 <body>
 
-<div class="waitlist-container">
-  <h1>Get Ahead of the Curve</h1>
-  <p>Join BeyondDEX and gain <strong>exclusive early access</strong> to institutional-grade crypto analytics before anyone else. Limited spots for early adopters.</p>
+<h1>BeyondDEX Access</h1>
+<p>Be the first to experience institutional-grade analytics. Join the waitlist for early access to premium tools before public launch.</p>
 
-  <!-- Countdown Timer -->
-  <div class="countdown" id="countdown">Launching in: Loading...</div>
-
-  <!-- Waitlist Form -->
-  <input type="email" id="email" class="email-input" placeholder="Enter your email" />
-  <button id="joinWaitlist" class="cta-btn">Join the Waitlist</button>
-
+<div class="waitlist-box">
+  <div class="countdown" id="countdown">Launch in: Loading...</div>
+  <input type="email" id="email" placeholder="Enter your email" />
+  <button id="joinWaitlist">Join Waitlist</button>
   <ul class="benefits">
-    <li>First access to Pro Reports</li>
-    <li>VIP perks for early members</li>
-    <li>Exclusive Discord alpha community</li>
+    <li>Exclusive early access</li>
+    <li>Hedge-fund grade analytics</li>
+    <li>Founding member perks</li>
   </ul>
 </div>
 
@@ -163,7 +160,7 @@
         email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
-      alert('You’re on the waitlist! Stay tuned for updates.');
+      alert('You’re on the waitlist! We’ll keep you updated.');
       document.getElementById('email').value = '';
     } catch (err) {
       console.error(err);
@@ -171,27 +168,25 @@
     }
   });
 
-  // Countdown Timer Logic
+  // Countdown
   const countdownEl = document.getElementById('countdown');
-  const launchDate = new Date("2025-09-01T00:00:00").getTime(); // Set beta launch date
+  const launchDate = new Date("2025-09-01T00:00:00").getTime();
 
   function updateCountdown() {
-    const now = new Date().getTime();
+    const now = Date.now();
     const diff = launchDate - now;
-
     if (diff <= 0) {
-      countdownEl.textContent = "We're live!";
+      countdownEl.textContent = "We're Live!";
       return;
     }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    countdownEl.textContent = `Launching in: ${days}d ${hours}h ${minutes}m`;
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+    countdownEl.textContent = `Launch in: ${days}d ${hours}h ${minutes}m`;
   }
 
   updateCountdown();
-  setInterval(updateCountdown, 60000); // Update every minute
+  setInterval(updateCountdown, 60000);
 </script>
 </body>
 </html>
