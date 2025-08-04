@@ -170,9 +170,9 @@
     <div class="text-column">
   <div class="text-wrapper">
     <h1>Your Daily Crypto Edge</h1>
-    <p>BeyondDEX is your institutional-grade trading assistant — delivering the most important on-chain, macro, sentiment, and volatility signals into a clean, 60-second daily report.<br><br>
-    Designed like a hedge fund desk note. Built for traders who demand clarity over clutter.</p>
-    <button class="cta">Access Pro Reports</button>
+    <p>Get early access to BeyondDEX — your institutional-grade trading edge. We deliver the most critical on-chain, macro, and market signals in one clean, 60-second daily report.<br><br>
+Built like a hedge fund desk note, designed for traders who demand clarity. Join the waitlist today and be first in line when we launch.</p>
+    <button class="cta" id="joinWaitlistBtn">Join Waitlist</button>
   </div>
 </div>
     <div class="image-wrapper">
@@ -192,6 +192,10 @@
   </footer>
 
   <script>
+document.getElementById('joinWaitlistBtn').addEventListener('click', () => {
+  window.location.href = '/waitlist.html';
+});
+
     const firebaseConfig = {
       apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
       authDomain: "beyonddex-be653.firebaseapp.com",

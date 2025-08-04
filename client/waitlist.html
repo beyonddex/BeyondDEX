@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Join Waitlist | BeyondDEX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/waitlist.css" />
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div class="container">
+  <h1>Join the Waitlist</h1>
+  <p>Be the first to access BeyondDEX Pro tools.</p>
+  <input type="email" id="email" placeholder="Enter your email" required />
+  <button id="joinWaitlist">Join</button>
+
+  <p style="margin-top: 20px; font-size: 14px;">Admin? <a href="#" id="adminLogin">Access Dashboard</a></p>
+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+    authDomain: "beyonddex-be653.firebaseapp.com",
+    projectId: "beyonddex-be653",
+    storageBucket: "beyonddex-be653.firebasestorage.app",
+    messagingSenderId: "687411546401",
+    appId: "1:687411546401:web:ec71401e52751d3e121660",
+    measurementId: "G-6SH111LB7J"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ✅ Add email to waitlist
+document.getElementById('joinWaitlist').addEventListener('click', async () => {
+  const email = document.getElementById('email').value.trim();
+  if (!email) return alert('Please enter your email.');
+
+  try {
+    await db.collection('waitlist').add({
+      email,
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert('You have successfully joined the waitlist!');
+    document.getElementById('email').value = '';
+  } catch (err) {
+    console.error('Waitlist Error:', err);
+    alert('Something went wrong. Please try again.');
+  }
+});
+
+// ✅ Admin Access
+document.getElementById('adminLogin').addEventListener('click', () => {
+  const key = prompt('Enter admin key:');
+  if (key === 'supersecret123') { // Change this key later or store in ENV
+    localStorage.setItem('admin-access', 'true');
+    window.location.href = '/dashboard.html';
+  } else {
+    alert('Invalid key.');
+  }
+});
+</script>
+</body>
+</html>
