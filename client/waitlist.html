@@ -3,63 +3,195 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Join Waitlist | BeyondDEX</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/waitlist.css" />
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<title>Join the Waitlist | BeyondDEX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(-45deg, #0f172a, #1e293b, #111827, #1e3a8a);
+    background-size: 400% 400%;
+    animation: gradientBG 12s ease infinite;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+
+  @keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+
+  h1 {
+    font-size: 2.8rem;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeIn 1.2s ease forwards;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    max-width: 600px;
+    margin-bottom: 32px;
+    line-height: 1.6;
+    opacity: 0;
+    animation: fadeIn 1.5s ease forwards;
+    animation-delay: 0.4s;
+  }
+
+  .waitlist-container {
+    background: rgba(30, 41, 59, 0.85);
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    max-width: 500px;
+    width: 100%;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+    animation-delay: 0.8s;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0);}
+    from { opacity: 0; transform: translateY(20px);}
+  }
+
+  .countdown {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #38bdf8;
+    margin-bottom: 24px;
+  }
+
+  .email-input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  .cta-btn {
+    width: 100%;
+    padding: 14px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .cta-btn:hover {
+    background: #2563eb;
+  }
+
+  .benefits {
+    text-align: left;
+    margin-top: 24px;
+    font-size: 0.95rem;
+    color: #94a3b8;
+  }
+
+  .benefits li {
+    margin-bottom: 10px;
+    list-style: none;
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .benefits li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #3b82f6;
+    font-weight: bold;
+  }
+</style>
 </head>
 <body>
-<div class="container">
-  <h1>Join the Waitlist</h1>
-  <p>Be the first to access BeyondDEX Pro tools.</p>
-  <input type="email" id="email" placeholder="Enter your email" required />
-  <button id="joinWaitlist">Join</button>
 
-  <p style="margin-top: 20px; font-size: 14px;">Admin? <a href="#" id="adminLogin">Access Dashboard</a></p>
+<div class="waitlist-container">
+  <h1>Get Ahead of the Curve</h1>
+  <p>Join BeyondDEX and gain <strong>exclusive early access</strong> to institutional-grade crypto analytics before anyone else. Limited spots for early adopters.</p>
+
+  <!-- Countdown Timer -->
+  <div class="countdown" id="countdown">Launching in: Loading...</div>
+
+  <!-- Waitlist Form -->
+  <input type="email" id="email" class="email-input" placeholder="Enter your email" />
+  <button id="joinWaitlist" class="cta-btn">Join the Waitlist</button>
+
+  <ul class="benefits">
+    <li>First access to Pro Reports</li>
+    <li>VIP perks for early members</li>
+    <li>Exclusive Discord alpha community</li>
+  </ul>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {
-    apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-    authDomain: "beyonddex-be653.firebaseapp.com",
-    projectId: "beyonddex-be653",
-    storageBucket: "beyonddex-be653.firebasestorage.app",
-    messagingSenderId: "687411546401",
-    appId: "1:687411546401:web:ec71401e52751d3e121660",
-    measurementId: "G-6SH111LB7J"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-// ✅ Add email to waitlist
-document.getElementById('joinWaitlist').addEventListener('click', async () => {
-  const email = document.getElementById('email').value.trim();
-  if (!email) return alert('Please enter your email.');
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-  try {
-    await db.collection('waitlist').add({
-      email,
-      joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert('You have successfully joined the waitlist!');
-    document.getElementById('email').value = '';
-  } catch (err) {
-    console.error('Waitlist Error:', err);
-    alert('Something went wrong. Please try again.');
+  document.getElementById('joinWaitlist').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    if (!email) return alert('Please enter your email.');
+
+    try {
+      await db.collection('waitlist').add({
+        email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('You’re on the waitlist! Stay tuned for updates.');
+      document.getElementById('email').value = '';
+    } catch (err) {
+      console.error(err);
+      alert('Failed to join waitlist. Try again.');
+    }
+  });
+
+  // Countdown Timer Logic
+  const countdownEl = document.getElementById('countdown');
+  const launchDate = new Date("2025-09-01T00:00:00").getTime(); // Set beta launch date
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = launchDate - now;
+
+    if (diff <= 0) {
+      countdownEl.textContent = "We're live!";
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    countdownEl.textContent = `Launching in: ${days}d ${hours}h ${minutes}m`;
   }
-});
 
-// ✅ Admin Access
-document.getElementById('adminLogin').addEventListener('click', () => {
-  const key = prompt('Enter admin key:');
-  if (key === 'supersecret123') { // Change this key later or store in ENV
-    localStorage.setItem('admin-access', 'true');
-    window.location.href = '/dashboard.html';
-  } else {
-    alert('Invalid key.');
-  }
-});
+  updateCountdown();
+  setInterval(updateCountdown, 60000); // Update every minute
 </script>
 </body>
 </html>
