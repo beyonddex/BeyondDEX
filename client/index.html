@@ -106,30 +106,21 @@
       align-items: center;
       background: #f5f5f5;
       position: relative;
-      overflow:hidden;
+      overflow: hidden;
     }
 
     .main-section::before {
-  content: "";
-  position: absolute;
-  top: -100px;
-  left: -100px;
-  width: 120vw;  
-  height: 120vh; 
-  background: radial-gradient(circle at 30% 30%, rgba(0, 123, 255, 0.1), transparent 60%),
-              radial-gradient(circle at 70% 70%, rgba(255, 0, 150, 0.1), transparent 60%);
-  animation: floatBG 10s ease-in-out infinite;
-  z-index: 0;
+      content: "";
+      position: absolute;
+      top: -100px;
+      left: -100px;
+      width: 120vw;
+      height: 120vh;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 123, 255, 0.1), transparent 60%),
+                  radial-gradient(circle at 70% 70%, rgba(255, 0, 150, 0.1), transparent 60%);
+      z-index: 0;
     }
 
-    @keyframes floatBG {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(50px);
-  }
-}
     .text-column, .image-column {
       position: relative;
       z-index: 1;
@@ -187,11 +178,16 @@
       margin-bottom: 20px;
     }
 
-    .affiliate-section p {
+    .affiliate-section p.desktop-affiliate {
       font-size: 1.1rem;
       max-width: 800px;
       margin: 0 auto 30px;
       color: #333;
+      display: block;
+    }
+
+    .affiliate-section p.mobile-affiliate {
+      display: none;
     }
 
     .affiliate-section a {
@@ -222,37 +218,41 @@
         color: #333;
         margin-bottom: 30px;
       }
-
+      .affiliate-section p.desktop-affiliate {
+        display: none;
+      }
+      .affiliate-section p.mobile-affiliate {
+        display: block;
+        font-size: 1rem;
+        max-width: 90%;
+        margin: 0 auto 20px;
+        color: #333;
+      }
       header {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-between;
         gap: 10px;
       }
-
       .nav-links {
         flex-direction: row;
         justify-content: center;
         width: auto;
         gap: 12px;
       }
-
       .text-column {
         padding-right: 0;
         margin-bottom: 40px;
       }
-
       .main-section {
         padding: 100px 20px;
       }
-
       .image-wrapper img {
         max-width: 100%;
       }
     }
   </style>
 </head>
-
 <body>
   <header>
     <div class="logo-container">
@@ -291,8 +291,13 @@
 
   <section class="affiliate-section">
     <h2>Join Our Affiliate Program</h2>
-    <p>Help us grow the BeyondDEX community and earn recurring income.
-    As an affiliate, you'll receive 30% of the revenue for every user you refer — each month they stay subscribed. Getting started is easy: sign up, get your unique code, and start earning.</p>
+    <p class="desktop-affiliate">
+      Help us grow the BeyondDEX community and earn recurring income.
+      As an affiliate, you'll receive 30% of the revenue for every user you refer — each month they stay subscribed. Getting started is easy: sign up, get your unique code, and start earning.
+    </p>
+    <p class="mobile-affiliate">
+      Earn recurring income by referring users. Get 30% every month they stay subscribed.
+    </p>
     <a href="/affiliate">Learn more about the affiliate program →</a>
   </section>
 
