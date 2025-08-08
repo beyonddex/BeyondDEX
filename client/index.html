@@ -123,10 +123,13 @@
     }
 
     @keyframes floatBG {
-      0%, 100% { transform: translate(0px, 0px); }
-      50% { transform: translate(-50px, 50px); }
-    }
-
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(50px);
+  }
+}
     .text-column, .image-column {
       position: relative;
       z-index: 1;
