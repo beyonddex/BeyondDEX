@@ -210,14 +210,33 @@ document.getElementById('joinWaitlistBtn').addEventListener('click', () => {
     const db = firebase.firestore();
 
      auth.onAuthStateChanged(async user => {
-    if (user) {
-      const doc = await db.collection("users").doc(user.uid).get();
-      const username = doc.exists ? doc.data().username : "U";
-      const initial = username.charAt(0).toUpperCase();
-      const userCircle = document.getElementById("userCircle");
-      if (userCircle) userCircle.textContent = initial;
-    }
-  });
+  const userCircle = document.getElementById("userCircle");
+  const dropdownMenu = document.getElementById("dropdownMenu");
+
+  if (user) {
+    const doc = await db.collection("users").doc(user.uid).get();
+    const username = doc.exists ? doc.data().username : "U";
+    const initial = username.charAt(0).toUpperCase();
+    userCircle.textContent = initial;
+    dropdownMenu.innerHTML = `<a href="#" id="logout">Log Out</a>`;
+    
+    document.getElementById("logout").addEventListener("click", () => {
+      auth.signOut().then(() => {
+        location.reload();
+      });
+    });
+
+  } else {
+    userCircle.textContent = "+";
+    dropdownMenu.innerHTML = `<a href="#" id="login">Log In</a>`;
+    
+    document.getElementById("login").addEventListener("click", () => {
+      // Redirect to waitlist (or login page if you build one later)
+      window.location.href = "/waitlist.html";
+    });
+  }
+});
+
   const userCircle = document.getElementById("userCircle");
 const dropdownMenu = document.getElementById("dropdownMenu");
 
