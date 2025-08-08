@@ -170,9 +170,14 @@
       const snapshot = await db.collection('waitlist').where('email', '==', email).get();
 
       if (!snapshot.empty) {
-        alert("You're already on the waitlist! 🚀");
-        return;
-      }
+  // Show confirmation message if already signed up
+  document.querySelector('.waitlist-box').innerHTML = `
+    <h2 style="margin-bottom: 20px;">✅ You're already on the waitlist!</h2>
+    <p style="margin-bottom: 30px;">We’ve got you in — no need to sign up again.</p>
+    <button onclick="window.location.href='/index.html'" style="margin-bottom: 10px;">Go to Homepage</button>
+  `;
+  return;
+}
 
       await db.collection('waitlist').add({
         email,
