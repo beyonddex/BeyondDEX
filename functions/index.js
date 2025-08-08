@@ -21,8 +21,10 @@ exports.sendConfirmationEmail = functions.firestore
         {
           sender: { name: "BeyondDEX", email: "team@beyonddex.com" },
           to: [{ email }],
-          subject: "You're on the BeyondDEX waitlist 🚀",
-          htmlContent: `<p>Thanks for joining the BeyondDEX waitlist!</p><p>We're building something exciting. Stay tuned.</p>`,
+          templateId: 1, // ⬅️ Replace with your actual Brevo template ID
+          params: {
+            // name: data.name || "Trader" — Optional dynamic variables
+          }
         },
         {
           headers: {
@@ -32,9 +34,9 @@ exports.sendConfirmationEmail = functions.firestore
         }
       );
 
-      console.log(`Confirmation sent to ${email}`);
+      console.log(`✅ Confirmation email sent to ${email}`);
     } catch (error) {
-      console.error("Error sending email:", error.message);
+      console.error("❌ Error sending email:", error.message);
     }
 
     return null;
