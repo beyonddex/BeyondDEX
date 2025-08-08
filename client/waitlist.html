@@ -1,124 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Join Waitlist | BeyondDEX</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  body {
-    font-family: 'Inter', sans-serif;
-    background: #fff;
-    color: #111;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    padding: 20px;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join Waitlist | BeyondDEX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
 
-  h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    opacity: 0;
-    animation: fadeIn 1.2s ease forwards;
-  }
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeIn 1.2s ease forwards;
+    }
 
-  p {
-    font-size: 1.2rem;
-    color: #555;
-    max-width: 500px;
-    margin-bottom: 28px;
-    text-align: center;
-    line-height: 1.5;
-    opacity: 0;
-    animation: fadeIn 1.5s ease forwards;
-    animation-delay: 0.3s;
-  }
+    p {
+      font-size: 1.2rem;
+      color: #555;
+      max-width: 500px;
+      margin-bottom: 28px;
+      text-align: center;
+      line-height: 1.5;
+      opacity: 0;
+      animation: fadeIn 1.5s ease forwards;
+      animation-delay: 0.3s;
+    }
 
-  .waitlist-box {
-    background: #f9f9f9;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 40px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    opacity: 0;
-    animation: fadeIn 1.8s ease forwards;
-    animation-delay: 0.6s;
-  }
+    .waitlist-box {
+      background: #f9f9f9;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      opacity: 0;
+      animation: fadeIn 1.8s ease forwards;
+      animation-delay: 0.6s;
+    }
 
-  .countdown {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 20px;
-  }
+    .countdown {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
 
-  input[type="email"] {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    font-size: 1rem;
-    outline: none;
-    transition: border 0.2s;
-  }
+    input[type="email"] {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
 
-  input[type="email"]:focus {
-    border-color: #111;
-  }
+    input[type="email"]:focus {
+      border-color: #111;
+    }
 
-  button {
-    width: 100%;
-    padding: 14px;
-    background: #111;
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #111;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
 
-  button:hover {
-    background: #333;
-  }
+    button:hover {
+      background: #333;
+    }
 
-  .benefits {
-    text-align: left;
-    margin-top: 24px;
-    font-size: 0.95rem;
-    color: #444;
-  }
+    .benefits {
+      text-align: left;
+      margin-top: 24px;
+      font-size: 0.95rem;
+      color: #444;
+    }
 
-  .benefits li {
-    margin-bottom: 10px;
-    list-style: none;
-    position: relative;
-    padding-left: 16px;
-  }
+    .benefits li {
+      margin-bottom: 10px;
+      list-style: none;
+      position: relative;
+      padding-left: 16px;
+    }
 
-  .benefits li::before {
-    content: "•";
-    position: absolute;
-    left: 0;
-    color: #111;
-    font-weight: bold;
-  }
+    .benefits li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #111;
+      font-weight: bold;
+    }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px);}
-    to { opacity: 1; transform: translateY(0);}
-  }
-</style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+  </style>
 </head>
 <body>
 
@@ -141,48 +141,55 @@
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
+    authDomain: "beyonddex-be653.firebaseapp.com",
+    projectId: "beyonddex-be653",
+    storageBucket: "beyonddex-be653.firebasestorage.app",
+    messagingSenderId: "687411546401",
+    appId: "1:687411546401:web:ec71401e52751d3e121660",
+    measurementId: "G-6SH111LB7J"
   };
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
   document.getElementById('joinWaitlist').addEventListener('click', async () => {
-  const email = document.getElementById('email').value.trim().toLowerCase();
-  if (!email) return alert('Please enter your email.');
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  try {
-    // Check for existing email
-    const snapshot = await db.collection('waitlist').where('email', '==', email).get();
-    if (!snapshot.empty) {
-      alert("You're already on the waitlist! 🚀");
+    if (!email) {
+      alert('Please enter your email.');
       return;
     }
 
-    // Add new entry if not found
-    await db.collection('waitlist').add({
-      email,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
 
-    // Show confirmation
-    document.querySelector('.waitlist-box').innerHTML = `
-      <h2 style="margin-bottom: 20px;">🎉 You're on the waitlist!</h2>
-      <p style="margin-bottom: 30px;">We’ll keep you updated as we roll out early access.</p>
-      <button onclick="window.location.href='/index.html'" style="margin-bottom: 10px;">Go to Homepage</button>
-    `;
-  } catch (err) {
-    console.error(err);
-    alert('Something went wrong. Please try again.');
-  }
-});
+    try {
+      const snapshot = await db.collection('waitlist').where('email', '==', email).get();
 
-  // Countdown
+      if (!snapshot.empty) {
+        alert("You're already on the waitlist! 🚀");
+        return;
+      }
+
+      await db.collection('waitlist').add({
+        email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.querySelector('.waitlist-box').innerHTML = `
+        <h2 style="margin-bottom: 20px;">🎉 You're on the waitlist!</h2>
+        <p style="margin-bottom: 30px;">We’ll keep you updated as we roll out early access.</p>
+        <button onclick="window.location.href='/index.html'" style="margin-bottom: 10px;">Go to Homepage</button>
+      `;
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong. Please try again.');
+    }
+  });
+
   const countdownEl = document.getElementById('countdown');
   const launchDate = new Date("2025-09-01T00:00:00").getTime();
 
@@ -193,9 +200,9 @@
       countdownEl.textContent = "We're Live!";
       return;
     }
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     countdownEl.textContent = `Launch in: ${days}d ${hours}h ${minutes}m`;
   }
 
