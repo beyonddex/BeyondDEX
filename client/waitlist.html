@@ -140,33 +140,47 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+      authDomain: "beyonddex-be653.firebaseapp.com",
+      projectId: "beyonddex-be653",
+      storageBucket: "beyonddex-be653.firebasestorage.app",
+      messagingSenderId: "687411546401",
+      appId: "1:687411546401:web:ec71401e52751d3e121660",
+      measurementId: "G-6SH111LB7J"
   };
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
   document.getElementById('joinWaitlist').addEventListener('click', async () => {
-    const email = document.getElementById('email').value.trim();
-    if (!email) return alert('Please enter your email.');
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  if (!email) return alert('Please enter your email.');
 
-    try {
-      await db.collection('waitlist').add({
-        email,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      alert('You’re on the waitlist! We’ll keep you updated.');
-      document.getElementById('email').value = '';
-    } catch (err) {
-      console.error(err);
-      alert('Failed to join waitlist. Try again.');
+  try {
+    // Check for existing email
+    const snapshot = await db.collection('waitlist').where('email', '==', email).get();
+    if (!snapshot.empty) {
+      alert("You're already on the waitlist! 🚀");
+      return;
     }
-  });
+
+    // Add new entry if not found
+    await db.collection('waitlist').add({
+      email,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Show confirmation
+    document.querySelector('.waitlist-box').innerHTML = `
+      <h2 style="margin-bottom: 20px;">🎉 You're on the waitlist!</h2>
+      <p style="margin-bottom: 30px;">We’ll keep you updated as we roll out early access.</p>
+      <button onclick="window.location.href='/index.html'" style="margin-bottom: 10px;">Go to Homepage</button>
+    `;
+  } catch (err) {
+    console.error(err);
+    alert('Something went wrong. Please try again.');
+  }
+});
 
   // Countdown
   const countdownEl = document.getElementById('countdown');
