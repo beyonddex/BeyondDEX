@@ -21,6 +21,69 @@
       color: #111;
       overflow-x: hidden;
     }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+      flex-wrap: wrap;
+    }
+
+    .logo-container img {
+      height: 40px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: nowrap;
+    }
+
+    .nav-links a {
+      color: #111;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .user-container {
+      position: relative;
+    }
+
+    .user-circle {
+      background: #111;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .dropdown {
+      position: absolute;
+      right: 0;
+      top: 40px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      display: none;
+      flex-direction: column;
+      min-width: 120px;
+      z-index: 10;
+    }
+
+    .dropdown a {
+      padding: 10px 16px;
+      color: #111;
+      text-decoration: none;
+    }
+
     .cta {
       background-color: #111;
       color: #fff;
@@ -31,18 +94,20 @@
       cursor: pointer;
       transition: background 0.2s ease;
     }
+
     .cta:hover {
       background-color: #333;
     }
+
     .main-section {
-      position: relative;
       display: flex;
       flex-wrap: wrap;
-      padding: 180px 60px 200px;
+      padding: 140px 30px 180px;
       align-items: center;
       background: #f5f5f5;
-      overflow: hidden;
+      position: relative;
     }
+
     .main-section::before {
       content: "";
       position: absolute;
@@ -55,68 +120,76 @@
       animation: floatBG 10s ease-in-out infinite;
       z-index: 0;
     }
+
     @keyframes floatBG {
-      0%, 100% {
-        transform: translate(0px, 0px);
-      }
-      50% {
-        transform: translate(-50px, 50px);
-      }
+      0%, 100% { transform: translate(0px, 0px); }
+      50% { transform: translate(-50px, 50px); }
     }
+
     .text-column, .image-column {
       position: relative;
       z-index: 1;
     }
+
     .text-column {
       flex: 1 1 500px;
       padding-right: 40px;
     }
+
+    .text-wrapper {
+      max-width: 800px;
+    }
+
     .text-column h1 {
       font-size: 2.75rem;
       margin-bottom: 20px;
-      color: #111;
     }
-    .text-column p {
+
+    .desktop-text {
       font-size: 1.1rem;
       line-height: 1.6;
       margin-bottom: 30px;
       color: #333;
+      display: block;
     }
-    .image-column {
+
+    .mobile-text {
+      display: none;
+    }
+
+    .image-wrapper {
       flex: 1 1 500px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
-    .image-placeholder {
+
+    .image-wrapper img {
       width: 100%;
       max-width: 520px;
-      height: 320px;
-      background: #dcdcdc;
       border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1rem;
-      color: #666;
       box-shadow: 0 0 12px rgba(0,0,0,0.06);
     }
+
     .affiliate-section {
-      padding: 60px 60px 80px;
+      padding: 60px 30px 80px;
       background: #ffffff;
       text-align: center;
       border-top: 1px solid #eee;
     }
+
     .affiliate-section h2 {
       font-size: 2rem;
       margin-bottom: 20px;
     }
+
     .affiliate-section p {
       font-size: 1.1rem;
       max-width: 800px;
       margin: 0 auto 30px;
       color: #333;
     }
+
     .affiliate-section a {
       display: inline-block;
       margin-top: 10px;
@@ -124,6 +197,7 @@
       color: #111;
       text-decoration: underline;
     }
+
     footer {
       padding: 40px 0;
       text-align: center;
@@ -132,64 +206,49 @@
       border-top: 1px solid #ddd;
       background: #fff;
     }
-    .image-wrapper img {
-  width: 100%;
-  max-width: 520px;
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.06);
-}
-.text-wrapper {
-  background: transparent;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 0 0 transparent;
-  max-width: 800px;
-}
-@media (max-width: 768px) {
-  .main-section {
-    flex-direction: column;
-    padding: 100px 20px 80px;
-    text-align: center;
-  }
 
-  .text-column {
-    padding-right: 0;
-    margin-bottom: 40px;
-  }
+    @media (max-width: 768px) {
+      .desktop-text {
+        display: none;
+      }
+      .mobile-text {
+        display: block;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #333;
+        margin-bottom: 30px;
+      }
 
-  .image-wrapper img {
-    width: 100%;
-    height: auto;
-  }
+      header {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+      }
 
-  .nav-links {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-  }
+      .nav-links {
+        flex-direction: row;
+        justify-content: center;
+        width: auto;
+        gap: 12px;
+      }
 
-  .user-container {
-    margin-top: 10px;
-  }
+      .text-column {
+        padding-right: 0;
+        margin-bottom: 40px;
+      }
 
-  .affiliate-section {
-    padding: 40px 20px;
-  }
+      .main-section {
+        padding: 100px 20px;
+      }
 
-  .affiliate-section p {
-    font-size: 1rem;
-    padding: 0 10px;
-  }
-
-  footer {
-    padding: 30px 10px;
-    font-size: 0.85rem;
-  }
-}
-
+      .image-wrapper img {
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
+
 <body>
   <header>
     <div class="logo-container">
@@ -209,15 +268,20 @@
 
   <section class="main-section">
     <div class="text-column">
-  <div class="text-wrapper">
-    <h1>Your Daily Crypto Edge</h1>
-    <p>Get early access to BeyondDEX — your institutional-grade trading edge. We deliver the most critical on-chain, macro, and market signals in one clean, 60-second daily report.<br><br>
-Built like a hedge fund desk note, designed for traders who demand clarity. Join the waitlist today and be first in line when we launch.</p>
-    <button class="cta" id="joinWaitlistBtn">Join Waitlist</button>
-  </div>
-</div>
+      <div class="text-wrapper">
+        <h1>Your Daily Crypto Edge</h1>
+        <p class="desktop-text">
+          Get early access to BeyondDEX — your institutional-grade trading edge. We deliver the most critical on-chain, macro, and market signals in one clean, 60-second daily report.<br><br>
+          Built like a hedge fund desk note, designed for traders who demand clarity. Join the waitlist today and be first in line when we launch.
+        </p>
+        <p class="mobile-text">
+          Get early access to institutional-grade trading insights — all in 60 seconds. Join the waitlist now.
+        </p>
+        <button class="cta" id="joinWaitlistBtn">Join Waitlist</button>
+      </div>
+    </div>
     <div class="image-wrapper">
-       <img src="assets/dashboard-fix.png" alt="BeyondDEX Dashboard Screenshot">
+      <img src="assets/dashboard-fix.png" alt="BeyondDEX Dashboard Screenshot">
     </div>
   </section>
 
@@ -233,9 +297,9 @@ Built like a hedge fund desk note, designed for traders who demand clarity. Join
   </footer>
 
   <script>
-document.getElementById('joinWaitlistBtn').addEventListener('click', () => {
-  window.location.href = '/waitlist.html';
-});
+    document.getElementById('joinWaitlistBtn').addEventListener('click', () => {
+      window.location.href = '/waitlist.html';
+    });
 
     const firebaseConfig = {
       apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
@@ -251,52 +315,40 @@ document.getElementById('joinWaitlistBtn').addEventListener('click', () => {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-     auth.onAuthStateChanged(async user => {
-  const userCircle = document.getElementById("userCircle");
-  const dropdownMenu = document.getElementById("dropdownMenu");
+    auth.onAuthStateChanged(async user => {
+      const userCircle = document.getElementById("userCircle");
+      const dropdownMenu = document.getElementById("dropdownMenu");
 
-  if (user) {
-    const doc = await db.collection("users").doc(user.uid).get();
-    const username = doc.exists ? doc.data().username : "U";
-    const initial = username.charAt(0).toUpperCase();
-    userCircle.textContent = initial;
-    dropdownMenu.innerHTML = `<a href="#" id="logout">Log Out</a>`;
-    
-    document.getElementById("logout").addEventListener("click", () => {
-      auth.signOut().then(() => {
-        location.reload();
-      });
+      if (user) {
+        const doc = await db.collection("users").doc(user.uid).get();
+        const username = doc.exists ? doc.data().username : "U";
+        const initial = username.charAt(0).toUpperCase();
+        userCircle.textContent = initial;
+        dropdownMenu.innerHTML = `<a href="#" id="logout">Log Out</a>`;
+        document.getElementById("logout").addEventListener("click", () => {
+          auth.signOut().then(() => location.reload());
+        });
+      } else {
+        userCircle.textContent = "+";
+        dropdownMenu.innerHTML = `<a href="#" id="login">Log In</a>`;
+        document.getElementById("login").addEventListener("click", () => {
+          window.location.href = "/auth.html";
+        });
+      }
     });
 
-  } else {
-    userCircle.textContent = "+";
-    dropdownMenu.innerHTML = `<a href="#" id="login">Log In</a>`;
-    
-    document.getElementById("login").addEventListener("click", () => {
-      // Redirect to waitlist (or login page if you build one later)
-      window.location.href = "/auth.html";
+    const userCircle = document.getElementById("userCircle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+
+    userCircle.addEventListener("click", () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     });
-  }
-});
 
-  const userCircle = document.getElementById("userCircle");
-const dropdownMenu = document.getElementById("dropdownMenu");
-
-userCircle.addEventListener("click", () => {
-  dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
-});
-
-window.addEventListener("click", e => {
-  if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-    dropdownMenu.style.display = "none";
-  }
-});
-
-document.getElementById("logout").addEventListener("click", () => {
-  auth.signOut().then(() => {
-    location.reload();
-  });
-});
+    window.addEventListener("click", e => {
+      if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
   </script>
 </body>
 </html>
