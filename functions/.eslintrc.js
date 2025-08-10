@@ -1,28 +1,27 @@
 module.exports = {
+  root: true,
   env: {
-    es6: true,
-    node: true,
+    es2021: true,
+    node: true
   },
   parserOptions: {
-    "ecmaVersion": 2018,
+    ecmaVersion: 2022,
+    sourceType: 'script'
   },
   extends: [
-    "eslint:recommended",
-    "google",
+    'eslint:recommended',
+    'google'
   ],
   rules: {
-    "no-restricted-globals": ["error", "name", "length"],
-    "prefer-arrow-callback": "error",
-    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
+    'max-len': ['error', { 'code': 120, 'ignoreStrings': true, 'ignoreTemplateLiterals': true }],
+    'object-curly-spacing': 'off',
+    'quote-props': 'off',
+    'comma-dangle': 'off'
   },
   overrides: [
     {
-      files: ["**/*.spec.*"],
-      env: {
-        mocha: true,
-      },
-      rules: {},
-    },
-  ],
-  globals: {},
+      files: ['**/*.spec.*'],
+      env: { mocha: true }
+    }
+  ]
 };
