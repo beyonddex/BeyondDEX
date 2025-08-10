@@ -1,17 +1,20 @@
-const {onDocumentCreated} = require('firebase-functions/v2/firestore');
-const {logger} = require('firebase-functions');
-const {defineSecret} = require('firebase-functions/params');
+// functions/index.js
+const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { logger } = require('firebase-functions');
 const axios = require('axios');
 
-const BREVO_API_KEY = defineSecret('BREVO_API_KEY');
-
 exports.sendConfirmationEmailV2 = onDocumentCreated(
-  { document: 'waitlist/{docId}', secrets: [BREVO_API_KEY], region: 'us-central1' },
+  { document: 'waitlist/{docId}', region: 'us-central1' },
   async (event) => {
     const data = event.data && event.data.data();
-
     if (!data || !data.email) {
       logger.warn('No email found in new document.', { dataPresent: !!data });
+      return;
+    }
+
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) {
+      logger.error('BREVO_API_KEY is missing from process.env');
       return;
     }
 
@@ -30,13 +33,12 @@ exports.sendConfirmationEmailV2 = onDocumentCreated(
         },
         {
           headers: {
-            'api-key': BREVO_API_KEY.value(),
+            'api-key': apiKey,
             'Content-Type': 'application/json'
           },
           timeout: 10000
         }
       );
-
       logger.info('Email sent', { to: email, status: resp.status });
     } catch (error) {
       const status = error && error.response ? error.response.status : undefined;
