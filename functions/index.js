@@ -1,24 +1,28 @@
-// functions/index.js
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
-const { logger } = require('firebase-functions');
+const {onDocumentCreated} = require('firebase-functions/v2/firestore');
+const {logger} = require('firebase-functions');
 const axios = require('axios');
 
-exports.sendConfirmationEmailV2 = onDocumentCreated(
+exports.sendWaitlistEmailOnCreate = onDocumentCreated(
   { document: 'waitlist/{docId}', region: 'us-central1' },
   async (event) => {
     const data = event.data && event.data.data();
+    logger.info('Trigger fired', { hasData: !!data, keys: data ? Object.keys(data) : [] });
+
     if (!data || !data.email) {
-      logger.warn('No email found in new document.', { dataPresent: !!data });
+      logger.warn('No email field on new waitlist doc');
       return;
     }
 
     const apiKey = process.env.BREVO_API_KEY;
+    logger.info('Env check', { hasApiKey: !!apiKey });
+
     if (!apiKey) {
-      logger.error('BREVO_API_KEY is missing from process.env');
+      logger.error('Missing BREVO_API_KEY in process.env');
       return;
     }
 
     const email = String(data.email).trim();
+    logger.info('Sending email via Brevo', { to: email });
 
     try {
       const resp = await axios.post(
@@ -32,22 +36,16 @@ exports.sendConfirmationEmailV2 = onDocumentCreated(
             '<p>We\'re building something exciting. Stay tuned.</p>'
         },
         {
-          headers: {
-            'api-key': apiKey,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
           timeout: 10000
         }
       );
-      logger.info('Email sent', { to: email, status: resp.status });
+      logger.info('Brevo response', { status: resp.status });
     } catch (error) {
       const status = error && error.response ? error.response.status : undefined;
       const dataOut = error && error.response ? error.response.data : undefined;
-      logger.error('Failed to send confirmation email', {
-        to: email,
-        message: error && error.message ? error.message : String(error),
-        status,
-        data: dataOut
+      logger.error('Brevo error', {
+        status, data: dataOut, message: error && error.message ? error.message : String(error)
       });
     }
   }
