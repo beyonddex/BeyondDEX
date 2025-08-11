@@ -116,7 +116,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Affiliate Program
       </span>
-      <h1>Institutional polish. Creator-friendly payouts.</h1>
+      <h1>No BS. Just Creator-friendly payouts.</h1>
       <p>Earn recurring revenue by sharing BeyondDEX. Apply in minutes — we’ll review your application within <strong>24 hours</strong>.</p>
     </section>
 
@@ -124,9 +124,9 @@
       <section class="card">
         <h2>Program perks</h2>
         <ul style="margin-top: 8px; color: #2b2f36; line-height: 1.65; font-size: .98rem;">
-          <li>• 30% recurring revenue share while referrals remain subscribed</li>
-          <li>• Custom tracking links & partner dashboard (post‑approval)</li>
-          <li>• Prompt payouts and dedicated partner support</li>
+          <li>30% recurring revenue share while referrals remain subscribed</li>
+          <li>Custom tracking links & partner dashboard (post‑approval)</li>
+          <li>Prompt payouts and dedicated partner support</li>
         </ul>
         <div class="muted-box">
           By applying, you agree to our <a href="#" style="text-decoration: underline; color:#111;">Affiliate Terms</a> and <a href="#" style="text-decoration: underline; color:#111;">Privacy Policy</a>.
@@ -171,7 +171,7 @@
         </form>
       </section>
 
-      <section id="successCard" class="card success" style="grid-column: 1 / -1;">
+      <section id="successCard" class="card" style="grid-column: 1 / -1;" hidden aria-hidden="true">
         <div class="badge" style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
@@ -287,8 +287,8 @@
         await db.collection('affiliate_applications').add(data);
 
         // Success UI
-        formCard.style.display = 'none';
-        successCard.style.display = 'block';
+        formCard.hidden = true;
+        successCard.hidden = false; successCard.removeAttribute('aria-hidden');
       } catch (err) {
         console.error(err);
         showError('Something went wrong. Please try again.');
