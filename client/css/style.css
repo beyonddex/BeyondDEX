@@ -210,3 +210,16 @@ footer {
   background: #cbd5e1;
   border-radius: 4px;
 }
+/* Reserve space for the fixed header (global) */
+:root { --header-h: 88px; }                 /* desktop header height */
+@media (max-width: 768px) { :root { --header-h: 72px; } }  /* mobile header height */
+
+body { padding-top: var(--header-h); }
+
+/* Tighter header nav spacing (global) */
+header .nav-links { gap: 12px !important; }
+header .nav-links a { margin-left: 0 !important; padding: 6px 8px; } /* keeps a comfy click area */
+
+@media (max-width: 768px) {
+  header .nav-links { gap: 10px !important; }
+}
