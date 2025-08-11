@@ -100,6 +100,10 @@
     }
 
     .main-section {
+       /* Taller section so the next block sits below the fold */
+      min-height: clamp(640px, 85vh, 1000px);
+      padding: clamp(120px, 12vh, 180px) 30px clamp(160px, 14vh, 240px);
+
       display: flex;
       flex-wrap: wrap;
       padding: 140px 30px 180px;
@@ -112,12 +116,14 @@
     .main-section::before {
       content: "";
       position: absolute;
-      top: -100px;
-      left: -100px;
-      width: 120vw;
-      height: 120vh;
-      background: radial-gradient(circle at 30% 30%, rgba(0, 123, 255, 0.1), transparent 60%),
-                  radial-gradient(circle at 70% 70%, rgba(255, 0, 150, 0.1), transparent 60%);
+       top: -25vh;
+      left: -20vw;
+      width: 220vw;
+      height: 180vh;
+
+      background:
+        radial-gradient(circle at 25% 30%, rgba(0, 123, 255, 0.12), transparent 65%),
+        radial-gradient(circle at 65% 70%, rgba(255, 0, 150, 0.12), transparent 65%);
       z-index: 0;
     }
 
