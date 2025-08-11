@@ -10,55 +10,89 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Page-specific light styles that complement css/style.css -->
+  <!-- Page-specific styles: refined, Apple/hedge‑fund vibe -->
   <style>
     :root {
-      --bdx-border: #e5e7eb;
-      --bdx-muted: #334155;
+      --bdx-border: #e5e7eb;   /* gray-200 */
+      --bdx-text:   #0f172a;   /* slate-900 */
+      --bdx-sub:    #475569;   /* slate-600 */
+      --bdx-muted:  #64748b;   /* slate-500 */
+      --bdx-bg:     #f6f7f9;   /* light canvas */
+      --bdx-card:   #ffffff;   /* panels */
+      --bdx-black:  #111111;   /* primary */
     }
-    /* keep space for fixed header from style.css */
-    main { padding: 120px 20px 60px; max-width: 1100px; margin: 0 auto; }
 
-    .affiliate-hero { display: grid; gap: 20px; margin-bottom: 24px; }
-    .affiliate-hero h1 { font-size: 2.2rem; line-height: 1.2; }
-    .affiliate-hero p { color: #333; font-size: 1.05rem; }
+    /* Canvas with subtle premium feel */
+    body { background: var(--bdx-bg); }
+    .page-shell { padding: 128px 24px 64px; max-width: 1100px; margin: 0 auto; position: relative; }
+    .page-shell:before, .page-shell:after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+    .page-shell:before { background:
+        radial-gradient(60rem 30rem at 20% -5%, rgba(0,0,0,0.05), transparent 60%),
+        radial-gradient(50rem 25rem at 110% 10%, rgba(0,0,0,0.04), transparent 60%);
+      z-index: -2; }
+    .page-shell:after { background:
+        linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0) 40%);
+      z-index: -1; opacity: .7; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    /* Hero */
+    .affiliate-hero { display: grid; gap: 16px; margin-bottom: 28px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--bdx-border); border-radius:999px; background:#fff; color:var(--bdx-sub); font-size:12px; font-weight:600; letter-spacing:.02em; }
+    .affiliate-hero h1 { font-size: 2.6rem; line-height: 1.15; letter-spacing: -0.02em; color: var(--bdx-text); }
+    .affiliate-hero p { color: var(--bdx-sub); font-size: 1.075rem; max-width: 70ch; }
 
-    .card { border: 1px solid var(--bdx-border); }
-    .card h2 { font-size: 1.4rem; margin-bottom: 8px; }
+    /* Layout */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items:start; }
 
+    /* Cards: crisp, elevated */
+    .card {
+      background: var(--bdx-card);
+      border: 1px solid rgba(17,17,17,0.05);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow:
+        0 1px 0 rgba(0,0,0,0.04),
+        0 8px 30px rgba(0,0,0,0.04);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .card:hover { transform: translateY(-1px); box-shadow: 0 1px 0 rgba(0,0,0,0.05), 0 12px 44px rgba(0,0,0,0.06); }
+    .card h2 { font-size: 1.3rem; margin-bottom: 10px; letter-spacing:-0.01em; }
+    .muted-box { margin-top: 16px; padding: 12px; border:1px solid var(--bdx-border); border-radius:12px; background:#fff; color:var(--bdx-sub); font-size:.95rem; }
+
+    /* Form */
     form .field { display: flex; flex-direction: column; gap: 6px; }
-    form .field label { font-size: 0.9rem; color: #111; font-weight: 600; }
-    form .input, form select, form textarea { border: 1px solid #e0e0e0; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem; background: #fff; color: #111; }
-    form textarea { resize: vertical; min-height: 110px; }
-    form .checkbox { display: flex; gap: 10px; align-items: start; font-size: 0.9rem; color: #222; }
-    form .checkbox input { margin-top: 3px; }
-
-    .error { display: none; margin-top: 10px; border: 1px solid #fecaca; background: #fee2e2; color: #991b1b; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; }
-    .success { display: none; text-align: center; }
-    .success .badge { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 999px; background: #ecfdf5; border: 1px solid #a7f3d0; }
-
-    .subtle { color: #475569; font-size: 0.95rem; }
-
-    .btn-primary { background: #111; color: #fff; border: none; padding: 12px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; }
-    .btn-primary:hover { background: #333; }
-    .btn-ghost { border: 1px solid var(--bdx-border); padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #111; display: inline-flex; }
-
-    footer { margin-top: 40px; }
-
-    @media (max-width: 1024px) {
-      main { padding: 110px 16px 50px; }
-      .grid-2 { grid-template-columns: 1fr; }
+    form .field label { font-size: 0.88rem; color: #111; font-weight: 600; }
+    .input, select, textarea {
+      border: 1px solid #e3e5e8; border-radius: 12px; padding: 11px 12px; font-size: .96rem; background: #fff; color: #111;
+      outline: none; transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
     }
+    .input::placeholder, textarea::placeholder { color: #9aa3af; }
+    .input:focus, select:focus, textarea:focus { border-color: #d1d5db; box-shadow: 0 0 0 4px rgba(17,17,17,0.06); }
+    textarea { resize: vertical; min-height: 112px; }
+    .checkbox { display:flex; gap:10px; align-items:start; font-size:.92rem; color:#222; }
+    .checkbox input { margin-top: 3px; }
+
+    .error { display: none; margin-top: 10px; border: 1px solid #fecaca; background: #fee2e2; color: #991b1b; padding: 10px 12px; border-radius: 10px; font-size: .92rem; }
+
+    .btn-primary { width:100%; background: var(--bdx-black); color:#fff; border:none; padding: 13px 16px; border-radius: 12px; font-weight: 700; letter-spacing:.01em; cursor: pointer; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1), 0 6px 20px rgba(0,0,0,0.08); transition: transform .12s ease, background .15s ease, box-shadow .15s ease; }
+    .btn-primary:hover { background:#1a1a1a; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1), 0 10px 28px rgba(0,0,0,0.12); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-ghost { border: 1px solid var(--bdx-border); padding: 10px 14px; border-radius: 12px; text-decoration: none; color: #111; display: inline-flex; }
+
+    /* Footer (centered like index) */
+    footer { margin-top: 48px; text-align:center; }
+
+    /* Responsive */
+    @media (max-width: 1100px) { .page-shell { padding: 120px 20px 56px; } }
+    @media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
     @media (max-width: 640px) {
-      .affiliate-hero h1 { font-size: 1.9rem; }
+      .affiliate-hero h1 { font-size: 2.05rem; }
       .affiliate-hero p { font-size: 1rem; }
+      .card { padding: 18px; border-radius: 16px; }
     }
   </style>
 </head>
 <body>
-  <!-- Header cloned from your existing index.html for a perfect match -->
+  <!-- Header (unchanged to mirror index.html) -->
   <header>
     <div class="logo-container">
       <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
@@ -66,6 +100,7 @@
     <div class="nav-links">
       <a href="/index.html">Home</a>
       <a href="/dashboard.html">Dashboard</a>
+      <a href="/affiliateSignUp.html">Affiliate</a>
     </div>
     <div class="user-container">
       <div class="user-circle" id="userCircle">?</div>
@@ -75,28 +110,32 @@
     </div>
   </header>
 
-  <main>
+  <main class="page-shell">
     <section class="affiliate-hero">
-      <h1>BeyondDEX Affiliate Program</h1>
-      <p class="subtle">Earn recurring revenue by sharing BeyondDEX. Apply in minutes — we’ll review your application within <strong>24 hours</strong>.</p>
+      <span class="eyebrow" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Affiliate Program
+      </span>
+      <h1>Institutional polish. Creator-friendly payouts.</h1>
+      <p>Earn recurring revenue by sharing BeyondDEX. Apply in minutes — we’ll review your application within <strong>24 hours</strong>.</p>
     </section>
 
     <div class="grid-2">
       <section class="card">
         <h2>Program perks</h2>
-        <ul style="margin-top: 8px; color: #333; line-height: 1.6;">
+        <ul style="margin-top: 8px; color: #2b2f36; line-height: 1.65; font-size: .98rem;">
           <li>• 30% recurring revenue share while referrals remain subscribed</li>
-          <li>• Custom tracking links & dashboard (on approval)</li>
-          <li>• Prompt payouts and partner support</li>
+          <li>• Custom tracking links & partner dashboard (post‑approval)</li>
+          <li>• Prompt payouts and dedicated partner support</li>
         </ul>
-        <div style="margin-top: 16px; padding: 12px; border: 1px solid var(--bdx-border); border-radius: 12px; background: #fff; color:#475569; font-size: 0.95rem;">
+        <div class="muted-box">
           By applying, you agree to our <a href="#" style="text-decoration: underline; color:#111;">Affiliate Terms</a> and <a href="#" style="text-decoration: underline; color:#111;">Privacy Policy</a>.
         </div>
       </section>
 
       <section id="formCard" class="card">
         <h2>Apply now</h2>
-        <form id="affiliateForm" style="margin-top: 8px;">
+        <form id="affiliateForm" style="margin-top: 10px;">
           <div class="grid-2" style="gap: 16px;">
             <div class="field"><label for="fullName">Full name</label><input class="input" id="fullName" name="fullName" required autocomplete="name"></div>
             <div class="field"><label for="email">Email</label><input class="input" id="email" name="email" type="email" required autocomplete="email"></div>
@@ -127,13 +166,13 @@
             <label class="checkbox" style="grid-column: 1 / -1;"><input type="checkbox" id="agree" name="agree"> <span>I agree to the Affiliate Terms and confirm the information provided is accurate.</span></label>
           </div>
           <div id="formError" class="error"></div>
-          <button type="submit" id="submitBtn" class="btn-primary" style="margin-top: 14px; width: 100%;">Apply to Program</button>
+          <button type="submit" id="submitBtn" class="btn-primary" style="margin-top: 14px;">Apply to Program</button>
           <p class="subtle" style="text-align:center; margin-top: 8px;">We’ll get back to you within <strong>24 hours</strong>.</p>
         </form>
       </section>
 
       <section id="successCard" class="card success" style="grid-column: 1 / -1;">
-        <div class="badge">
+        <div class="badge" style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <h2 style="margin-top: 12px; font-size: 1.6rem;">Thanks! Your application is in.</h2>
