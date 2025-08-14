@@ -160,3 +160,11 @@ img { max-width: 100%; display: block; }
 /* When in light mode, swap them */
 :root[data-theme="light"] .logo--light { display: block; }
 :root[data-theme="light"] .logo--dark { display: none; }
+
+/* ==== Mobile nav visibility fix (overrides) ==== */
+.nav__mobile { display: none; }
+.nav__mobile[hidden] { display: none !important; }
+
+@media (max-width: 860px) {
+  .nav__mobile:not([hidden]) { display: flex; }
+}
