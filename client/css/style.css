@@ -167,4 +167,21 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 860px) {
   .nav__mobile:not([hidden]) { display: flex; }
+
+  .nav__inner {
+    grid-template-columns: auto 1fr auto; /* brand | filler | actions */
+    gap: 0.5rem;
+  }
+
+  /* Prevent theme toggle from crowding text */
+  #themeToggle {
+    margin-left: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  /* Compact Join Waitlist button */
+  .nav__actions .btn--primary {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+  }
 }
