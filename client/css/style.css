@@ -147,3 +147,8 @@ img { max-width: 100%; display: block; }
   .nav__hamburger { display: inline-block; }
   .nav__mobile { display: flex; }
 }
+.brand__logo {
+  height: 32px; /* adjust as needed */
+  width: auto;
+  display: block;
+}
