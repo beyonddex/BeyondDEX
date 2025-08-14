@@ -257,6 +257,16 @@ header.nav,
 
 /* Mobile polish */
 @media (max-width: 860px) {
-   .nav__actions .btn--primary { display: none !important; } /* hide top-nav CTA */
+  /* already added: */
+  .nav__actions .btn--primary { display: none !important; } /* hide top-nav CTA */
   .profile-menu { position: fixed; right: 1rem; top: 64px; }
+
+  /* NEW: hide header Login/Register on mobile (they remain in the mobile menu) */
+  .auth-links { display: none !important; }
+
+  /* Keep brand and actions from colliding */
+  .nav__inner { grid-template-columns: auto 1fr auto; gap: 0.5rem; }
+  .brand { min-width: 0; }
+  .brand__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #themeToggle { margin-left: 0.25rem; flex-shrink: 0; }
 }
