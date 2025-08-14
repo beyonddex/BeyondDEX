@@ -185,3 +185,40 @@ img { max-width: 100%; display: block; }
     font-size: 0.85rem;
   }
 }
+
+/* ==== Kill accidental horizontal scroll on mobile ==== */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure mobile menu never extends width */
+.nav__mobile {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Contain wide hero effects so they don't create scrollbars */
+header.nav,
+.hero,
+.strip,
+.section,
+.footer {
+  overflow-x: clip;
+}
+@supports not (overflow: clip) {
+  header.nav,
+  .hero,
+  .strip,
+  .section,
+  .footer { overflow-x: hidden; }
+}
+
+/* Background glows shouldn't capture touches or affect layout width */
+.hero__bg, .mesh, .glow {
+  pointer-events: none;
+}
+
+/* Marquee safety: no nowrap overflow */
+.marquee { overflow: hidden; }
+.marquee span { white-space: nowrap; }
