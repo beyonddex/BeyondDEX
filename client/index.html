@@ -316,15 +316,33 @@ waitlistForm.addEventListener('submit', async (e) => {
 
     // ✅ No fetch() here — the Firestore trigger will send the email
 
-    // Success UI
-    waitlistForm.outerHTML = `
-      <div class="card" style="margin-top:.8rem;padding:1rem;border:1px solid var(--border);border-radius:14px;background:var(--card);box-shadow:var(--shadow)">
-        <strong>🎉 You're on the waitlist.</strong>
-        <div class="tiny" style="margin-top:.4rem;color:var(--muted);">
-          Check your inbox for a confirmation email.
-        </div>
-      </div>
-    `;
+    // Show success state inline + checkmark reset button
+waitlistForm.outerHTML = `
+  <div class="card success-card"
+       style="position:relative;margin-top:.8rem;padding:1rem 3.25rem 1rem 1rem;
+              border:1px solid var(--border);border-radius:14px;background:var(--card);
+              box-shadow:var(--shadow)">
+    <strong>🎉 You're on the waitlist.</strong>
+    <div class="tiny" style="margin-top:.4rem;color:var(--muted);">
+      Check your inbox for a confirmation email.
+    </div>
+
+    <button id="resetWaitlist"
+            aria-label="Close and reset"
+            title="Done"
+            style="position:absolute;right:.6rem;bottom:.6rem;width:36px;height:36px;
+                   border-radius:50%;border:1px solid var(--border);background:var(--bg-soft);
+                   color:var(--text);display:grid;place-items:center;font-weight:800;
+                   cursor:pointer;box-shadow:var(--shadow);transition:transform .12s ease;">
+      ✓
+    </button>
+  </div>
+`;
+
+// Wire the reset button to reload the page
+document.getElementById('resetWaitlist')?.addEventListener('click', () => {
+  window.location.reload();
+});
   } catch (err) {
     console.error("[Waitlist] error:", err);
     waitlistBtn.disabled = false;
