@@ -148,7 +148,15 @@ img { max-width: 100%; display: block; }
   .nav__mobile { display: flex; }
 }
 .brand__logo {
-  height: 32px; /* adjust as needed */
+  height: 42px; /* Larger for visibility */
   width: auto;
   display: block;
 }
+
+/* Default to dark mode look */
+.logo--light { display: none; }
+.logo--dark { display: block; }
+
+/* When in light mode, swap them */
+:root[data-theme="light"] .logo--light { display: block; }
+:root[data-theme="light"] .logo--dark { display: none; }
