@@ -302,7 +302,7 @@ waitlistForm.addEventListener('submit', async (e) => {
   waitlistBtn.textContent = "Adding...";
 
   try {
-    // Idempotent dedupe: store by hash(email) so repeat signups overwrite instead of duplicate
+    // Use hashed doc id so duplicates overwrite instead of duplicating
     const id  = await sha256(raw);
     const uid = auth?.currentUser?.uid || null;
 
@@ -314,14 +314,9 @@ waitlistForm.addEventListener('submit', async (e) => {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // Call your Cloud Function to send the Brevo confirmation email
-    await fetch(fnUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: raw })
-    });
+    // ✅ No fetch() here — the Firestore trigger will send the email
 
-    // Show success state inline
+    // Success UI
     waitlistForm.outerHTML = `
       <div class="card" style="margin-top:.8rem;padding:1rem;border:1px solid var(--border);border-radius:14px;background:var(--card);box-shadow:var(--shadow)">
         <strong>🎉 You're on the waitlist.</strong>
