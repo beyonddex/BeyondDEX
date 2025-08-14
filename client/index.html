@@ -55,7 +55,6 @@
   <div id="userMenu" class="profile-wrapper" hidden>
     <button id="profileBtn" class="profile-circle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">U</button>
     <div id="profileMenu" class="profile-menu" hidden>
-      <a href="/dashboard.html">Dashboard</a>
       <button id="logoutBtn" type="button">Log out</button>
     </div>
   </div>
@@ -72,8 +71,10 @@
       <a href="#dashboard">Dashboard</a>
       <a href="#affiliate">Affiliate</a>
       <a class="btn btn--primary" href="affiliateSignUp.html">Join Waitlist</a>
-      <a href="/auth.html">Login</a>
-      <a href="/auth.html#register">Register</a>
+      <div id="mobileAuthLinks">
+        <a href="/auth.html">Login</a>
+        <a href="/auth.html#register">Register</a>
+      </div>
     </div>
   </header>
 
@@ -338,11 +339,12 @@ waitlistForm.addEventListener('submit', async (e) => {
 });
 
   // Elements
-const authLinks   = document.getElementById('authLinks');
-const userMenu    = document.getElementById('userMenu');
-const profileBtn  = document.getElementById('profileBtn');
-const profileMenu = document.getElementById('profileMenu');
-const logoutBtnEl = () => document.getElementById('logoutBtn');
+const authLinks        = document.getElementById('authLinks');        // desktop "Login • Register"
+const mobileAuthLinks  = document.getElementById('mobileAuthLinks');  // mobile wrapper (optional)
+const userMenu         = document.getElementById('userMenu');         // profile circle wrapper
+const profileBtn       = document.getElementById('profileBtn');
+const profileMenu      = document.getElementById('profileMenu');
+const logoutBtnEl      = () => document.getElementById('logoutBtn');
 
 // --- helpers: open/close menu (default closed) ---
 function openProfileMenu() {
@@ -355,20 +357,20 @@ function closeProfileMenu() {
   profileMenu.setAttribute('hidden', '');
   profileBtn?.setAttribute('aria-expanded', 'false');
 }
-// start closed
-closeProfileMenu();
+closeProfileMenu(); // start closed
 
 // --- UI state ---
 function setLoggedOut(){
-  if (authLinks) authLinks.hidden = false;
-  if (userMenu)  userMenu.hidden  = true;
+  if (authLinks)       authLinks.hidden = false;
+  if (mobileAuthLinks) mobileAuthLinks.hidden = false;
+  if (userMenu)        userMenu.hidden  = true;
   closeProfileMenu();
 }
 function setLoggedIn(initial){
-  if (authLinks) authLinks.hidden = true;
-  if (userMenu)  userMenu.hidden  = false;
+  if (authLinks)       authLinks.hidden = true;
+  if (mobileAuthLinks) mobileAuthLinks.hidden = true;
+  if (userMenu)        userMenu.hidden  = false;
   if (profileBtn && initial) profileBtn.textContent = initial;
-  // keep dropdown closed on login
   closeProfileMenu();
 }
 
@@ -377,14 +379,10 @@ profileBtn?.addEventListener('click', (e) => {
   e.stopPropagation();
   if (profileMenu?.hasAttribute('hidden')) openProfileMenu(); else closeProfileMenu();
 });
-// click outside closes
 document.addEventListener('click', (e) => {
   if (!profileBtn?.contains(e.target) && !profileMenu?.contains(e.target)) closeProfileMenu();
 });
-// Esc closes
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeProfileMenu();
-});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileMenu(); });
 
 // --- Auth state ---
 auth.onAuthStateChanged(async (user) => {
@@ -398,7 +396,8 @@ auth.onAuthStateChanged(async (user) => {
       console.error('[Auth] Failed to get user doc:', e);
       setLoggedIn('U');
     }
-    // wire logout lazily (menu might be closed initially)
+
+    // wire logout lazily
     const ensureLogout = () => {
       const btn = logoutBtnEl();
       if (btn && !btn.dataset.wired) {
@@ -410,14 +409,10 @@ auth.onAuthStateChanged(async (user) => {
         });
       }
     };
-    ensureLogout();                 // try now
-    profileBtn?.addEventListener('click', ensureLogout); // and on first open
+    ensureLogout();
+    profileBtn?.addEventListener('click', ensureLogout);
   } else {
     setLoggedOut();
-    // keep default links working
-    document.querySelectorAll('.auth-link').forEach(a => {
-      a.addEventListener('click', () => {});
-    });
   }
 });
   </script>
