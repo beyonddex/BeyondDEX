@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Meta -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BeyondDEX</title>
-  <meta name="theme-color" content="#0b0f14" />
-  <meta name="description" content="BeyondDEX — your daily crypto edge: clean, institutional-grade on-chain and market signals in 60 seconds." />
 
-  <!-- Fonts & CSS -->
+  <meta name="theme-color" content="#0b0f14" />
+  <meta name="description" content="BeyondDEX — your daily crypto edge: institutional-grade on-chain and market signals in one clean, 60-second read." />
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- Firebase (compat) -->
+  <!-- Firebase (compat to match your current usage) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 
-<!-- Add class="inline-nav" below if you want inline, non-wrapping nav on mobile -->
 <body>
-  <!-- ===== Header ===== -->
-  <header class="site-header container">
-    <a class="brand" href="/">
-      <img src="assets/bdx.png" alt="BeyondDEX Logo" class="brand-logo" />
-      <span class="brand-text">BeyondDEX</span>
-    </a>
+  <!-- ===== Header: full-bleed bar with inner container ===== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">
+        <img src="assets/bdx.png" alt="BeyondDEX Logo" class="brand-logo" />
+        <span class="brand-text">BeyondDEX</span>
+      </a>
 
-    <nav class="nav" id="nav">
-      <a href="/index.html">Home</a>
-      <a href="/dashboard.html">Dashboard</a>
-      <a href="/affiliateSignUp.html">Affiliate</a>
+      <nav class="nav" id="nav">
+        <a href="/index.html">Home</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/affiliateSignUp.html">Affiliate</a>
 
-      <div class="user-container">
-        <div class="user-circle" id="userCircle">?</div>
-        <div class="dropdown" id="dropdownMenu"></div>
-      </div>
-    </nav>
+        <div class="user-container">
+          <div class="user-circle" id="userCircle">?</div>
+          <div class="dropdown" id="dropdownMenu"></div>
+        </div>
+      </nav>
 
-    <button class="nav-toggle" id="navToggle" aria-label="Open menu">☰</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">☰</button>
+    </div>
   </header>
 
   <!-- ===== Main ===== -->
   <main>
-    <!-- Hero -->
+    <!-- Hero (mountain photo lives here) -->
     <section class="main-section container">
       <div class="text-column">
         <div class="text-wrapper">
@@ -60,7 +60,7 @@
             Get early access to institutional-grade trading insights — all in 60 seconds. Join the waitlist now.
           </p>
 
-          <a class="btn solid lg" id="joinWaitlistBtn">Join Waitlist</a>
+          <a class="btn solid lg" id="joinWaitlistBtn" href="/waitlist.html" role="button">Join Waitlist</a>
 
           <div class="meta">
             <span>⚡ Real-time data</span>
@@ -105,17 +105,12 @@
     // Year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // CTA → waitlist
-    document.getElementById('joinWaitlistBtn').addEventListener('click', () => {
-      window.location.href = '/waitlist.html';
-    });
-
     // Mobile nav toggle
     const navToggle = document.getElementById('navToggle');
     const nav = document.getElementById('nav');
     navToggle.addEventListener('click', () => nav.classList.toggle('open'));
 
-    // Firebase config (your original)
+    // Firebase config (yours)
     const firebaseConfig = {
       apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
       authDomain: "beyonddex-be653.firebaseapp.com",
