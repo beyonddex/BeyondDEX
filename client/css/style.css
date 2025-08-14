@@ -270,3 +270,12 @@ header.nav,
   .brand__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #themeToggle { margin-left: 0.25rem; flex-shrink: 0; }
 }
+
+/* Smooth anchor scroll */
+html { scroll-behavior: smooth; }
+
+/* Offset anchor target for sticky nav height */
+:root { --navH: 64px; }
+@media (max-width: 860px) { :root { --navH: 72px; } }
+
+#waitlist { scroll-margin-top: calc(var(--navH) + 12px); }

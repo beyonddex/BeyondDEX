@@ -67,9 +67,9 @@
     </div>
 
     <div class="nav__mobile" id="mobileMenu" hidden>
-      <a href="#home">Home</a>
-      <a href="#dashboard">Dashboard</a>
-      <a href="#affiliate">Affiliate</a>
+      <a href="/index.html">Home</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/affiliateSignUp.html">Affiliate</a>
       <a class="btn btn--primary" href="affiliateSignUp.html">Join Waitlist</a>
       <div id="mobileAuthLinks">
         <a href="/auth.html">Login</a>
@@ -215,9 +215,9 @@
         <strong>BeyondDEX</strong>
       </div>
       <nav class="footer__links">
-        <a href="#features">Features</a>
-        <a href="#community">Community</a>
-        <a href="#faq">FAQ</a>
+        <a href="/index.html">Home</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/affiliateSignUp.html">Affiliate</a>
         <a href="mailto:team@beyonddex.com">Contact</a>
       </nav>
       <p class="tiny">© <span id="year"></span> BeyondDEX. All rights reserved.</p>
@@ -259,8 +259,6 @@
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
     // ==== Firestore + Brevo confirmation integration ====
-const fnUrl = "https://us-central1-beyonddex-be653.cloudfunctions.net/sendConfirmationEmailV2";
-
 if (!firebase.apps.length) {
   firebase.initializeApp({
     apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
@@ -422,6 +420,23 @@ auth.onAuthStateChanged(async (user) => {
   } else {
     setLoggedOut();
   }
+});
+
+// Close mobile menu when an in-page anchor is tapped
+mobile?.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', () => {
+    mobile.setAttribute('hidden', '');
+    burger.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('no-scroll');
+  });
+});
+
+// If any link targets #waitlist, focus the email box after scroll
+document.querySelectorAll('a[href="#waitlist"]').forEach(a => {
+  a.addEventListener('click', () => {
+    // small delay so focus happens after scroll ends
+    setTimeout(() => document.getElementById('email')?.focus(), 300);
+  });
 });
   </script>
 </body>
