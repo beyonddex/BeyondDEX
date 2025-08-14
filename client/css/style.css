@@ -257,6 +257,6 @@ header.nav,
 
 /* Mobile polish */
 @media (max-width: 860px) {
-  .nav__actions .btn--primary { padding: 0.5rem 0.9rem; font-size: 0.85rem; }
+   .nav__actions .btn--primary { display: none !important; } /* hide top-nav CTA */
   .profile-menu { position: fixed; right: 1rem; top: 64px; }
 }
