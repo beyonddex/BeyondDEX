@@ -1,163 +1,246 @@
+<!--
+  VC‑grade Landing Page (Dark/Light Combo)
+  -------------------------------------------------
+  • All in one place: index.html (links external style.css below)
+  • Smooth, tasteful animations (no heavy libs)
+  • Dark/Light auto + toggle
+  • Sticky nav, premium hero, trust bar, feature grid, social proof, CTA
+  • Mobile‑first and accessible
+
+  👉 After you paste this into your project, also create css/style.css using the CSS at the end of this doc.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BeyondDEX</title>
-
-  <meta name="theme-color" content="#0b0f14" />
-  <meta name="description" content="BeyondDEX — your daily crypto edge: institutional-grade on-chain and market signals in one clean, 60-second read." />
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>BeyondDEX — Trade Smarter. Together.</title>
+  <meta name="description" content="A next‑gen crypto dashboard with deep wallet analytics, whale tracking, and real‑time exchange flows. Join the waitlist." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
-
-  <!-- Firebase (compat to match your current usage) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="icon" href="/favicon.ico" />
 </head>
-
 <body>
-  <!-- ===== Header: full-bleed bar with inner container ===== -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="/">
-        <img src="assets/bdx.png" alt="BeyondDEX Logo" class="brand-logo" />
-        <span class="brand-text">BeyondDEX</span>
+  <!-- ====== NAV ====== -->
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="#" class="brand">
+        <span class="brand__glyph" aria-hidden="true">▱</span>
+        <span class="brand__name">BeyondDEX</span>
       </a>
 
-      <nav class="nav" id="nav">
-        <a href="/index.html">Home</a>
-        <a href="/dashboard.html">Dashboard</a>
-        <a href="/affiliateSignUp.html">Affiliate</a>
-
-        <div class="user-container">
-          <div class="user-circle" id="userCircle">?</div>
-          <div class="dropdown" id="dropdownMenu"></div>
-        </div>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#insights">Insights</a>
+        <a href="#community">Community</a>
+        <a href="#faq">FAQ</a>
       </nav>
 
-      <button class="nav-toggle" id="navToggle" aria-label="Open menu">☰</button>
+      <div class="nav__actions">
+        <button class="btn btn--ghost" id="themeToggle" aria-label="Toggle theme">☾</button>
+        <a class="btn btn--primary" href="#waitlist">Join Waitlist</a>
+      </div>
+      <button class="nav__hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="nav__mobile" id="mobileMenu" hidden>
+      <a href="#features">Features</a>
+      <a href="#insights">Insights</a>
+      <a href="#community">Community</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn--primary" href="#waitlist">Join Waitlist</a>
     </div>
   </header>
 
-  <!-- ===== Main ===== -->
-  <main>
-    <!-- Hero (mountain photo lives here) -->
-    <section class="main-section container">
-      <div class="text-column">
-        <div class="text-wrapper">
-          <h1>Your Daily Crypto Edge</h1>
+  <!-- ====== HERO ====== -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="glow glow--1"></div>
+      <div class="glow glow--2"></div>
+      <div class="mesh"></div>
+    </div>
 
-          <p class="desktop-text">
-            Get early access to BeyondDEX — your institutional-grade trading edge. We deliver the most critical on-chain,
-            macro, and market signals in one clean, 60-second daily report.<br><br>
-            Built like a hedge fund desk note, designed for traders who demand clarity. Join the waitlist today and be first
-            in line when we launch.
-          </p>
+    <div class="container hero__inner">
+      <div class="hero__copy reveal">
+        <h1>Trade smarter.<br><span class="accent">See the flows before the crowd.</span></h1>
+        <p class="lead">Institutional‑grade wallet analytics, exchange inflow/outflow radar, and whale alerts—wrapped in a clean, fast dashboard.</p>
+        <form id="waitlist" class="waitlist reveal" action="#" method="post">
+          <label class="sr-only" for="email">Email</label>
+          <input id="email" type="email" placeholder="you@protrader.xyz" required />
+          <button class="btn btn--primary" type="submit">Get Early Access</button>
+          <p class="tiny">No spam. Early users get Founder perks.</p>
+        </form>
+      </div>
 
-          <p class="mobile-text">
-            Get early access to institutional-grade trading insights — all in 60 seconds. Join the waitlist now.
-          </p>
-
-          <a class="btn solid lg" id="joinWaitlistBtn" href="/waitlist.html" role="button">Join Waitlist</a>
-
-          <div class="meta">
-            <span>⚡ Real-time data</span>
-            <span>🔒 Secure auth</span>
-            <span>🧠 AI insights</span>
-          </div>
+      <div class="hero__media reveal">
+        <!-- Replace src with your actual dashboard screenshot -->
+        <div class="mockup">
+          <img src="/assets/dashboard-hero.png" alt="BeyondDEX dashboard preview" />
+          <div class="mockup__shine" aria-hidden="true"></div>
         </div>
       </div>
+    </div>
 
-      <div class="image-wrapper">
-        <img src="assets/dashboard-fix.png" alt="BeyondDEX Dashboard Screenshot" class="hero-img" />
+    <div class="trust container reveal" aria-label="As seen on / trusted by">
+      <div class="marquee">
+        <span>On‑chain • Real‑time • Low‑latency • De‑risk • Alpha • Repeat</span>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Affiliate -->
-    <section class="affiliate-section container">
-      <h2>Join Our Affiliate Program</h2>
-      <p class="desktop-affiliate">
-        Help us grow the BeyondDEX community and earn recurring income.
-        As an affiliate, you'll receive 30% of the revenue for every user you refer — each month they stay subscribed.
-        Getting started is easy: sign up, get your unique code, and start earning.
-      </p>
-      <p class="mobile-affiliate">
-        Earn recurring income by referring users. Get 30% every month they stay subscribed.
-      </p>
-      <a class="link" href="/affiliateSignUp.html">Learn more about the affiliate program →</a>
-    </section>
-  </main>
+  <!-- ====== FEATURES ====== -->
+  <section id="features" class="section">
+    <div class="container">
+      <header class="section__head reveal">
+        <h2>Built for speed, clarity, and conviction.</h2>
+        <p class="sub">Every decision should feel obvious. We surface the signal and mute the noise.</p>
+      </header>
 
-  <!-- ===== Footer ===== -->
-  <footer class="site-footer container">
-    <span>© <span id="year"></span> BeyondDEX. All rights reserved.</span>
-    <nav class="foot-nav">
-      <a href="/privacy">Privacy</a>
-      <a href="/terms">Terms</a>
-      <a href="/contact">Contact</a>
-    </nav>
+      <div class="grid features">
+        <article class="card reveal">
+          <h3>Whale Watch</h3>
+          <p>Real‑time alerts on high‑impact moves across top chains, tagged by exchange and entity.</p>
+        </article>
+        <article class="card reveal">
+          <h3>Exchange Flows</h3>
+          <p>Instant read of inflows/outflows so you can gauge pressure and positioning.</p>
+        </article>
+        <article class="card reveal">
+          <h3>Smart Wallet Tracker</h3>
+          <p>Follow proven wallets, mirror strategies, and build watchlists with risk controls.</p>
+        </article>
+        <article class="card reveal">
+          <h3>Macro + On‑chain</h3>
+          <p>Context that matters: key events, liquidity, funding, and positioning in one view.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== INSIGHTS STRIP ====== -->
+  <section id="insights" class="strip">
+    <div class="container strip__inner reveal">
+      <div class="strip__copy">
+        <h3>Daily insight briefs</h3>
+        <p>Concise recaps, levels, and catalysts, purpose‑built for fast execution. Delivered to your dashboard.</p>
+      </div>
+      <a href="#waitlist" class="btn btn--ghost">Get the Briefs</a>
+    </div>
+  </section>
+
+  <!-- ====== COMMUNITY / SOCIAL PROOF ====== -->
+  <section id="community" class="section">
+    <div class="container">
+      <header class="section__head reveal">
+        <h2>Not just data—an edge‑seeking community.</h2>
+        <p class="sub">Sharpen together with playbooks, AMAs, and collaborative research drops.</p>
+      </header>
+
+      <div class="grid quotes">
+        <figure class="quote reveal">
+          <blockquote>“The only crypto dashboard I actually check before placing size.”</blockquote>
+          <figcaption>— Early user, ex‑HF</figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <blockquote>“The flow view called the top before Binance listings hit CT.”</blockquote>
+          <figcaption>— Quant trader</figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <blockquote>“Clean, fast, and the alerts are worth the fee alone.”</blockquote>
+          <figcaption>— Options lead</figcaption>
+        </figure>
+      </div>
+
+      <div class="cta reveal">
+        <a class="btn btn--primary btn--xl" href="#waitlist">Reserve Your Handle</a>
+        <p class="tiny">Founder pricing for first 1,000 signups.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FAQ ====== -->
+  <section id="faq" class="section">
+    <div class="container">
+      <header class="section__head reveal">
+        <h2>Questions, answered.</h2>
+      </header>
+      <div class="faq grid">
+        <details class="reveal">
+          <summary>Is there a free trial?</summary>
+          <p>Yes. Early users get a 14‑day trial during private beta.</p>
+        </details>
+        <details class="reveal">
+          <summary>Which chains are supported?</summary>
+          <p>ETH mainnet at launch, with fast‑follow for Arbitrum, Base, and Solana.</p>
+        </details>
+        <details class="reveal">
+          <summary>Do you offer team plans?</summary>
+          <p>Yes. Team seats and SSO are available for funds and desks.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="brand__glyph">▱</span>
+        <strong>BeyondDEX</strong>
+      </div>
+      <nav class="footer__links">
+        <a href="#features">Features</a>
+        <a href="#community">Community</a>
+        <a href="#faq">FAQ</a>
+        <a href="mailto:team@beyonddex.com">Contact</a>
+      </nav>
+      <p class="tiny">© <span id="year"></span> BeyondDEX. All rights reserved.</p>
+    </div>
   </footer>
 
-  <!-- ===== Scripts ===== -->
   <script>
     // Year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Mobile nav toggle
-    const navToggle = document.getElementById('navToggle');
-    const nav = document.getElementById('nav');
-    navToggle.addEventListener('click', () => nav.classList.toggle('open'));
-
-    // Firebase config (yours)
-    const firebaseConfig = {
-      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Auth state → userCircle & dropdown
-    auth.onAuthStateChanged(async user => {
-      const userCircle = document.getElementById("userCircle");
-      const dropdownMenu = document.getElementById("dropdownMenu");
-
-      if (user) {
-        const doc = await db.collection("users").doc(user.uid).get();
-        const username = doc.exists ? doc.data().username : "U";
-        const initial = username.charAt(0).toUpperCase();
-        userCircle.textContent = initial;
-
-        dropdownMenu.innerHTML = `<a href="#" id="logout">Log Out</a>`;
-        document.getElementById("logout").addEventListener("click", () => {
-          auth.signOut().then(() => location.reload());
-        });
-      } else {
-        userCircle.textContent = "+";
-        dropdownMenu.innerHTML = `<a href="#" id="login">Log In</a>`;
-        document.getElementById("login").addEventListener("click", () => {
-          window.location.href = "/auth.html";
-        });
-      }
+    // Theme toggle (respects system by default)
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    if (stored) root.dataset.theme = stored;
+    toggle.addEventListener('click', () => {
+      const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = next;
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'light' ? '☾' : '☀';
     });
 
-    // Dropdown open/close
-    const userCircle = document.getElementById("userCircle");
-    const dropdownMenu = document.getElementById("dropdownMenu");
-    userCircle.addEventListener("click", () => {
-      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+    // Mobile nav
+    const burger = document.getElementById('hamburger');
+    const mobile = document.getElementById('mobileMenu');
+    burger.addEventListener('click', () => {
+      const open = mobile.hasAttribute('hidden') ? false : true;
+      burger.setAttribute('aria-expanded', String(!open));
+      mobile.toggleAttribute('hidden');
+      document.body.classList.toggle('no-scroll');
     });
-    window.addEventListener("click", e => {
-      if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        dropdownMenu.style.display = "none";
-      }
+
+    // Reveal on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('reveal--in');
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Fake submit (replace with your backend / Firebase)
+    document.getElementById('waitlist').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Added!';
     });
   </script>
 </body>
