@@ -1,40 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Meta basics -->
+  <!-- Meta -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BeyondDEX</title>
-
-  <!-- SEO (optional but recommended) -->
-  <meta name="description" content="BeyondDEX — your daily crypto edge: clean, institutional-grade on-chain and market signals in 60 seconds." />
   <meta name="theme-color" content="#0b0f14" />
-
-  <!-- Open Graph (link previews) -->
-  <meta property="og:title" content="BeyondDEX — Your Daily Crypto Edge" />
-  <meta property="og:description" content="Critical on-chain, macro, and market signals in one clean 60-second daily read." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://beyonddex.com/" />
-  <meta property="og:image" content="/assets/dashboard-fix.png" />
-
-  <!-- Favicon (put files in /assets if you have them) -->
-  <!-- <link rel="icon" href="/assets/favicon.ico" /> -->
-  <!-- <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" /> -->
+  <meta name="description" content="BeyondDEX — your daily crypto edge: clean, institutional-grade on-chain and market signals in 60 seconds." />
 
   <!-- Fonts & CSS -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- Firebase (compat to match your current usage) -->
+  <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <!-- Prevent FOUC on very slow networks (optional) -->
-  <style>html{visibility:visible;opacity:1}</style>
 </head>
+
+<!-- Add class="inline-nav" below if you want inline, non-wrapping nav on mobile -->
 <body>
-  <!-- ===== Fixed Header ================================================== -->
+  <!-- ===== Header ===== -->
   <header class="site-header container">
     <a class="brand" href="/">
       <img src="assets/bdx.png" alt="BeyondDEX Logo" class="brand-logo" />
@@ -46,7 +32,6 @@
       <a href="/dashboard.html">Dashboard</a>
       <a href="/affiliateSignUp.html">Affiliate</a>
 
-      <!-- User menu (same IDs for your script) -->
       <div class="user-container">
         <div class="user-circle" id="userCircle">?</div>
         <div class="dropdown" id="dropdownMenu"></div>
@@ -56,10 +41,10 @@
     <button class="nav-toggle" id="navToggle" aria-label="Open menu">☰</button>
   </header>
 
-  <!-- ===== Main Content ================================================== -->
+  <!-- ===== Main ===== -->
   <main>
-    <!-- Hero / First Fold -->
-    <section class="hero container main-section">
+    <!-- Hero -->
+    <section class="main-section container">
       <div class="text-column">
         <div class="text-wrapper">
           <h1>Your Daily Crypto Edge</h1>
@@ -75,7 +60,7 @@
             Get early access to institutional-grade trading insights — all in 60 seconds. Join the waitlist now.
           </p>
 
-          <button class="btn solid lg" id="joinWaitlistBtn">Join Waitlist</button>
+          <a class="btn solid lg" id="joinWaitlistBtn">Join Waitlist</a>
 
           <div class="meta">
             <span>⚡ Real-time data</span>
@@ -90,25 +75,22 @@
       </div>
     </section>
 
-    <!-- Affiliate Block -->
+    <!-- Affiliate -->
     <section class="affiliate-section container">
       <h2>Join Our Affiliate Program</h2>
-
       <p class="desktop-affiliate">
         Help us grow the BeyondDEX community and earn recurring income.
         As an affiliate, you'll receive 30% of the revenue for every user you refer — each month they stay subscribed.
         Getting started is easy: sign up, get your unique code, and start earning.
       </p>
-
       <p class="mobile-affiliate">
         Earn recurring income by referring users. Get 30% every month they stay subscribed.
       </p>
-
       <a class="link" href="/affiliateSignUp.html">Learn more about the affiliate program →</a>
     </section>
   </main>
 
-  <!-- ===== Footer ======================================================== -->
+  <!-- ===== Footer ===== -->
   <footer class="site-footer container">
     <span>© <span id="year"></span> BeyondDEX. All rights reserved.</span>
     <nav class="foot-nav">
@@ -118,7 +100,7 @@
     </nav>
   </footer>
 
-  <!-- ===== Scripts ======================================================= -->
+  <!-- ===== Scripts ===== -->
   <script>
     // Year
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -133,7 +115,7 @@
     const nav = document.getElementById('nav');
     navToggle.addEventListener('click', () => nav.classList.toggle('open'));
 
-    // Firebase config (from your original)
+    // Firebase config (your original)
     const firebaseConfig = {
       apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
       authDomain: "beyonddex-be653.firebaseapp.com",
@@ -143,13 +125,11 @@
       appId: "1:687411546401:web:ec71401e52751d3e121660",
       measurementId: "G-6SH111LB7J"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Auth state → userCircle / dropdown
+    // Auth state → userCircle & dropdown
     auth.onAuthStateChanged(async user => {
       const userCircle = document.getElementById("userCircle");
       const dropdownMenu = document.getElementById("dropdownMenu");

@@ -1,288 +1,177 @@
-/* global.css */
+/* ===========================
+   BeyondDEX — Dark Web3 Theme
+   (merged with your tight mobile/ultra-narrow rules)
+   =========================== */
 
+:root{
+  --bg:#0b0f14;
+  --bg-elev:#0f141b;
+  --ink:#f5f7fb;
+  --ink-dim:#c8cfdb;
+  --muted:#7b8698;
+  --brand:#6ae2ff;
+  --stroke:rgba(255,255,255,0.10);
+  --glass:rgba(255,255,255,0.06);
+  --shadow:0 12px 40px rgba(0,0,0,0.55);
+  --header-h:88px;
+}
+@media (max-width:768px){ :root{ --header-h:64px } }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  border-bottom: 1px solid #e0e0e0;
-  background: white;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 999;
+/* Base reset-ish */
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--ink);
+  background: linear-gradient(180deg, #0b0f14, #0a0d12);
+  /* If/when you add a photo, comment the line above and UNcomment below: */
+  /* background: linear-gradient(180deg, rgba(5,8,12,.85), rgba(5,8,12,.92)), url("../assets/mountains.webp") center bottom / cover no-repeat; */
+  padding-top:var(--header-h);
+}
+img{ max-width:100%; height:auto; display:block }
+a{ color:inherit; text-decoration:none }            /* no purple links */
+a:hover{ text-decoration:none }
+
+/* Layout helper */
+.container{ width:min(1200px,92%); margin-inline:auto }
+
+/* ================= HEADER (fixed) ================= */
+.site-header{
+  display:flex; align-items:center; gap:16px;
+  padding:16px 0;
+  position:fixed; top:0; left:0; right:0; z-index:999;
+  background:rgba(11,15,20,.7);
+  border-bottom:1px solid var(--stroke);
+  backdrop-filter:saturate(120%) blur(8px);
 }
 
+.brand{ display:flex; align-items:center; gap:12px; color:var(--ink) }
+.brand-logo{
+  height:36px; width:auto; display:block;            /* prevents giant logo */
+  object-fit:contain;
+}
+.brand-text{ font-weight:800; letter-spacing:.2px; white-space:nowrap }
 
-.logo-container img {
-  height: 50px;
+.nav{
+  margin-left:auto; display:flex; align-items:center; gap:18px; flex-wrap:nowrap;
+}
+.nav a{
+  color:var(--ink-dim); font-weight:600;
+  padding:8px 10px; border-radius:10px;
+  white-space:nowrap;                                   /* no wrapping */
+}
+.nav a:hover{ color:var(--ink); background:var(--glass) }
+
+.user-container{ position:relative; margin-left:8px }
+.user-circle{
+  width:36px; height:36px; border-radius:50%;
+  display:grid; place-items:center; cursor:pointer;
+  font-weight:800; font-size:14px;
+  background:var(--ink); color:#0b0f14;
+}
+.dropdown{
+  position:absolute; right:0; top:44px; display:none; min-width:140px; z-index:20;
+  background:var(--bg-elev); border:1px solid var(--stroke); border-radius:12px; overflow:hidden;
+}
+.dropdown a{ display:block; padding:10px 14px; color:var(--ink); font-size:14px }
+.dropdown a:hover{ background:var(--glass) }
+
+.nav-toggle{
+  display:none; margin-left:8px; font-size:20px; color:var(--ink);
+  background:none; border:1px solid var(--stroke); border-radius:10px; padding:4px 8px; cursor:pointer;
 }
 
+/* ================= HERO ================= */
+.main-section{
+  min-height: clamp(640px, 85vh, 1000px);
+  padding: clamp(120px, 12vh, 180px) 30px clamp(160px, 14vh, 240px);
+  display:flex; flex-wrap:wrap; align-items:center; gap:24px;
+}
+.text-column{ flex:1 1 500px; padding-right:40px; min-width:300px }
+.text-wrapper{ max-width:800px }
+h1{ margin:0 0 12px; font-size: clamp(34px,5vw,54px); line-height:1.05 }
+.desktop-text{ color:var(--ink-dim); line-height:1.65; margin: 8px 0 22px }
+.mobile-text{ display:none; color:var(--ink-dim); line-height:1.55; margin:8px 0 22px }
+.meta{ display:flex; gap:16px; color:var(--muted); font-size:14px; margin-top:10px; flex-wrap:wrap }
 
-.nav-links a {
-  margin-left: 20px;
-  text-decoration: none;
-  color: #000;
-  font-weight: 500;
+.image-wrapper{ flex:1 1 500px; display:flex; justify-content:center; align-items:center; min-width:280px }
+.hero-img{
+  width:100%; max-width:520px;
+  border-radius:14px; border:1px solid var(--stroke); box-shadow:var(--shadow)
 }
 
+/* ================= BUTTONS ================= */
+.btn{
+  border:1px solid var(--stroke);
+  padding:10px 16px; border-radius:12px; font-weight:800;
+  display:inline-block;
+}
+.btn.solid{ background:var(--ink); color:#0b0f14; border-color:transparent }
+.btn.lg{ padding:12px 20px }
 
-.user-container {
-  position: relative;
-  margin-left: auto;
+/* ================= AFFILIATE ================= */
+.affiliate-section{ text-align:center; padding:72px 0 }
+.affiliate-section h2{ margin:0 0 12px; font-size: clamp(24px,3.6vw,34px) }
+.desktop-affiliate{ color:var(--ink-dim); max-width:800px; margin:0 auto 18px; line-height:1.65 }
+.mobile-affiliate{ display:none; color:var(--ink-dim); max-width:90%; margin:0 auto 18px }
+.link{ color:var(--ink); text-decoration:underline }
+
+/* ================= FOOTER ================= */
+.site-footer{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:28px 0 48px; color:var(--muted); font-size:14px;
+}
+.foot-nav a{ color:var(--muted); margin-left:14px }
+.foot-nav a:hover{ color:var(--ink) }
+
+/* ================= RESPONSIVE ================= */
+
+/* Tablet */
+@media (max-width:980px){
+  .main-section{ padding-top:calc(120px + 24px) }
 }
 
-
-.user-circle {
-  width: 40px;
-  height: 40px;
-  background: #000;
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-
-.dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  display: none;
-  min-width: 120px;
-  z-index: 1000;
-}
-
-
-.dropdown a {
-  display: block;
-  padding: 10px;
-  text-decoration: none;
-  color: #000;
-  font-size: 14px;
-}
-
-
-.dropdown a:hover {
-  background: #f0f0f0;
-}
-/* Modern Apple-style dashboard overrides */
-body, html {
-  background-color: #f5f6f8;
-  font-family: 'Inter', sans-serif;
-  color: #111;
-}
-
-
-/* Elevate card look */
-.card {
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  padding: 24px;
-  margin-bottom: 20px;
-  transition: all 0.2s ease-in-out;
-}
-
-
-/* Top nav */
-header {
-  background: #ffffff;
-  padding: 16px 32px;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.05);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-
-header .nav-links a {
-  color: #444;
-  margin: 0 16px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-header .nav-links a:hover {
-  color: #000;
-}
-
-
-/* Sidebar */
-.left-nav {
-  background: #f7f8fa;
-  border-right: 1px solid #e5e7eb;
-  padding: 24px 16px;
-}
-
-
-.left-nav button {
-  background: none;
-  border: none;
-  color: #333;
-  font-weight: 500;
-  padding: 10px 14px;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-.left-nav button:hover {
-  background: #e5e7eb;
-}
-
-
-/* Chat styling */
-.chat-box {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 16px;
-  font-size: 14px;
-  height: 100%;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
-}
-.chat-input input {
-  background: #f9fafb;
-  border: 1px solid #d1d5db;
-  padding: 10px;
-  border-radius: 8px;
-}
-.chat-input button {
-  background: #3b82f6;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  transition: background 0.2s ease;
-}
-.chat-input button:hover {
-  background: #2563eb;
-}
-
-
-/* Heatmap container */
-#heatmap {
-  background: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  border-radius: 16px;
-}
-
-
-/* Economic calendar */
-.economic-calendar-preview,
-.market-data-box,
-.market-insights-box {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-}
-
-
-/* Fonts and details */
-h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 12px;
-}
-li {
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-
-/* Online user dot refinement */
-.chat-message span[style*="background-color"] {
-  width: 10px;
-  height: 10px;
-  margin-right: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  box-shadow: 0 0 6px rgba(34,197,94,0.5);
-}
-
-
-/* Footer */
-footer {
-  border-top: 1px solid #e5e7eb;
-  background: #ffffff;
-  padding: 24px;
-  font-size: 13px;
-  color: #666;
-}
-
-
-/* Scrollbars (optional aesthetic) */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-/* Reserve space for the fixed header (global) */
-:root { --header-h: 88px; }                 /* desktop header height */
-@media (max-width: 768px) { :root { --header-h: 72px; } }  /* mobile header height */
-
-
-body { padding-top: var(--header-h); }
-
-
-/* Tighter header nav spacing (global) */
-header .nav-links { gap: 12px !important; }
-header .nav-links a { margin-left: 0 !important; padding: 6px 8px; } /* keeps a comfy click area */
-
-
-@media (max-width: 768px) {
-  header .nav-links { gap: 10px !important; }
-}
-
-
-/* --- Keep fixed header from overlapping content --- */
-:root { --header-h: 88px; }
-@media (max-width: 768px) { :root { --header-h: 64px; } }  /* shorter on mobile */
-body { padding-top: var(--header-h); }
-
-
-/* --- Tighter nav + prevent wrapping on mobile --- */
-@media (max-width: 768px) {
-  header {
-    padding: 12px 16px !important;
-    flex-wrap: nowrap !important;   /* keep everything on one line */
-    align-items: center !important;
-    min-height: var(--header-h);
+/* Mobile (burger default) */
+@media (max-width:780px){
+  .nav{ display:none }
+  .nav.open{
+    position:absolute; right:4%; top:64px; background:var(--bg-elev);
+    border:1px solid var(--stroke); border-radius:14px; padding:10px;
+    display:flex; flex-direction:column; gap:6px; width:220px;
   }
-  header .logo-container img { height: 28px; }
-  header .nav-links {
-    gap: 8px !important;
-    flex: 1 1 auto;                /* let links shrink in the middle */
-    justify-content: center;
-    min-width: 0;                  /* allows shrinking instead of wrapping */
-  }
-  header .nav-links a {
-    margin-left: 0 !important;
-    padding: 6px 6px;
-    font-size: 14px;
-    flex: 0 0 auto;                /* prevent flex from stretching items */
-    white-space: nowrap;           /* no line breaks inside labels */
-  }
-  .user-container { margin-left: 8px; }
-  .user-circle { width: 32px; height: 32px; font-size: 14px; }
+  .nav-toggle{ display:block }
+  .text-column{ padding-right:0 }
+  .desktop-text{ display:none }
+  .mobile-text{ display:block }
+  .site-footer{ flex-direction:column; gap:8px }
 }
 
+/* ===== Optional: INLINE NAV (no wrapping) on small screens =====
+   Add class="inline-nav" to <body> to keep links inline instead of burger. */
+body.inline-nav .nav{ display:flex !important }
+body.inline-nav .nav-toggle{ display:none !important }
+body.inline-nav .site-header{
+  padding:12px 0 !important;
+  flex-wrap:nowrap !important; align-items:center !important;
+  min-height:var(--header-h);
+}
+body.inline-nav .brand-logo{ height:28px }
+body.inline-nav .brand-text{ font-size:14px; font-weight:800; letter-spacing:.1px; max-width:28vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+body.inline-nav .nav{ gap:10px !important; flex:1 1 auto; justify-content:center; min-width:0 }
+body.inline-nav .nav a{ padding:6px 6px; font-size:14px; flex:0 0 auto; white-space:nowrap }
+body.inline-nav .user-container{ margin-left:8px }
+body.inline-nav .user-circle{ width:32px; height:32px; font-size:14px }
 
-/* ultra-narrow phones */
-@media (max-width: 380px) {
-  header { padding: 10px 12px !important; }
-  header .nav-links a { font-size: 13px; padding: 4px 4px; }
+/* Ultra-narrow phones */
+@media (max-width:380px){
+  body.inline-nav .site-header{ padding:10px 0 !important }
+  body.inline-nav .brand-text{ display:none }     /* save space for links */
+  body.inline-nav .nav a{ font-size:13px; padding:4px 4px }
+}
+
+/* Super tiny devices (optional) */
+@media (max-width:340px){
+  body.inline-nav .nav a{ font-size:12px }
+  body.inline-nav .user-circle{ width:30px; height:30px; font-size:12px }
 }
