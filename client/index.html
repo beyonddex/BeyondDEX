@@ -340,41 +340,37 @@ waitlistForm.addEventListener('submit', async (e) => {
 
   // Elements
 const authLinks        = document.getElementById('authLinks');        // desktop "Login • Register"
-const mobileAuthLinks  = document.getElementById('mobileAuthLinks');  // mobile wrapper (optional)
+const mobileAuthLinks  = document.getElementById('mobileAuthLinks');  // mobile wrapper
 const userMenu         = document.getElementById('userMenu');         // profile circle wrapper
 const profileBtn       = document.getElementById('profileBtn');
 const profileMenu      = document.getElementById('profileMenu');
 const logoutBtnEl      = () => document.getElementById('logoutBtn');
 
-// --- helpers: open/close menu (default closed) ---
-function openProfileMenu() {
-  if (!profileMenu) return;
-  profileMenu.removeAttribute('hidden');
-  profileBtn?.setAttribute('aria-expanded', 'true');
-}
-function closeProfileMenu() {
-  if (!profileMenu) return;
-  profileMenu.setAttribute('hidden', '');
-  profileBtn?.setAttribute('aria-expanded', 'false');
-}
-closeProfileMenu(); // start closed
+// helpers
+function hide(el){ if (!el) return; el.hidden = true; el.style.display = 'none'; }
+function show(el, display=''){ if (!el) return; el.hidden = false; el.style.display = display; }
 
-// --- UI state ---
+// profile menu controls
+function openProfileMenu(){ if (!profileMenu) return; profileMenu.removeAttribute('hidden'); profileBtn?.setAttribute('aria-expanded','true'); }
+function closeProfileMenu(){ if (!profileMenu) return; profileMenu.setAttribute('hidden',''); profileBtn?.setAttribute('aria-expanded','false'); }
+closeProfileMenu(); // default closed
+
+// UI states
 function setLoggedOut(){
-  if (authLinks)       authLinks.hidden = false;
-  if (mobileAuthLinks) mobileAuthLinks.hidden = false;
-  if (userMenu)        userMenu.hidden  = true;
+  show(authLinks, 'inline-flex');           // desktop auth links
+  show(mobileAuthLinks, '');                // mobile auth links (block)
+  hide(userMenu);                           // hide profile circle
   closeProfileMenu();
 }
 function setLoggedIn(initial){
-  if (authLinks)       authLinks.hidden = true;
-  if (mobileAuthLinks) mobileAuthLinks.hidden = true;
-  if (userMenu)        userMenu.hidden  = false;
+  hide(authLinks);                          // hide desktop auth links
+  hide(mobileAuthLinks);                    // hide mobile auth links
+  show(userMenu, '');                       // show profile circle
   if (profileBtn && initial) profileBtn.textContent = initial;
   closeProfileMenu();
 }
 
-// --- Toggle dropdown ---
+// Toggle dropdown
 profileBtn?.addEventListener('click', (e) => {
   e.stopPropagation();
   if (profileMenu?.hasAttribute('hidden')) openProfileMenu(); else closeProfileMenu();
@@ -384,7 +380,7 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileMenu(); });
 
-// --- Auth state ---
+// Auth state
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     try {
@@ -396,8 +392,7 @@ auth.onAuthStateChanged(async (user) => {
       console.error('[Auth] Failed to get user doc:', e);
       setLoggedIn('U');
     }
-
-    // wire logout lazily
+    // wire logout (only item in dropdown)
     const ensureLogout = () => {
       const btn = logoutBtnEl();
       if (btn && !btn.dataset.wired) {
