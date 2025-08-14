@@ -19,6 +19,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="/favicon.ico" />
 </head>
@@ -39,9 +42,26 @@
     </nav>
 
       <div class="nav__actions">
-        <button class="btn btn--ghost" id="themeToggle" aria-label="Toggle theme">☾</button>
-        <a class="btn btn--primary" href="affiliateSignUp.html">Join Waitlist</a>
-      </div>
+  <button class="btn btn--ghost" id="themeToggle" aria-label="Toggle theme">☾</button>
+
+  <!-- Shown when logged OUT -->
+  <span id="authLinks" class="auth-links">
+    <a href="/auth.html" class="auth-link">Login</a>
+    <span class="dot">•</span>
+    <a href="/auth.html#register" class="auth-link">Register</a>
+  </span>
+
+  <!-- Shown when logged IN -->
+  <div id="userMenu" class="profile-wrapper" hidden>
+    <button id="profileBtn" class="profile-circle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">U</button>
+    <div id="profileMenu" class="profile-menu" hidden>
+      <a href="/dashboard.html">Dashboard</a>
+      <button id="logoutBtn" type="button">Log out</button>
+    </div>
+  </div>
+
+  <a class="btn btn--primary" href="/affiliateSignUp.html">Join Waitlist</a>
+</div>
       <button class="nav__hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
         <span></span><span></span><span></span>
       </button>
@@ -52,6 +72,8 @@
       <a href="#dashboard">Dashboard</a>
       <a href="#affiliate">Affiliate</a>
       <a class="btn btn--primary" href="affiliateSignUp.html">Join Waitlist</a>
+      <a href="/auth.html">Login</a>
+      <a href="/auth.html#register">Register</a>
     </div>
   </header>
 
@@ -69,7 +91,7 @@
         <p class="lead">Institutional‑grade wallet analytics, exchange inflow/outflow radar, and whale alerts—wrapped in a clean, fast dashboard.</p>
         <form id="waitlist" class="waitlist reveal" action="#" method="post">
           <label class="sr-only" for="email">Email</label>
-          <input id="email" type="email" placeholder="you@protrader.xyz" required />
+          <input id="email" name="email" type="email" placeholder="you@protrader.xyz" required />
           <button class="btn btn--primary" type="submit">Get Early Access</button>
           <p class="tiny">No spam. Early users get Founder perks.</p>
         </form>
@@ -235,12 +257,161 @@
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-    // Fake submit (replace with your backend / Firebase)
-    document.getElementById('waitlist').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const btn = e.target.querySelector('button');
-      btn.disabled = true; btn.textContent = 'Added!';
+    // ==== Firestore + Brevo confirmation integration ====
+const fnUrl = "https://us-central1-beyonddex-be653.cloudfunctions.net/sendConfirmationEmailV2";
+
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+    authDomain: "beyonddex-be653.firebaseapp.com",
+    projectId: "beyonddex-be653",
+    storageBucket: "beyonddex-be653.firebasestorage.app",
+    messagingSenderId: "687411546401",
+    appId: "1:687411546401:web:ec71401e52751d3e121660",
+    measurementId: "G-6SH111LB7J"
+  });
+}
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+const waitlistForm  = document.getElementById('waitlist');
+const waitlistBtn   = waitlistForm.querySelector('button');
+const waitlistEmail = document.getElementById('email');
+
+function isValidEmail(v){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
+
+async function sha256(str) {
+  const data = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+waitlistForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const raw = (waitlistEmail.value || "").trim().toLowerCase();
+  if (!isValidEmail(raw)) {
+    waitlistEmail.focus();
+    waitlistEmail.setAttribute('aria-invalid', 'true');
+    alert("Please enter a valid email.");
+    return;
+  }
+
+  waitlistBtn.disabled = true;
+  waitlistBtn.textContent = "Adding...";
+
+  try {
+    // Idempotent dedupe: store by hash(email) so repeat signups overwrite instead of duplicate
+    const id  = await sha256(raw);
+    const uid = auth?.currentUser?.uid || null;
+
+    await db.collection("waitlist").doc(id).set({
+      email: raw,
+      uid,
+      source: "landing",
+      userAgent: navigator.userAgent,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    // Call your Cloud Function to send the Brevo confirmation email
+    await fetch(fnUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: raw })
     });
+
+    // Show success state inline
+    waitlistForm.outerHTML = `
+      <div class="card" style="margin-top:.8rem;padding:1rem;border:1px solid var(--border);border-radius:14px;background:var(--card);box-shadow:var(--shadow)">
+        <strong>🎉 You're on the waitlist.</strong>
+        <div class="tiny" style="margin-top:.4rem;color:var(--muted);">
+          Check your inbox for a confirmation email.
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.error("[Waitlist] error:", err);
+    waitlistBtn.disabled = false;
+    waitlistBtn.textContent = "Get Early Access";
+    alert("Sorry—something went wrong. Please try again.");
+  }
+});
+
+  // Elements
+  const authLinks   = document.getElementById('authLinks');
+  const userMenu    = document.getElementById('userMenu');
+  const profileBtn  = document.getElementById('profileBtn');
+  const profileMenu = document.getElementById('profileMenu');
+  const logoutBtnEl = () => document.getElementById('logoutBtn');
+
+  function setLoggedOut(){
+    if (authLinks) authLinks.hidden = false;
+    if (userMenu)  userMenu.hidden  = true;
+  }
+  function setLoggedIn(initial){
+    if (authLinks) authLinks.hidden = true;
+    if (userMenu)  userMenu.hidden  = false;
+    if (profileBtn && initial) profileBtn.textContent = initial;
+  }
+
+  // Toggle dropdown
+  function toggleProfileMenu(force) {
+    const open = force != null ? !force : profileMenu.hasAttribute('hidden');
+    if (open) {
+      profileMenu.removeAttribute('hidden');
+      profileBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      profileMenu.setAttribute('hidden', '');
+      profileBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+  if (profileBtn) {
+    profileBtn.addEventListener('click', () => toggleProfileMenu());
+    window.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+        toggleProfileMenu(false);
+      }
+    });
+  }
+
+  // Auth state
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      try {
+        const doc = await db.collection("users").doc(user.uid).get();
+        const username = doc.exists ? (doc.data().username || 'U') : 'U';
+        const initial  = String(username).charAt(0).toUpperCase() || 'U';
+        setLoggedIn(initial);
+      } catch (e) {
+        console.error('[Auth] Failed to get user doc:', e);
+        setLoggedIn('U');
+      }
+      // Wire logout
+      const ensureLogout = () => {
+        const btn = logoutBtnEl();
+        if (btn && !btn.dataset.wired) {
+          btn.dataset.wired = '1';
+          btn.addEventListener('click', async () => {
+            await auth.signOut();
+            setLoggedOut();
+            // Optional: redirect
+            window.location.href = '/';
+          });
+        }
+      };
+      // Run once now and again after menu opens
+      ensureLogout();
+      profileBtn?.addEventListener('click', ensureLogout);
+    } else {
+      setLoggedOut();
+      // Optional: click Login/Register to go to auth.html
+      document.querySelectorAll('.auth-link').forEach(a => {
+        a.addEventListener('click', () => {
+          // leave default hrefs: /auth.html and /auth.html#register
+        });
+      });
+    }
+  });
   </script>
 </body>
 </html>

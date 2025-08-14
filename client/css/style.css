@@ -222,3 +222,36 @@ header.nav,
 /* Marquee safety: no nowrap overflow */
 .marquee { overflow: hidden; }
 .marquee span { white-space: nowrap; }
+
+/* ==== Auth UI (profile circle + menu) ==== */
+.auth-links { display: inline-flex; align-items: center; gap: .35rem; color: var(--muted); }
+.auth-link { color: var(--muted); text-decoration: none; font-weight: 600; }
+.auth-link:hover { color: var(--text); }
+.auth-links .dot { opacity: .6; }
+
+.profile-wrapper { position: relative; }
+.profile-circle {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card); color: var(--text);
+  font-weight: 700; display: grid; place-items: center;
+  box-shadow: var(--shadow); cursor: pointer;
+}
+.profile-menu {
+  position: absolute; right: 0; top: calc(100% + 8px);
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-radius: 12px; min-width: 180px; box-shadow: var(--shadow);
+  padding: .4rem; display: flex; flex-direction: column; gap: .2rem;
+}
+.profile-menu a, .profile-menu button {
+  text-align: left; padding: .6rem .7rem; border-radius: 10px;
+  border: 0; background: transparent; color: var(--text);
+  text-decoration: none; font-weight: 600; cursor: pointer;
+}
+.profile-menu a:hover, .profile-menu button:hover { background: var(--card); }
+
+/* Mobile polish */
+@media (max-width: 860px) {
+  .nav__actions .btn--primary { padding: 0.5rem 0.9rem; font-size: 0.85rem; }
+  .profile-menu { position: fixed; right: 1rem; top: 64px; }
+}
