@@ -1,365 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Meta basics -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BeyondDEX</title>
+
+  <!-- SEO (optional but recommended) -->
+  <meta name="description" content="BeyondDEX — your daily crypto edge: clean, institutional-grade on-chain and market signals in 60 seconds." />
+  <meta name="theme-color" content="#0b0f14" />
+
+  <!-- Open Graph (link previews) -->
+  <meta property="og:title" content="BeyondDEX — Your Daily Crypto Edge" />
+  <meta property="og:description" content="Critical on-chain, macro, and market signals in one clean 60-second daily read." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://beyonddex.com/" />
+  <meta property="og:image" content="/assets/dashboard-fix.png" />
+
+  <!-- Favicon (put files in /assets if you have them) -->
+  <!-- <link rel="icon" href="/assets/favicon.ico" /> -->
+  <!-- <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" /> -->
+
+  <!-- Fonts & CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Firebase (compat to match your current usage) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #fafafa;
-      color: #111;
-      overflow-x: hidden;
-    }
 
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 30px;
-      background: #fff;
-      border-bottom: 1px solid #e5e5e5;
-      flex-wrap: wrap;
-    }
-
-
-    .logo-container img {
-      height: 40px;
-    }
-
-
-    .nav-links {
-      display: flex;
-      gap: 20px;
-      flex-wrap: nowrap;
-    }
-
-
-    .nav-links a {
-      color: #111;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-
-    .user-container {
-      position: relative;
-    }
-
-
-    .user-circle {
-      background: #111;
-      color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-
-    .dropdown {
-      position: absolute;
-      right: 0;
-      top: 40px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      display: none;
-      flex-direction: column;
-      min-width: 120px;
-      z-index: 10;
-    }
-
-
-    .dropdown a {
-      padding: 10px 16px;
-      color: #111;
-      text-decoration: none;
-    }
-
-
-    .cta {
-      background-color: #111;
-      color: #fff;
-      padding: 12px 28px;
-      border-radius: 8px;
-      font-size: 1rem;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-
-    .cta:hover {
-      background-color: #333;
-    }
-
-
-    .main-section {
-       /* Taller section so the next block sits below the fold */
-      min-height: clamp(640px, 85vh, 1000px);
-      padding: clamp(120px, 12vh, 180px) 30px clamp(160px, 14vh, 240px);
-
-
-      display: flex;
-      flex-wrap: wrap;
-      padding: 140px 30px 180px;
-      align-items: center;
-      background: #f5f5f5;
-      position: relative;
-      overflow: hidden;
-    }
-
-
-    .main-section::before {
-      content: "";
-      position: absolute;
-       top: -25vh;
-      left: -20vw;
-      width: 220vw;
-      height: 180vh;
-
-
-      background:
-        radial-gradient(circle at 25% 30%, rgba(0, 123, 255, 0.12), transparent 65%),
-        radial-gradient(circle at 65% 70%, rgba(255, 0, 150, 0.12), transparent 65%);
-      z-index: 0;
-    }
-
-
-    .text-column, .image-column {
-      position: relative;
-      z-index: 1;
-    }
-
-
-    .text-column {
-      flex: 1 1 500px;
-      padding-right: 40px;
-    }
-
-
-    .text-wrapper {
-      max-width: 800px;
-    }
-
-
-    .text-column h1 {
-      font-size: 2.75rem;
-      margin-bottom: 20px;
-    }
-
-
-    .desktop-text {
-      font-size: 1.1rem;
-      line-height: 1.6;
-      margin-bottom: 30px;
-      color: #333;
-      display: block;
-    }
-
-
-    .mobile-text {
-      display: none;
-    }
-
-
-    .image-wrapper {
-      flex: 1 1 500px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-
-    .image-wrapper img {
-      width: 100%;
-      max-width: 520px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.06);
-    }
-
-
-    .affiliate-section {
-      padding: 60px 30px 80px;
-      background: #ffffff;
-      text-align: center;
-      border-top: 1px solid #eee;
-    }
-
-
-    .affiliate-section h2 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-
-
-    .affiliate-section p.desktop-affiliate {
-      font-size: 1.1rem;
-      max-width: 800px;
-      margin: 0 auto 30px;
-      color: #333;
-      display: block;
-    }
-
-
-    .affiliate-section p.mobile-affiliate {
-      display: none;
-    }
-
-
-    .affiliate-section a {
-      display: inline-block;
-      margin-top: 10px;
-      font-weight: 600;
-      color: #111;
-      text-decoration: underline;
-    }
-
-
-    footer {
-      padding: 40px 0;
-      text-align: center;
-      color: #888;
-      font-size: 0.9rem;
-      border-top: 1px solid #ddd;
-      background: #fff;
-    }
-
-
-    @media (max-width: 768px) {
-      .desktop-text {
-        display: none;
-      }
-        .main-section::before {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 50% 20%, rgba(0, 123, 255, 0.08), transparent 70%),
-                radial-gradient(circle at 50% 80%, rgba(255, 0, 150, 0.08), transparent 70%);
-    animation: none;
-  }
-      .mobile-text {
-        display: block;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #333;
-        margin-bottom: 30px;
-      }
-      .affiliate-section p.desktop-affiliate {
-        display: none;
-      }
-      .affiliate-section p.mobile-affiliate {
-        display: block;
-        font-size: 1rem;
-        max-width: 90%;
-        margin: 0 auto 20px;
-        color: #333;
-      }
-      header {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 10px;
-      }
-      .nav-links {
-        flex-direction: row;
-        justify-content: center;
-        width: auto;
-        gap: 12px;
-      }
-      .text-column {
-        padding-right: 0;
-        margin-bottom: 40px;
-      }
-      .main-section {
-        padding: 100px 20px;
-      }
-      .image-wrapper img {
-        max-width: 100%;
-      }
-    }
-  </style>
+  <!-- Prevent FOUC on very slow networks (optional) -->
+  <style>html{visibility:visible;opacity:1}</style>
 </head>
 <body>
-  <header>
-    <div class="logo-container">
-      <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
-    </div>
-    <div class="nav-links">
+  <!-- ===== Fixed Header ================================================== -->
+  <header class="site-header container">
+    <a class="brand" href="/">
+      <img src="assets/bdx.png" alt="BeyondDEX Logo" class="brand-logo" />
+      <span class="brand-text">BeyondDEX</span>
+    </a>
+
+    <nav class="nav" id="nav">
       <a href="/index.html">Home</a>
       <a href="/dashboard.html">Dashboard</a>
       <a href="/affiliateSignUp.html">Affiliate</a>
-    </div>
-    <div class="user-container">
-      <div class="user-circle" id="userCircle">?</div>
-      <div class="dropdown" id="dropdownMenu">
-        <a href="#" id="logout">Log Out</a>
+
+      <!-- User menu (same IDs for your script) -->
+      <div class="user-container">
+        <div class="user-circle" id="userCircle">?</div>
+        <div class="dropdown" id="dropdownMenu"></div>
       </div>
-    </div>
+    </nav>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu">☰</button>
   </header>
 
+  <!-- ===== Main Content ================================================== -->
+  <main>
+    <!-- Hero / First Fold -->
+    <section class="hero container main-section">
+      <div class="text-column">
+        <div class="text-wrapper">
+          <h1>Your Daily Crypto Edge</h1>
 
-  <section class="main-section">
-    <div class="text-column">
-      <div class="text-wrapper">
-        <h1>Your Daily Crypto Edge</h1>
-        <p class="desktop-text">
-          Get early access to BeyondDEX — your institutional-grade trading edge. We deliver the most critical on-chain, macro, and market signals in one clean, 60-second daily report.<br><br>
-          Built like a hedge fund desk note, designed for traders who demand clarity. Join the waitlist today and be first in line when we launch.
-        </p>
-        <p class="mobile-text">
-          Get early access to institutional-grade trading insights — all in 60 seconds. Join the waitlist now.
-        </p>
-        <button class="cta" id="joinWaitlistBtn">Join Waitlist</button>
+          <p class="desktop-text">
+            Get early access to BeyondDEX — your institutional-grade trading edge. We deliver the most critical on-chain,
+            macro, and market signals in one clean, 60-second daily report.<br><br>
+            Built like a hedge fund desk note, designed for traders who demand clarity. Join the waitlist today and be first
+            in line when we launch.
+          </p>
+
+          <p class="mobile-text">
+            Get early access to institutional-grade trading insights — all in 60 seconds. Join the waitlist now.
+          </p>
+
+          <button class="btn solid lg" id="joinWaitlistBtn">Join Waitlist</button>
+
+          <div class="meta">
+            <span>⚡ Real-time data</span>
+            <span>🔒 Secure auth</span>
+            <span>🧠 AI insights</span>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="image-wrapper">
-      <img src="assets/dashboard-fix.png" alt="BeyondDEX Dashboard Screenshot">
-    </div>
-  </section>
 
+      <div class="image-wrapper">
+        <img src="assets/dashboard-fix.png" alt="BeyondDEX Dashboard Screenshot" class="hero-img" />
+      </div>
+    </section>
 
-  <section class="affiliate-section">
-    <h2>Join Our Affiliate Program</h2>
-    <p class="desktop-affiliate">
-      Help us grow the BeyondDEX community and earn recurring income.
-      As an affiliate, you'll receive 30% of the revenue for every user you refer — each month they stay subscribed. Getting started is easy: sign up, get your unique code, and start earning.
-    </p>
-    <p class="mobile-affiliate">
-      Earn recurring income by referring users. Get 30% every month they stay subscribed.
-    </p>
-    <a href="/affiliateSignUp.html">Learn more about the affiliate program →</a>
-  </section>
+    <!-- Affiliate Block -->
+    <section class="affiliate-section container">
+      <h2>Join Our Affiliate Program</h2>
 
+      <p class="desktop-affiliate">
+        Help us grow the BeyondDEX community and earn recurring income.
+        As an affiliate, you'll receive 30% of the revenue for every user you refer — each month they stay subscribed.
+        Getting started is easy: sign up, get your unique code, and start earning.
+      </p>
 
-  <footer>
-    &copy; 2025 BeyondDEX. All rights reserved.
+      <p class="mobile-affiliate">
+        Earn recurring income by referring users. Get 30% every month they stay subscribed.
+      </p>
+
+      <a class="link" href="/affiliateSignUp.html">Learn more about the affiliate program →</a>
+    </section>
+  </main>
+
+  <!-- ===== Footer ======================================================== -->
+  <footer class="site-footer container">
+    <span>© <span id="year"></span> BeyondDEX. All rights reserved.</span>
+    <nav class="foot-nav">
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/contact">Contact</a>
+    </nav>
   </footer>
 
-
+  <!-- ===== Scripts ======================================================= -->
   <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // CTA → waitlist
     document.getElementById('joinWaitlistBtn').addEventListener('click', () => {
       window.location.href = '/waitlist.html';
     });
 
+    // Mobile nav toggle
+    const navToggle = document.getElementById('navToggle');
+    const nav = document.getElementById('nav');
+    navToggle.addEventListener('click', () => nav.classList.toggle('open'));
 
+    // Firebase config (from your original)
     const firebaseConfig = {
       apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
       authDomain: "beyonddex-be653.firebaseapp.com",
@@ -370,22 +144,22 @@
       measurementId: "G-6SH111LB7J"
     };
 
-
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-
+    // Auth state → userCircle / dropdown
     auth.onAuthStateChanged(async user => {
       const userCircle = document.getElementById("userCircle");
       const dropdownMenu = document.getElementById("dropdownMenu");
-
 
       if (user) {
         const doc = await db.collection("users").doc(user.uid).get();
         const username = doc.exists ? doc.data().username : "U";
         const initial = username.charAt(0).toUpperCase();
         userCircle.textContent = initial;
+
         dropdownMenu.innerHTML = `<a href="#" id="logout">Log Out</a>`;
         document.getElementById("logout").addEventListener("click", () => {
           auth.signOut().then(() => location.reload());
@@ -399,16 +173,12 @@
       }
     });
 
-
+    // Dropdown open/close
     const userCircle = document.getElementById("userCircle");
     const dropdownMenu = document.getElementById("dropdownMenu");
-
-
     userCircle.addEventListener("click", () => {
       dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     });
-
-
     window.addEventListener("click", e => {
       if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.style.display = "none";
