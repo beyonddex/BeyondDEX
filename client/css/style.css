@@ -249,6 +249,7 @@ header.nav,
   text-decoration: none; font-weight: 600; cursor: pointer;
 }
 .profile-menu a:hover, .profile-menu button:hover { background: var(--card); }
+.profile-menu[hidden] { display: none !important; }
 
 /* Mobile polish */
 @media (max-width: 860px) {
