@@ -2,135 +2,502 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login | BeyondDEX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BeyondDEX — Sign in / Register</title>
+  <meta name="description" content="Sign in or create an account to access the BeyondDEX dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Theme CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="/favicon.ico" />
+
+  <!-- Page-scoped polish so we don't touch other pages -->
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #fff;
-      color: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+    .profile-menu[hidden], .auth-links[hidden], #mobileAuthLinks[hidden], #userMenu[hidden] { display: none !important; }
 
-    .auth-box {
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 40px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      background: white;
-    }
+    /* Page flag */
+    body.page-auth { min-height: 100dvh; position: relative; overflow-x: hidden; }
 
-    .auth-box h2 {
-      margin-bottom: 20px;
-      font-size: 28px;
-      text-align: center;
-    }
+    /* Subtle animated background using your existing glow/mesh classes */
+    .auth-bg { position: absolute; inset: 0; z-index: -1; }
+    .auth-bg .glow--1 { width: 50vw; height: 50vw; background: var(--primary); top: -15%; left: -10%; filter: blur(90px); opacity: .24; }
+    .auth-bg .glow--2 { width: 42vw; height: 42vw; background: var(--accent); top: auto; bottom: -10%; right: -10%; filter: blur(90px); opacity: .22; }
+    .auth-bg .mesh { opacity: .10; }
 
-    .auth-box input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
+    /* Layout */
+    .auth-wrap { padding: clamp(3rem, 6vw, 6rem) 0; }
+    .auth-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(1rem, 3vw, 3rem); align-items: center; }
+    @media (max-width: 980px) { .auth-grid { grid-template-columns: 1fr; } }
 
-    .auth-box .btn {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: 1px solid black;
-      background: white;
-      color: black;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
+    .auth-copy h1 { margin: 0 0 .6rem; font-size: clamp(1.8rem, 3.1vw, 3rem); line-height: 1.1; }
+    .auth-copy p  { color: var(--muted); max-width: 60ch; }
 
-    .auth-box .btn:hover {
-      background: black;
-      color: white;
-    }
+    /* Card form */
+    .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 1.25rem; box-shadow: var(--shadow); }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 12px; padding: .3rem; }
+    .auth-tab { border: 0; border-radius: 8px; padding: .6rem .8rem; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); }
+    .auth-tab[aria-selected="true"] { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #0b0d12; }
 
-    .toggle-link {
-      display: block;
-      margin-top: 15px;
-      text-align: center;
-      color: #555;
-      cursor: pointer;
-      font-size: 14px;
+    .auth-form { display: grid; gap: .9rem; margin-top: 1rem; }
+    .auth-form label { display: grid; gap: .35rem; font-weight: 600; }
+    .auth-input { width: 100%; padding: .9rem 1rem; border-radius: 14px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text); box-shadow: var(--shadow); }
+    .auth-row { display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: center; }
+    .pw-wrap { position: relative; }
+    .pw-toggle { position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); background: transparent; border: 0; cursor: pointer; font-weight: 700; color: var(--muted); }
+
+    .pw-meter { height: 8px; border-radius: 999px; background: color-mix(in oklab, var(--bg) 70%, var(--border)); overflow: hidden; }
+    .pw-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b6b, #ffd166, #8ee39a); transition: width .25s ease; }
+
+    .auth-actions { display: flex; gap: .6rem; align-items: center; justify-content: space-between; margin-top: .25rem; }
+    .auth-actions .btn--primary { min-width: 140px; }
+    .link { color: var(--primary); text-decoration: none; font-weight: 600; }
+    .link:hover { text-decoration: underline; }
+
+    .or { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .6rem; color: var(--muted); font-size: .9rem; margin: .8rem 0; }
+    .or::before, .or::after { content: ""; height: 1px; background: var(--border); display: block; }
+
+    .btn-google { width: 100%; justify-content: center; background: transparent; }
+    .btn-google img { width: 18px; height: 18px; }
+
+    .auth-error { color: #ff6b6b; font-weight: 600; min-height: 1.2em; }
+    .auth-hint { color: var(--muted); font-size: .9rem; }
+
+    /* Mobile header clean-up already lives in your main CSS; this is just a safety */
+    @media (max-width: 860px) {
+      .auth-links { display: none !important; }
+      .nav__actions .btn--primary { display: none !important; }
     }
   </style>
 </head>
-<body>
-  <div class="auth-box">
-    <h2 id="form-title">Login to BeyondDEX</h2>
-    <input type="text" id="username" placeholder="Username" style="display: none;" />
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button class="btn" id="auth-button">Login</button>
-    <span class="toggle-link" id="toggle-mode">Don't have an account? Register</span>
+<body class="page-auth">
+  <!-- ====== NAV (same as other pages) ====== -->
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="/index.html#home" class="brand">
+        <img src="/assets/bdx.png" alt="BeyondDEX logo" class="brand__logo logo--light" />
+        <img src="/assets/bdx-white.png" alt="BeyondDEX logo" class="brand__logo logo--dark" />
+        <span class="brand__name">BeyondDEX</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a href="/index.html#home">Home</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/affiliateSignUp.html">Affiliate</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="btn btn--ghost" id="themeToggle" aria-label="Toggle theme">☾</button>
+
+        <!-- Logged OUT -->
+        <span id="authLinks" class="auth-links">
+          <a href="/auth.html" class="auth-link">Login</a>
+          <span class="dot">•</span>
+          <a href="/auth.html#register" class="auth-link">Register</a>
+        </span>
+
+        <!-- Logged IN -->
+        <div id="userMenu" class="profile-wrapper" hidden>
+          <button id="profileBtn" class="profile-circle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">U</button>
+          <div id="profileMenu" class="profile-menu" hidden>
+            <button id="logoutBtn" type="button">Log out</button>
+          </div>
+        </div>
+
+        <a class="btn btn--primary" href="/affiliateSignUp.html">Join Waitlist</a>
+      </div>
+
+      <button class="nav__hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="nav__mobile" id="mobileMenu" hidden>
+      <a href="/index.html#home">Home</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/affiliateSignUp.html">Affiliate</a>
+      <a class="btn btn--primary" href="/affiliateSignUp.html">Join Waitlist</a>
+      <div id="mobileAuthLinks">
+        <a href="/auth.html">Login</a>
+        <a href="/auth.html#register">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====== BG ====== -->
+  <div class="auth-bg" aria-hidden="true">
+    <div class="glow glow--1"></div>
+    <div class="glow glow--2"></div>
+    <div class="mesh"></div>
   </div>
 
+  <!-- ====== MAIN ====== -->
+  <main class="auth-wrap">
+    <div class="container auth-grid">
+      <div class="auth-copy reveal">
+        <h1>Welcome back.<br><span class="accent">Access your trading edge.</span></h1>
+        <p>Sign in to your dashboard to track whales, exchange flows, and smart wallets—built for speed and clarity.</p>
+        <p class="auth-hint">New here? Register in seconds and reserve your handle.</p>
+      </div>
+
+      <section class="auth-card reveal" aria-labelledby="authTitle">
+        <h2 id="authTitle" class="sr-only">Authentication</h2>
+
+        <div class="auth-tabs" role="tablist" aria-label="Auth mode">
+          <button id="tabLogin" class="auth-tab" role="tab" aria-selected="true" aria-controls="panelLogin">Login</button>
+          <button id="tabRegister" class="auth-tab" role="tab" aria-selected="false" aria-controls="panelRegister">Register</button>
+        </div>
+
+        <!-- Login panel -->
+        <form id="panelLogin" class="auth-form" role="tabpanel" aria-labelledby="tabLogin">
+          <label>
+            <span>Email</span>
+            <input class="auth-input" type="email" id="loginEmail" autocomplete="email" required placeholder="you@protrader.xyz" />
+          </label>
+          <div class="pw-wrap">
+            <label>
+              <span>Password</span>
+              <input class="auth-input" type="password" id="loginPassword" autocomplete="current-password" required placeholder="••••••••" />
+            </label>
+            <button class="pw-toggle" type="button" data-target="loginPassword">Show</button>
+          </div>
+
+          <div class="auth-actions">
+            <a href="#" id="forgot" class="link">Forgot password?</a>
+            <button class="btn btn--primary" id="loginBtn" type="submit">Login</button>
+          </div>
+
+          <div class="or"><span>or</span></div>
+          <button class="btn btn--ghost btn-google" type="button" id="googleLogin">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" /> Continue with Google
+          </button>
+
+          <div id="loginError" class="auth-error" aria-live="polite"></div>
+        </form>
+
+        <!-- Register panel -->
+        <form id="panelRegister" class="auth-form" role="tabpanel" aria-labelledby="tabRegister" hidden>
+          <label>
+            <span>Username</span>
+            <input class="auth-input" type="text" id="regUsername" autocomplete="nickname" minlength="2" maxlength="24" placeholder="e.g., zkalpha" />
+          </label>
+          <label>
+            <span>Email</span>
+            <input class="auth-input" type="email" id="regEmail" autocomplete="email" required placeholder="you@protrader.xyz" />
+          </label>
+
+          <div class="pw-wrap">
+            <label>
+              <span>Password</span>
+              <input class="auth-input" type="password" id="regPassword" autocomplete="new-password" required placeholder="Minimum 8 characters" />
+            </label>
+            <button class="pw-toggle" type="button" data-target="regPassword">Show</button>
+          </div>
+
+          <div class="pw-meter" aria-hidden="true"><div class="pw-bar" id="pwBar"></div></div>
+          <div class="auth-hint">Use at least 8 characters with a mix of letters, numbers, or symbols.</div>
+
+          <div class="auth-actions">
+            <span></span>
+            <button class="btn btn--primary" id="registerBtn" type="submit">Create Account</button>
+          </div>
+
+          <div class="or"><span>or</span></div>
+          <button class="btn btn--ghost btn-google" type="button" id="googleRegister">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" /> Continue with Google
+          </button>
+
+          <div id="registerError" class="auth-error" aria-live="polite"></div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="brand__glyph">▱</span>
+        <strong>BeyondDEX</strong>
+      </div>
+      <nav class="footer__links">
+        <a href="/index.html#features">Features</a>
+        <a href="/index.html#community">Community</a>
+        <a href="/index.html#faq">FAQ</a>
+        <a href="mailto:team@beyonddex.com">Contact</a>
+      </nav>
+      <p class="tiny">© <span id="year"></span> BeyondDEX. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ====== CORE SCRIPTS (theme + nav) ====== -->
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
-    };
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-    firebase.initializeApp(firebaseConfig);
+    // Theme toggle
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    if (stored) root.dataset.theme = stored;
+    toggle.addEventListener('click', () => {
+      const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = next;
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'light' ? '☾' : '☀';
+    });
+
+    // Mobile nav
+    const burger = document.getElementById('hamburger');
+    const mobile = document.getElementById('mobileMenu');
+    burger.addEventListener('click', () => {
+      const open = mobile.hasAttribute('hidden') ? false : true;
+      burger.setAttribute('aria-expanded', String(!open));
+      mobile.toggleAttribute('hidden');
+      document.body.classList.toggle('no-scroll');
+    });
+  </script>
+
+  <!-- ====== AUTH LOGIC ====== -->
+  <script>
+    // Firebase init (reuse if already initialized)
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+        authDomain: "beyonddex-be653.firebaseapp.com",
+        projectId: "beyonddex-be653",
+        storageBucket: "beyonddex-be653.firebasestorage.app",
+        messagingSenderId: "687411546401",
+        appId: "1:687411546401:web:ec71401e52751d3e121660",
+        measurementId: "G-6SH111LB7J"
+      });
+    }
     const auth = firebase.auth();
-    const db = firebase.firestore();
+    const db   = firebase.firestore();
 
-    let isLogin = true;
+    // Header auth visibility (match your site)
+    const authLinks       = document.getElementById('authLinks');
+    const mobileAuthLinks = document.getElementById('mobileAuthLinks');
+    const userMenu        = document.getElementById('userMenu');
+    const profileBtn      = document.getElementById('profileBtn');
+    const profileMenu     = document.getElementById('profileMenu');
+    const logoutBtnEl     = () => document.getElementById('logoutBtn');
 
-    document.getElementById("auth-button").addEventListener("click", () => {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const username = document.getElementById("username").value.trim();
+    function hide(el){ if (!el) return; el.hidden = true; el.style.display = 'none'; }
+    function show(el, display=''){ if (!el) return; el.hidden = false; el.style.display = display; }
+    function openProfileMenu(){ if (!profileMenu) return; profileMenu.removeAttribute('hidden'); profileBtn?.setAttribute('aria-expanded','true'); }
+    function closeProfileMenu(){ if (!profileMenu) return; profileMenu.setAttribute('hidden',''); profileBtn?.setAttribute('aria-expanded','false'); }
+    closeProfileMenu();
 
-      if (isLogin) {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => window.location.href = "/dashboard.html")
-          .catch(err => alert(err.message));
+    function setLoggedOut(){ show(authLinks, 'inline-flex'); show(mobileAuthLinks, ''); hide(userMenu); closeProfileMenu(); }
+    function setLoggedIn(initial){ hide(authLinks); hide(mobileAuthLinks); show(userMenu, ''); if (profileBtn && initial) profileBtn.textContent = initial; closeProfileMenu(); }
+
+    profileBtn?.addEventListener('click', (e) => { e.stopPropagation(); profileMenu?.hasAttribute('hidden') ? openProfileMenu() : closeProfileMenu(); });
+    document.addEventListener('click', (e) => { if (!profileBtn?.contains(e.target) && !profileMenu?.contains(e.target)) closeProfileMenu(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileMenu(); });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const doc = await db.collection("users").doc(user.uid).get();
+          const username = doc.exists ? (doc.data().username || 'U') : 'U';
+          const initial  = String(username).charAt(0).toUpperCase() || 'U';
+          setLoggedIn(initial);
+        } catch (e) {
+          console.error('[Auth] Failed to get user doc:', e);
+          setLoggedIn('U');
+        }
+        // Already logged in? Go straight to dashboard.
+        window.location.href = "/dashboard.html";
       } else {
-        if (!username) return alert("Please enter a username.");
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(cred => {
-            return db.collection("users").doc(cred.user.uid).set({
-              email,
-              username,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          })
-          .then(() => window.location.href = "/dashboard.html")
-          .catch(err => alert(err.message));
+        setLoggedOut();
       }
     });
 
-    document.getElementById("toggle-mode").addEventListener("click", () => {
-      isLogin = !isLogin;
-      const usernameField = document.getElementById("username");
-      document.getElementById("form-title").textContent = isLogin ? "Login to BeyondDEX" : "Register for BeyondDEX";
-      document.getElementById("auth-button").textContent = isLogin ? "Login" : "Register";
-      document.getElementById("toggle-mode").textContent = isLogin ? "Don't have an account? Register" : "Already have an account? Login";
-      usernameField.style.display = isLogin ? "none" : "block";
+    // ===== Auth form behavior =====
+    const tabLogin     = document.getElementById('tabLogin');
+    const tabRegister  = document.getElementById('tabRegister');
+    const panelLogin   = document.getElementById('panelLogin');
+    const panelRegister= document.getElementById('panelRegister');
+
+    function setMode(mode) {
+      const isLogin = mode !== 'register';
+      tabLogin.setAttribute('aria-selected', String(isLogin));
+      tabRegister.setAttribute('aria-selected', String(!isLogin));
+      panelLogin.hidden = !isLogin;
+      panelRegister.hidden = isLogin;
+      if (!isLogin) location.hash = '#register'; else if (location.hash) history.replaceState(null, '', location.pathname);
+    }
+
+    // Deep link to register tab with #register
+    if (location.hash === '#register') setMode('register'); else setMode('login');
+
+    tabLogin.addEventListener('click', () => setMode('login'));
+    tabRegister.addEventListener('click', () => setMode('register'));
+
+    // Show/Hide password
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-target');
+        const inp = document.getElementById(id);
+        const next = inp.type === 'password' ? 'text' : 'password';
+        inp.type = next;
+        btn.textContent = next === 'password' ? 'Show' : 'Hide';
+      });
     });
+
+    // Password strength (simple client-side signal)
+    const regPassword = document.getElementById('regPassword');
+    const pwBar = document.getElementById('pwBar');
+    function scorePass(v) {
+      let s = 0;
+      if (v.length >= 8) s += 25;
+      if (/[A-Z]/.test(v)) s += 20;
+      if (/[0-9]/.test(v)) s += 20;
+      if (/[^A-Za-z0-9]/.test(v)) s += 20;
+      if (v.length >= 12) s += 15;
+      return Math.min(100, s);
+    }
+    regPassword?.addEventListener('input', (e) => {
+      const pct = scorePass(e.target.value || '');
+      pwBar.style.width = pct + '%';
+    });
+
+    // Forgot password
+    document.getElementById('forgot').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = (document.getElementById('loginEmail').value || '').trim();
+      if (!email) { document.getElementById('loginError').textContent = 'Enter your email above first.'; return; }
+      try {
+        await auth.sendPasswordResetEmail(email);
+        document.getElementById('loginError').textContent = 'Password reset link sent.';
+      } catch (err) {
+        document.getElementById('loginError').textContent = err.message || 'Could not send reset email.';
+      }
+    });
+
+    // Helpers
+    function validEmail(v){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
+    function setLoading(btn, on, label) {
+      if (!btn) return;
+      btn.disabled = !!on;
+      btn.textContent = on ? label : btn.dataset.default || btn.textContent;
+    }
+    document.getElementById('loginBtn').dataset.default = 'Login';
+    document.getElementById('registerBtn').dataset.default = 'Create Account';
+
+    // Login submit
+    panelLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
+      const pass  = (document.getElementById('loginPassword').value || '').trim();
+      const errEl = document.getElementById('loginError');
+
+      errEl.textContent = '';
+      if (!validEmail(email) || !pass) { errEl.textContent = 'Enter a valid email and password.'; return; }
+
+      setLoading(document.getElementById('loginBtn'), true, 'Logging in…');
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        errEl.textContent = err.message || 'Login failed.';
+      } finally {
+        setLoading(document.getElementById('loginBtn'), false);
+      }
+    });
+
+    // Register submit
+    panelRegister.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = (document.getElementById('regUsername').value || '').trim();
+      const email    = (document.getElementById('regEmail').value || '').trim().toLowerCase();
+      const pass     = (document.getElementById('regPassword').value || '').trim();
+      const errEl    = document.getElementById('registerError');
+
+      errEl.textContent = '';
+      if (username.length < 2) { errEl.textContent = 'Username must be at least 2 characters.'; return; }
+      if (!validEmail(email)) { errEl.textContent = 'Enter a valid email.'; return; }
+      if (pass.length < 8)    { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+
+      setLoading(document.getElementById('registerBtn'), true, 'Creating…');
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        await cred.user.updateProfile({ displayName: username }).catch(()=>{});
+        await db.collection('users').doc(cred.user.uid).set({
+          email, username,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          role: 'user'
+        }, { merge: true });
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        errEl.textContent = err.message || 'Registration failed.';
+      } finally {
+        setLoading(document.getElementById('registerBtn'), false);
+      }
+    });
+
+    // Google sign-in (enable provider in Firebase console)
+    function googleAuth() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      return auth.signInWithPopup(provider);
+    }
+    document.getElementById('googleLogin').addEventListener('click', async () => {
+      const errEl = document.getElementById('loginError');
+      errEl.textContent = '';
+      try {
+        const cred = await googleAuth();
+        if (cred?.user) {
+          await db.collection('users').doc(cred.user.uid).set({
+            email: cred.user.email || '',
+            username: cred.user.displayName || 'U',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            role: 'user'
+          }, { merge: true });
+        }
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        errEl.textContent = err.message || 'Google sign-in failed.';
+      }
+    });
+    document.getElementById('googleRegister').addEventListener('click', async () => {
+      const errEl = document.getElementById('registerError');
+      errEl.textContent = '';
+      try {
+        const cred = await googleAuth();
+        if (cred?.user) {
+          await db.collection('users').doc(cred.user.uid).set({
+            email: cred.user.email || '',
+            username: cred.user.displayName || 'U',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            role: 'user'
+          }, { merge: true });
+        }
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        errEl.textContent = err.message || 'Google sign-in failed.';
+      }
+    });
+
+    // Wire logout inside profile menu when visible
+    const ensureLogout = () => {
+      const btn = logoutBtnEl();
+      if (btn && !btn.dataset.wired) {
+        btn.dataset.wired = '1';
+        btn.addEventListener('click', async () => {
+          await auth.signOut();
+          setLoggedOut();
+          window.location.href = '/';
+        });
+      }
+    };
+    profileBtn?.addEventListener('click', ensureLogout);
   </script>
 </body>
 </html>
