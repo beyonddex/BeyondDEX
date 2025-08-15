@@ -55,8 +55,36 @@
     .auth-form label { display: grid; gap: .35rem; font-weight: 600; }
     .auth-input { width: 100%; padding: .9rem 1rem; border-radius: 14px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text); box-shadow: var(--shadow); }
     .auth-row { display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: center; }
+    /* === Password toggle alignment fix === */
     .pw-wrap { position: relative; }
-    .pw-toggle { position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); background: transparent; border: 0; cursor: pointer; font-weight: 700; color: var(--muted); }
+    .pw-wrap .auth-input { padding-right: 3.25rem; }
+
+    .pw-toggle {
+      position: absolute;
+      top: 0;
+      bottom: 0;                 /* fill wrapper height */
+      right: .6rem;
+      display: grid;             /* perfect center */
+      place-items: center;
+      padding: 0 .25rem;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1;
+
+      /* appearance reset (order: prefixes then standard) */
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    .pw-toggle:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
 
     .pw-meter { height: 8px; border-radius: 999px; background: color-mix(in oklab, var(--bg) 70%, var(--border)); overflow: hidden; }
     .pw-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b6b, #ffd166, #8ee39a); transition: width .25s ease; }
