@@ -18,9 +18,15 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="/favicon.ico" />
 
-  <!-- Page-scoped polish so we don't touch other pages -->
+  <!-- Page-scoped polish -->
   <style>
     .profile-menu[hidden], .auth-links[hidden], #mobileAuthLinks[hidden], #userMenu[hidden] { display: none !important; }
+
+    /* ✅ Ensure anything with [hidden] is actually hidden on this page */
+    .page-auth [hidden] { 
+      display: none !important; 
+      visibility: hidden !important;
+    }
 
     /* Page flag */
     body.page-auth { min-height: 100dvh; position: relative; overflow-x: hidden; }
@@ -69,7 +75,6 @@
     .auth-error { color: #ff6b6b; font-weight: 600; min-height: 1.2em; }
     .auth-hint { color: var(--muted); font-size: .9rem; }
 
-    /* Mobile header clean-up already lives in your main CSS; this is just a safety */
     @media (max-width: 860px) {
       .auth-links { display: none !important; }
       .nav__actions .btn--primary { display: none !important; }
@@ -77,7 +82,7 @@
   </style>
 </head>
 <body class="page-auth">
-  <!-- ====== NAV (same as other pages) ====== -->
+  <!-- ====== NAV ====== -->
   <header class="nav">
     <div class="container nav__inner">
       <a href="/index.html#home" class="brand">
@@ -264,7 +269,7 @@
     });
   </script>
 
-  <!-- ====== REVEAL ON SCROLL (fixes invisible content) ====== -->
+  <!-- ====== REVEAL ON SCROLL ====== -->
   <script>
     (function () {
       const els = document.querySelectorAll('.reveal');
@@ -338,7 +343,7 @@
       }
     });
 
-    // ===== Auth form behavior =====
+    // ===== Tabs / mode switching =====
     const tabLogin     = document.getElementById('tabLogin');
     const tabRegister  = document.getElementById('tabRegister');
     const panelLogin   = document.getElementById('panelLogin');
@@ -346,14 +351,23 @@
 
     function setMode(mode) {
       const isLogin = mode !== 'register';
+
       tabLogin.setAttribute('aria-selected', String(isLogin));
       tabRegister.setAttribute('aria-selected', String(!isLogin));
-      panelLogin.hidden = !isLogin;
-      panelRegister.hidden = isLogin;
-      if (!isLogin) location.hash = '#register'; else if (location.hash) history.replaceState(null, '', location.pathname);
+
+      // Toggle hidden attr
+      panelLogin.hidden    = !isLogin;
+      panelRegister.hidden =  isLogin;
+
+      // Belt & suspenders: also toggle display
+      panelLogin.style.display    = isLogin ? ''    : 'none';
+      panelRegister.style.display = isLogin ? 'none': '';
+
+      if (!isLogin) location.hash = '#register';
+      else if (location.hash) history.replaceState(null, '', location.pathname);
     }
 
-    // Deep link to register tab with #register
+    // Deep link
     if (location.hash === '#register') setMode('register'); else setMode('login');
 
     tabLogin.addEventListener('click', () => setMode('login'));
@@ -370,7 +384,7 @@
       });
     });
 
-    // Password strength (simple client-side signal)
+    // Password strength
     const regPassword = document.getElementById('regPassword');
     const pwBar = document.getElementById('pwBar');
     function scorePass(v) {
@@ -402,11 +416,7 @@
 
     // Helpers
     function validEmail(v){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
-    function setLoading(btn, on, label) {
-      if (!btn) return;
-      btn.disabled = !!on;
-      btn.textContent = on ? label : btn.dataset.default || btn.textContent;
-    }
+    function setLoading(btn, on, label) { if (!btn) return; btn.disabled = !!on; btn.textContent = on ? label : btn.dataset.default || btn.textContent; }
     document.getElementById('loginBtn').dataset.default = 'Login';
     document.getElementById('registerBtn').dataset.default = 'Create Account';
 
@@ -461,7 +471,7 @@
       }
     });
 
-    // Google sign-in (enable provider in Firebase console)
+    // Google sign-in
     function googleAuth() {
       const provider = new firebase.auth.GoogleAuthProvider();
       return auth.signInWithPopup(provider);
