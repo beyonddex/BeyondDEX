@@ -2,304 +2,321 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BeyondDEX — Affiliate Program</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Apply to the BeyondDEX affiliate program and earn 30% recurring revenue for every referral." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Page-specific styles: refined, Apple/hedge‑fund vibe -->
+  <!-- Theme CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="/favicon.ico" />
+
+  <!-- Tiny safety so [hidden] is respected even if CSS gets overridden -->
   <style>
-    :root {
-      --bdx-border: #e5e7eb;   /* gray-200 */
-      --bdx-text:   #0f172a;   /* slate-900 */
-      --bdx-sub:    #475569;   /* slate-600 */
-      --bdx-muted:  #64748b;   /* slate-500 */
-      --bdx-bg:     #f6f7f9;   /* light canvas */
-      --bdx-card:   #ffffff;   /* panels */
-      --bdx-black:  #111111;   /* primary */
+    .profile-menu[hidden], .auth-links[hidden], #mobileAuthLinks[hidden], #userMenu[hidden] { display: none !important; }
+    /* Affiliate page scoped tweaks in case style.css doesn't have them yet */
+    .page-affiliate main.affiliate { padding: clamp(3rem, 6vw, 6rem) 0; }
+    .page-affiliate .form.card { max-width: 860px; margin-inline: auto; display: grid; gap: 1rem; }
+    .page-affiliate .form.card label { display: grid; gap: .4rem; font-weight: 600; }
+    .page-affiliate .form.card .actions { display: flex; gap: .6rem; justify-content: flex-end; margin-top: .2rem; }
+    .page-affiliate input, .page-affiliate textarea, .page-affiliate select {
+      width: 100%; padding: .9rem 1rem; border-radius: 14px; border: 1px solid var(--border);
+      background: var(--bg-soft); color: var(--text); box-shadow: var(--shadow);
     }
-
-    /* Canvas with subtle premium feel */
-    body { background: var(--bdx-bg); }
-    .page-shell { padding: 128px 24px 64px; max-width: 1100px; margin: 0 auto; position: relative; }
-    .page-shell:before, .page-shell:after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-    .page-shell:before { background:
-        radial-gradient(60rem 30rem at 20% -5%, rgba(0,0,0,0.05), transparent 60%),
-        radial-gradient(50rem 25rem at 110% 10%, rgba(0,0,0,0.04), transparent 60%);
-      z-index: -2; }
-    .page-shell:after { background:
-        linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0) 40%);
-      z-index: -1; opacity: .7; }
-
-    /* Hero */
-    .affiliate-hero { display: grid; gap: 16px; margin-bottom: 28px; }
-    .eyebrow { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--bdx-border); border-radius:999px; background:#fff; color:var(--bdx-sub); font-size:12px; font-weight:600; letter-spacing:.02em; }
-    .affiliate-hero h1 { font-size: 2.6rem; line-height: 1.15; letter-spacing: -0.02em; color: var(--bdx-text); }
-    .affiliate-hero p { color: var(--bdx-sub); font-size: 1.075rem; max-width: 70ch; }
-
-    /* Layout */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items:start; }
-
-    /* Cards: crisp, elevated */
-    .card {
-      background: var(--bdx-card);
-      border: 1px solid rgba(17,17,17,0.05);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow:
-        0 1px 0 rgba(0,0,0,0.04),
-        0 8px 30px rgba(0,0,0,0.04);
-      transition: transform .18s ease, box-shadow .18s ease;
+    .page-affiliate textarea { min-height: 120px; resize: vertical; }
+    .page-affiliate .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 860px) {
+      .page-affiliate .grid-2 { grid-template-columns: 1fr; }
+      .page-affiliate .auth-links { display: none !important; } /* keep header uncluttered on mobile */
     }
-    .card:hover { transform: translateY(-1px); box-shadow: 0 1px 0 rgba(0,0,0,0.05), 0 12px 44px rgba(0,0,0,0.06); }
-    .card h2 { font-size: 1.3rem; margin-bottom: 10px; letter-spacing:-0.01em; }
-    .muted-box { margin-top: 16px; padding: 12px; border:1px solid var(--bdx-border); border-radius:12px; background:#fff; color:var(--bdx-sub); font-size:.95rem; }
-
-    /* Form */
-    form .field { display: flex; flex-direction: column; gap: 6px; }
-    form .field label { font-size: 0.88rem; color: #111; font-weight: 600; }
-    .input, select, textarea {
-      border: 1px solid #e3e5e8; border-radius: 12px; padding: 11px 12px; font-size: .96rem; background: #fff; color: #111;
-      outline: none; transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
-    }
-    .input::placeholder, textarea::placeholder { color: #9aa3af; }
-    .input:focus, select:focus, textarea:focus { border-color: #d1d5db; box-shadow: 0 0 0 4px rgba(17,17,17,0.06); }
-    textarea { resize: vertical; min-height: 112px; }
-    .checkbox { display:flex; gap:10px; align-items:start; font-size:.92rem; color:#222; }
-    .checkbox input { margin-top: 3px; }
-
-    .error { display: none; margin-top: 10px; border: 1px solid #fecaca; background: #fee2e2; color: #991b1b; padding: 10px 12px; border-radius: 10px; font-size: .92rem; }
-
-    .btn-primary { width:100%; background: var(--bdx-black); color:#fff; border:none; padding: 13px 16px; border-radius: 12px; font-weight: 700; letter-spacing:.01em; cursor: pointer; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1), 0 6px 20px rgba(0,0,0,0.08); transition: transform .12s ease, background .15s ease, box-shadow .15s ease; }
-    .btn-primary:hover { background:#1a1a1a; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1), 0 10px 28px rgba(0,0,0,0.12); }
-    .btn-primary:active { transform: translateY(1px); }
-    .btn-ghost { border: 1px solid var(--bdx-border); padding: 10px 14px; border-radius: 12px; text-decoration: none; color: #111; display: inline-flex; }
-
-    /* Footer (centered like index) */
-    footer { margin-top: 48px; text-align:center; }
-
-    /* Responsive */
-    @media (max-width: 1100px) { .page-shell { padding: 120px 20px 56px; } }
-    @media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
-    @media (max-width: 640px) {
-      .affiliate-hero h1 { font-size: 2.05rem; }
-      .affiliate-hero p { font-size: 1rem; }
-      .card { padding: 18px; border-radius: 16px; }
-    }
-    .page-shell {
-  /* was padding: 128px 24px 64px; */
-  padding-top: calc(128px - var(--header-h));  /* keeps the same visual space */
-}
   </style>
 </head>
-<body>
-  <!-- Header (unchanged to mirror index.html) -->
-  <header>
-    <div class="logo-container">
-      <a href="/"><img src="assets/bdx.png" alt="BeyondDEX Logo"></a>
+<body class="page-affiliate">
+  <!-- ====== NAV (same header) ====== -->
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="/index.html#home" class="brand">
+        <img src="/assets/bdx.png" alt="BeyondDEX logo" class="brand__logo logo--light" />
+        <img src="/assets/bdx-white.png" alt="BeyondDEX logo" class="brand__logo logo--dark" />
+        <span class="brand__name">BeyondDEX</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a href="/index.html#home">Home</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/affiliateSignUp.html">Affiliate</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="btn btn--ghost" id="themeToggle" aria-label="Toggle theme">☾</button>
+
+        <!-- Shown when logged OUT -->
+        <span id="authLinks" class="auth-links">
+          <a href="/auth.html" class="auth-link">Login</a>
+          <span class="dot">•</span>
+          <a href="/auth.html#register" class="auth-link">Register</a>
+        </span>
+
+        <!-- Shown when logged IN -->
+        <div id="userMenu" class="profile-wrapper" hidden>
+          <button id="profileBtn" class="profile-circle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">U</button>
+          <div id="profileMenu" class="profile-menu" hidden>
+            <button id="logoutBtn" type="button">Log out</button>
+          </div>
+        </div>
+
+        <a class="btn btn--primary" href="/affiliateSignUp.html">Join Waitlist</a>
+      </div>
+
+      <button class="nav__hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <div class="nav-links">
-      <a href="/index.html">Home</a>
+
+    <div class="nav__mobile" id="mobileMenu" hidden>
+      <a href="/index.html#home">Home</a>
       <a href="/dashboard.html">Dashboard</a>
       <a href="/affiliateSignUp.html">Affiliate</a>
-    </div>
-    <div class="user-container">
-      <div class="user-circle" id="userCircle">?</div>
-      <div class="dropdown" id="dropdownMenu">
-        <a href="#" id="logout">Log Out</a>
+      <a class="btn btn--primary" href="/affiliateSignUp.html">Join Waitlist</a>
+      <div id="mobileAuthLinks">
+        <a href="/auth.html">Login</a>
+        <a href="/auth.html#register">Register</a>
       </div>
     </div>
   </header>
 
-  <main class="page-shell">
-    <section class="affiliate-hero">
-      <span class="eyebrow" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Affiliate Program
-      </span>
-      <h1>No BS. Just Creator-friendly payouts.</h1>
-      <p>Earn recurring revenue by sharing BeyondDEX. Apply in minutes — we’ll review your application within <strong>24 hours</strong>.</p>
-    </section>
+  <!-- ====== MAIN ====== -->
+  <main class="affiliate container">
+    <header class="section__head">
+      <h1>Become a BeyondDEX Affiliate</h1>
+      <p class="sub">Earn <strong>30% recurring</strong> for every active referral. Apply in 60 seconds.</p>
+    </header>
 
-    <div class="grid-2">
-      <section class="card">
-        <h2>Program perks</h2>
-        <ul style="margin-top: 8px; color: #2b2f36; line-height: 1.65; font-size: .98rem;">
-          <li>30% recurring revenue share while referrals remain subscribed</li>
-          <li>Custom tracking links & partner dashboard (post‑approval)</li>
-          <li>Prompt payouts and dedicated partner support</li>
-        </ul>
-        <div class="muted-box">
-          By applying, you agree to our <a href="#" style="text-decoration: underline; color:#111;">Affiliate Terms</a> and <a href="#" style="text-decoration: underline; color:#111;">Privacy Policy</a>.
-        </div>
-      </section>
+    <form id="affiliateForm" class="card form" novalidate>
+      <div class="grid-2">
+        <label>
+          <span>Full name</span>
+          <input name="name" type="text" required />
+        </label>
+        <label>
+          <span>Email</span>
+          <input name="email" type="email" required placeholder="you@protrader.xyz" />
+        </label>
+      </div>
 
-      <section id="formCard" class="card">
-        <h2>Apply now</h2>
-        <form id="affiliateForm" style="margin-top: 10px;">
-          <div class="grid-2" style="gap: 16px;">
-            <div class="field"><label for="fullName">Full name</label><input class="input" id="fullName" name="fullName" required autocomplete="name"></div>
-            <div class="field"><label for="email">Email</label><input class="input" id="email" name="email" type="email" required autocomplete="email"></div>
-            <div class="field"><label for="brand">Brand/Company</label><input class="input" id="brand" name="brand"></div>
-            <div class="field"><label for="website">Website / Platform URL</label><input class="input" id="website" name="website" placeholder="https://" required></div>
-            <div class="field"><label for="audience">Primary audience</label>
-              <select id="audience" name="audience" required>
-                <option value="">Select</option>
-                <option value="defi">DeFi / Crypto traders</option>
-                <option value="nft">NFT / Web3 communities</option>
-                <option value="devs">Web3 developers</option>
-                <option value="fintech">General fintech</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <div class="field"><label for="audienceSize">Audience size</label>
-              <select id="audienceSize" name="audienceSize" required>
-                <option value="">Select</option>
-                <option value="<1k">Under 1,000</option>
-                <option value="1k-10k">1,000 – 10,000</option>
-                <option value="10k-100k">10,000 – 100,000</option>
-                <option value=">100k">100,000+</option>
-              </select>
-            </div>
-            <div class="field" style="grid-column: 1 / -1;"><label for="promoPlan">How will you promote BeyondDEX?</label><textarea id="promoPlan" name="promoPlan" placeholder="Briefly describe your channels and approach…" required></textarea></div>
-            <div class="field" style="grid-column: 1 / -1;"><label for="socials">Social links</label><textarea id="socials" name="socials" placeholder="Twitter, YouTube, TikTok, Discord…"></textarea></div>
-            <div class="field"><label for="referral">Referral code (optional)</label><input class="input" id="referral" name="referral"></div>
-            <label class="checkbox" style="grid-column: 1 / -1;"><input type="checkbox" id="agree" name="agree"> <span>I agree to the Affiliate Terms and confirm the information provided is accurate.</span></label>
-          </div>
-          <div id="formError" class="error"></div>
-          <button type="submit" id="submitBtn" class="btn-primary" style="margin-top: 14px;">Apply to Program</button>
-          <p class="subtle" style="text-align:center; margin-top: 8px;">We’ll get back to you within <strong>24 hours</strong>.</p>
-        </form>
-      </section>
+      <div class="grid-2">
+        <label>
+          <span>Twitter / X</span>
+        <input name="twitter" type="text" placeholder="@handle" />
+        </label>
+        <label>
+          <span>Website (optional)</span>
+          <input name="website" type="url" placeholder="https://…" />
+        </label>
+      </div>
 
-      <section id="successCard" class="card" style="grid-column: 1 / -1;" hidden aria-hidden="true">
-        <div class="badge" style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <h2 style="margin-top: 12px; font-size: 1.6rem;">Thanks! Your application is in.</h2>
-        <p class="subtle" style="margin-top: 6px;">We’ll review your details and get back to you within the next 24 hours for approval. Keep an eye on your inbox.</p>
-        <a href="/index.html" class="btn-ghost" style="margin-top: 14px;">← Back to home</a>
-      </section>
-    </div>
+      <label>
+        <span>How will you promote BeyondDEX?</span>
+        <textarea name="plan" required placeholder="Audience, channels, estimated reach, content ideas…"></textarea>
+      </label>
+
+      <div class="actions">
+        <button class="btn btn--ghost" type="button" id="cancelAff">Cancel</button>
+        <button class="btn btn--primary" type="submit" id="applyBtn">Apply</button>
+      </div>
+    </form>
   </main>
 
-  <footer>
-    &copy; <span id="year"></span> BeyondDEX. All rights reserved.
+  <!-- ====== FOOTER ====== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="brand__glyph">▱</span>
+        <strong>BeyondDEX</strong>
+      </div>
+      <nav class="footer__links">
+        <a href="/index.html#features">Features</a>
+        <a href="/index.html#community">Community</a>
+        <a href="/index.html#faq">FAQ</a>
+        <a href="mailto:team@beyonddex.com">Contact</a>
+      </nav>
+      <p class="tiny">© <span id="year"></span> BeyondDEX. All rights reserved.</p>
+    </div>
   </footer>
 
+  <!-- ====== SCRIPTS ====== -->
   <script>
-    // --- Firebase (same as index.html) ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
-      authDomain: "beyonddex-be653.firebaseapp.com",
-      projectId: "beyonddex-be653",
-      storageBucket: "beyonddex-be653.firebasestorage.app",
-      messagingSenderId: "687411546401",
-      appId: "1:687411546401:web:ec71401e52751d3e121660",
-      measurementId: "G-6SH111LB7J"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Header auth UI (same behavior as index)
-    const userCircle = document.getElementById("userCircle");
-    const dropdownMenu = document.getElementById("dropdownMenu");
-
-    auth.onAuthStateChanged(async user => {
-      if (user) {
-        const doc = await db.collection("users").doc(user.uid).get();
-        const username = doc.exists ? doc.data().username : "U";
-        const initial = String(username || 'U').charAt(0).toUpperCase();
-        userCircle.textContent = initial;
-        dropdownMenu.innerHTML = `<a href="#" id="logout">Log Out</a>`;
-        document.getElementById("logout").addEventListener("click", () => { auth.signOut().then(() => location.reload()); });
-      } else {
-        userCircle.textContent = "+";
-        dropdownMenu.innerHTML = `<a href="#" id="login">Log In</a>`;
-        document.getElementById("login").addEventListener("click", () => { window.location.href = "/auth.html"; });
-      }
-    });
-
-    userCircle.addEventListener("click", () => {
-      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
-    });
-    window.addEventListener("click", e => {
-      if (!userCircle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        dropdownMenu.style.display = "none";
-      }
-    });
-
-    // Footer year
+    // Year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Prefill referral from ?ref=
-    (function prefillReferral(){
-      const params = new URLSearchParams(location.search);
-      const ref = params.get('ref');
-      if (ref) document.getElementById('referral').value = ref;
-    })();
+    // Theme toggle
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    if (stored) root.dataset.theme = stored;
+    toggle.addEventListener('click', () => {
+      const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = next;
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'light' ? '☾' : '☀';
+    });
 
-    // --- Form handling ---
-    const form = document.getElementById('affiliateForm');
-    const errorEl = document.getElementById('formError');
-    const successCard = document.getElementById('successCard');
-    const formCard = document.getElementById('formCard');
-    const submitBtn = document.getElementById('submitBtn');
+    // Mobile nav
+    const burger = document.getElementById('hamburger');
+    const mobile = document.getElementById('mobileMenu');
+    burger.addEventListener('click', () => {
+      const open = mobile.hasAttribute('hidden') ? false : true;
+      burger.setAttribute('aria-expanded', String(!open));
+      mobile.toggleAttribute('hidden');
+      document.body.classList.toggle('no-scroll');
+    });
+  </script>
 
-    function showError(msg){ errorEl.textContent = msg; errorEl.style.display = 'block'; }
-    function clearError(){ errorEl.textContent = ''; errorEl.style.display = 'none'; }
+  <script>
+    // Firebase init (reuse if already initialized)
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyBbz_G9FNjS4cl0oi1221C3ZOACyZzEgK8",
+        authDomain: "beyonddex-be653.firebaseapp.com",
+        projectId: "beyonddex-be653",
+        storageBucket: "beyonddex-be653.firebasestorage.app",
+        messagingSenderId: "687411546401",
+        appId: "1:687411546401:web:ec71401e52751d3e121660",
+        measurementId: "G-6SH111LB7J"
+      });
+    }
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
 
-    function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-    function validUrl(v){ return /^https?:\/\//i.test(v || ''); }
+    // ===== Auth UI wiring (same behavior as index) =====
+    const authLinks        = document.getElementById('authLinks');
+    const mobileAuthLinks  = document.getElementById('mobileAuthLinks');
+    const userMenu         = document.getElementById('userMenu');
+    const profileBtn       = document.getElementById('profileBtn');
+    const profileMenu      = document.getElementById('profileMenu');
+    const logoutBtnEl      = () => document.getElementById('logoutBtn');
+
+    function hide(el){ if (!el) return; el.hidden = true; el.style.display = 'none'; }
+    function show(el, display=''){ if (!el) return; el.hidden = false; el.style.display = display; }
+
+    function openProfileMenu(){ if (!profileMenu) return; profileMenu.removeAttribute('hidden'); profileBtn?.setAttribute('aria-expanded','true'); }
+    function closeProfileMenu(){ if (!profileMenu) return; profileMenu.setAttribute('hidden',''); profileBtn?.setAttribute('aria-expanded','false'); }
+    closeProfileMenu();
+
+    function setLoggedOut(){ show(authLinks, 'inline-flex'); show(mobileAuthLinks, ''); hide(userMenu); closeProfileMenu(); }
+    function setLoggedIn(initial){ hide(authLinks); hide(mobileAuthLinks); show(userMenu, ''); if (profileBtn && initial) profileBtn.textContent = initial; closeProfileMenu(); }
+
+    profileBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (profileMenu?.hasAttribute('hidden')) openProfileMenu(); else closeProfileMenu();
+    });
+    document.addEventListener('click', (e) => {
+      if (!profileBtn?.contains(e.target) && !profileMenu?.contains(e.target)) closeProfileMenu();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileMenu(); });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const doc = await db.collection("users").doc(user.uid).get();
+          const username = doc.exists ? (doc.data().username || 'U') : 'U';
+          const initial  = String(username).charAt(0).toUpperCase() || 'U';
+          setLoggedIn(initial);
+        } catch (e) {
+          console.error('[Auth] Failed to get user doc:', e);
+          setLoggedIn('U');
+        }
+        const ensureLogout = () => {
+          const btn = logoutBtnEl();
+          if (btn && !btn.dataset.wired) {
+            btn.dataset.wired = '1';
+            btn.addEventListener('click', async () => {
+              await auth.signOut();
+              setLoggedOut();
+              window.location.href = '/';
+            });
+          }
+        };
+        ensureLogout();
+        profileBtn?.addEventListener('click', ensureLogout);
+      } else {
+        setLoggedOut();
+      }
+    });
+
+    // Close mobile menu when navigating
+    mobile?.querySelectorAll('a[href]').forEach(a => {
+      a.addEventListener('click', () => {
+        mobile.setAttribute('hidden', '');
+        burger.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('no-scroll');
+      });
+    });
+  </script>
+
+  <script>
+    // ===== Affiliate form submit -> Firestore create-only =====
+    const form      = document.getElementById('affiliateForm');
+    const applyBtn  = document.getElementById('applyBtn');
+    const cancelBtn = document.getElementById('cancelAff');
+
+    function valEmail(v){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      clearError();
-
+      const fd = new FormData(form);
       const data = {
-        fullName: document.getElementById('fullName').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        brand: document.getElementById('brand').value.trim(),
-        website: document.getElementById('website').value.trim(),
-        audience: document.getElementById('audience').value,
-        audienceSize: document.getElementById('audienceSize').value,
-        promoPlan: document.getElementById('promoPlan').value.trim(),
-        socials: document.getElementById('socials').value.trim(),
-        referral: document.getElementById('referral').value.trim(),
-        agree: document.getElementById('agree').checked,
+        name:   (fd.get('name')    || '').toString().trim(),
+        email:  (fd.get('email')   || '').toString().trim().toLowerCase(),
+        twitter:(fd.get('twitter') || '').toString().trim(),
+        website:(fd.get('website') || '').toString().trim(),
+        plan:   (fd.get('plan')    || '').toString().trim(),
+        uid:    auth?.currentUser?.uid || null,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        status: 'pending'
+        source: 'affiliate-signup'
       };
 
-      // Basic validation
-      if(!data.fullName) return showError('Please enter your full name.');
-      if(!validEmail(data.email)) return showError('Please enter a valid email address.');
-      if(!validUrl(data.website)) return showError('Website/Platform URL must start with http:// or https://');
-      if(!data.audience) return showError('Please select your primary audience.');
-      if(!data.audienceSize) return showError('Please select your audience size.');
-      if(!data.promoPlan) return showError('Tell us briefly how you plan to promote BeyondDEX.');
-      if(!data.agree) return showError('You must agree to the terms to continue.');
+      if (!data.name || !valEmail(data.email) || !data.plan) {
+        alert('Please complete your name, a valid email, and your promotion plan.');
+        return;
+      }
 
-      // Submit
-      submitBtn.disabled = true; submitBtn.textContent = 'Submitting…';
+      applyBtn.disabled = true; applyBtn.textContent = 'Submitting…';
       try {
-        // Write to Firestore (affiliate_applications)
         await db.collection('affiliate_applications').add(data);
 
-        // Success UI
-        formCard.hidden = true;
-        successCard.hidden = false; successCard.removeAttribute('aria-hidden');
+        form.outerHTML = `
+          <div class="card" style="position:relative;margin-top:.8rem;padding:1rem 3.25rem 1rem 1rem;
+                                    border:1px solid var(--border);border-radius:14px;background:var(--card);
+                                    box-shadow:var(--shadow)">
+            <strong>✅ Application received.</strong>
+            <div class="tiny" style="margin-top:.4rem;color:var(--muted);">
+              We’ll review and send your unique referral link if approved.
+            </div>
+            <button id="resetAff"
+                    aria-label="Close and reset"
+                    title="Done"
+                    style="position:absolute;right:.6rem;bottom:.6rem;width:36px;height:36px;
+                           border-radius:50%;border:1px solid var(--border);background:var(--bg-soft);
+                           color:var(--text);display:grid;place-items:center;font-weight:800;
+                           cursor:pointer;box-shadow:var(--shadow);">✓</button>
+          </div>`;
+        document.getElementById('resetAff')?.addEventListener('click', () => window.location.reload());
       } catch (err) {
-        console.error(err);
-        showError('Something went wrong. Please try again.');
-      } finally {
-        submitBtn.disabled = false; submitBtn.textContent = 'Apply to Program';
+        console.error('[Affiliate] submit error:', err);
+        applyBtn.disabled = false; applyBtn.textContent = 'Apply';
+        alert('Sorry—something went wrong. Please try again.');
       }
     });
+
+    cancelBtn?.addEventListener('click', () => window.location.href = '/');
   </script>
 </body>
 </html>
