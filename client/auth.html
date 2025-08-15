@@ -55,18 +55,40 @@
     .auth-form label { display: grid; gap: .35rem; font-weight: 600; }
     .auth-input { width: 100%; padding: .9rem 1rem; border-radius: 14px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text); box-shadow: var(--shadow); }
     .auth-row { display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: center; }
-    /* === Password toggle alignment fix === */
-    .pw-wrap { position: relative; }
-    .pw-wrap .auth-input { padding-right: 3.25rem; }
+    /* === Password row: perfect vertical centering for the toggle === */
+    .pw-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;     /* input | toggle */
+      grid-template-areas:
+        "label  label"
+        "field  toggle";
+      row-gap: .35rem;
+      column-gap: .5rem;
+    }
 
+    /* Flatten the label so its children can become grid items */
+    .pw-wrap > label {
+      display: contents;                   /* lets span + input participate in the grid */
+    }
+
+    /* Put the label text on the first row, full width */
+    .pw-wrap > label > span {
+      grid-area: label;
+      font-weight: 600;
+    }
+
+    /* Put the input on row 2, col 1 and add space for the toggle */
+    .pw-wrap > label > .auth-input {
+      grid-area: field;
+      padding-right: 3.25rem;              /* avoid text under the toggle */
+    }
+
+    /* Put the toggle on row 2, col 2 and center it */
     .pw-toggle {
-      position: absolute;
-      top: 0;
-      bottom: 0;                 /* fill wrapper height */
-      right: .6rem;
-      display: grid;             /* perfect center */
-      place-items: center;
-      padding: 0 .25rem;
+      grid-area: toggle;
+      align-self: center;
+      justify-self: end;
+
       background: transparent;
       border: 0;
       cursor: pointer;
@@ -74,7 +96,7 @@
       color: var(--muted);
       line-height: 1;
 
-      /* appearance reset (order: prefixes then standard) */
+      /* reset for cross-browser consistency */
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
