@@ -28,7 +28,7 @@
     /* Subtle animated background using your existing glow/mesh classes */
     .auth-bg { position: absolute; inset: 0; z-index: -1; }
     .auth-bg .glow--1 { width: 50vw; height: 50vw; background: var(--primary); top: -15%; left: -10%; filter: blur(90px); opacity: .24; }
-    .auth-bg .glow--2 { width: 42vw; height: 42vw; background: var(--accent); top: auto; bottom: -10%; right: -10%; filter: blur(90px); opacity: .22; }
+    .auth-bg .glow--2 { width: 42vw; height: 42vw; background: var(--accent); bottom: -10%; right: -10%; filter: blur(90px); opacity: .22; }
     .auth-bg .mesh { opacity: .10; }
 
     /* Layout */
@@ -245,7 +245,7 @@
     const root = document.documentElement;
     const toggle = document.getElementById('themeToggle');
     const stored = localStorage.getItem('theme');
-    if (stored) root.dataset.theme = stored;
+    if (stored) { root.dataset.theme = stored; toggle.textContent = stored === 'light' ? '☾' : '☀'; }
     toggle.addEventListener('click', () => {
       const next = root.dataset.theme === 'light' ? 'dark' : 'light';
       root.dataset.theme = next;
@@ -262,6 +262,24 @@
       mobile.toggleAttribute('hidden');
       document.body.classList.toggle('no-scroll');
     });
+  </script>
+
+  <!-- ====== REVEAL ON SCROLL (fixes invisible content) ====== -->
+  <script>
+    (function () {
+      const els = document.querySelectorAll('.reveal');
+      if (!els.length) return;
+
+      if (!('IntersectionObserver' in window)) {
+        els.forEach(el => el.classList.add('reveal--in'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('reveal--in'); });
+      }, { threshold: 0.1 });
+
+      els.forEach(el => io.observe(el));
+    })();
   </script>
 
   <!-- ====== AUTH LOGIC ====== -->
