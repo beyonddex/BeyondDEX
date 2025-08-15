@@ -417,11 +417,39 @@
       else if (location.hash) history.replaceState(null, '', location.pathname);
     }
 
-    // Deep link
-    if (location.hash === '#register') setMode('register'); else setMode('login');
+    // --- Hash routing + tab handlers ---
+    function applyModeFromHash() {
+      const h = (location.hash || '').toLowerCase();
+      setMode(h === '#register' ? 'register' : 'login');
+    }
+    applyModeFromHash();
+    window.addEventListener('hashchange', applyModeFromHash);
 
+    // Tab buttons inside the card
     tabLogin.addEventListener('click', () => setMode('login'));
     tabRegister.addEventListener('click', () => setMode('register'));
+
+    // --- Same-page link interceptor (handles /auth.html#login|#register OR #login|#register) ---
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+
+      // Resolve href against current origin so both "#login" and "/auth.html#login" work
+      const url = new URL(a.getAttribute('href'), window.location.origin);
+
+      const isSamePage = url.pathname === window.location.pathname;       // still on auth.html
+      const isAuthHash = url.hash === '#login' || url.hash === '#register';
+
+      if (isSamePage && isAuthHash) {
+        e.preventDefault();
+        setMode(url.hash === '#register' ? 'register' : 'login');
+
+        // Keep the URL tidy and consistent (only update if needed)
+        if (window.location.hash !== url.hash) {
+          history.replaceState(null, '', url.hash);
+        }
+      }
+    });
 
     // Show/Hide password
     document.querySelectorAll('.pw-toggle').forEach(btn => {
